@@ -18,8 +18,6 @@ namespace GenerativeDesignPackage
         public Vector3D Location;
 
         private Random random = new Random();
-        //private double alphaMove = 0.00001;
-        //private double MoveSTD = 10.0;
 
         public GenerativeDesigner(Model model, List<Rule> rules, CatalogObject catalogObject, Vector3D initialLoc)
         {
@@ -28,7 +26,7 @@ namespace GenerativeDesignPackage
             Location = initialLoc;
         }
 
-        public Model ExecuteGenDesign(int Itterations, double moveAmount, double reductionRate, int movesPerItteration, bool showRoute)
+        public Model ExecuteGenDesign(GenerativeDesignSettings settings)
         {
             List<Configuration> configsList = new List<Configuration>();
 
@@ -49,20 +47,16 @@ namespace GenerativeDesignPackage
                 CatalogObject = CatalogObject,
                 Orientation = orientations.First()
             };
-            while (Itterations > interationNum)
+
+            double moveAmount = settings.Movement;
+            double reductionRate = settings.Rate;
+            int movesPerItteration = settings.Moves;
+            while (settings.Itterations > interationNum)
             {
                 interationNum++;
 
                 moveAmount *= reductionRate;
-                //List<Vector3D> locations = new List<Vector3D>()
-                //{
-                //    new Vector3D(bestConfig.Location.x+moveAmount, bestConfig.Location.y, bestConfig.Location.z),
-                //    new Vector3D(bestConfig.Location.x-moveAmount, bestConfig.Location.y, bestConfig.Location.z),
-                //    new Vector3D(bestConfig.Location.x, bestConfig.Location.y+moveAmount, bestConfig.Location.z),
-                //    new Vector3D(bestConfig.Location.x, bestConfig.Location.y-moveAmount, bestConfig.Location.z),
-                //};
 
-                //double moveAmount = Math.Pow(Math.E, -alphaMove * interationNum) * MoveSTD;
                 List<Vector3D> locations = new List<Vector3D>();
                 for (int i = 0; i < movesPerItteration; i++)
                 {
@@ -107,7 +101,7 @@ namespace GenerativeDesignPackage
             }
 
             // Put the best back in:
-            if (showRoute)
+            if (settings.ShowRoute)
             {
                 foreach (Configuration config in configsList)
                 {

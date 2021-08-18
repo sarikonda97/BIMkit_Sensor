@@ -68,6 +68,10 @@
       <Project>{3820e1ab-860b-43a6-a0d5-dd3083192ad3}</Project>
       <Name>RuleAPI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GenerativeDesignPackage\GenerativeDesignPackage.csproj">
+      <Project>{3294ACD3-E30C-4A04-B116-2F31D6BA6629}</Project>
+      <Name>GenerativeDesignPackage</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -54,13 +54,7 @@ namespace GenerativeDesignService.Controllers
                 CatalogObject catalogObject = response2.Data;
 
                 GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObject, request.StartLocation);
-
-                int itterations = request.GenSettings.itterations;
-                double movement = request.GenSettings.movement;
-                double rate = request.GenSettings.rate;
-                int moves = request.GenSettings.moves;
-                bool showRoute = request.GenSettings.showRoute;
-                Model newModel = generativeDesigner.ExecuteGenDesign(itterations, movement, rate, moves, showRoute);
+                Model newModel = generativeDesigner.ExecuteGenDesign(request.GenSettings);
 
                 // Save the models:
                 newModel.Name = "Generated Model";

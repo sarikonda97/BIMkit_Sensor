@@ -32,6 +32,7 @@ namespace MCGDApp
         private string gdURL = "https://localhost:44328///api/"; 
 
         private ModelChecker ModelChecker;
+        private GenerativeDesignSettings GDSettings;
 
         public Main()
         {
@@ -41,6 +42,8 @@ namespace MCGDApp
             RuleAPIController = new RuleAPIController(ruleServiceURL);
             MCAPIController = new MCAPIController(mcURL);
             GDAPIController = new GDAPIController(gdURL);
+
+            GDSettings = new GenerativeDesignSettings();
         }
 
         private async void buttonSignInDBMS_Click(object sender, EventArgs e)
@@ -73,12 +76,14 @@ namespace MCGDApp
                 return;
             }
 
-            this.checkedListBoxObjects.Items.Clear();
+            this.listBoxCatalogList.Items.Clear();
             List<CatalogObjectMetadata> catalogObjects = response3.Data;
             foreach (CatalogObjectMetadata com in catalogObjects)
             {
-                this.checkedListBoxObjects.Items.Add(com);
+                this.listBoxCatalogList.Items.Add(com);
             }
+
+            this.listBoxSelectedCatalogList.Items.Clear();
         }
 
         private async void buttonSignInRMS_Click(object sender, EventArgs e)
@@ -262,14 +267,9 @@ namespace MCGDApp
             float maxZ = (float)catalogObject.Components.Max(c => c.Vertices.Max(v => v.z));
             float heightOfset = (maxZ - minZ) / 2.0f + 0.0001f;
 
+            // TODO: Should change the start location to the cetner of the whole model:
             GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObject, new Vector3D(0, 0, heightOfset));
-
-            int itterations = Convert.ToInt32(this.textBoxIterations.Text);
-            double movement = Convert.ToDouble(this.textBoxMovement.Text);
-            double rate = Convert.ToDouble(this.textBoxRate.Text);
-            int moves = Convert.ToInt32(this.textBoxMoves.Text);
-            bool showRoute = this.checkBoxShowRoute.Checked;
-            Model newModel = generativeDesigner.ExecuteGenDesign(itterations, movement, rate, moves, showRoute);
+            Model newModel = generativeDesigner.ExecuteGenDesign(GDSettings);
 
             // Save the models:
             newModel.Name = "Generated Model";
@@ -281,12 +281,14 @@ namespace MCGDApp
             }
 
             buttonSignInDBMS_Click(null, null);
+
+            this.richTextBoxGenDesign.Text = "Done";
         }
 
         private List<CatalogObjectMetadata> GetCheckedObjects()
         {
             List<CatalogObjectMetadata> selectedObjects = new List<CatalogObjectMetadata>();
-            foreach(CatalogObjectMetadata com in checkedListBoxObjects.CheckedItems)
+            foreach(CatalogObjectMetadata com in this.listBoxSelectedCatalogList.Items)
             {
                 selectedObjects.Add(com);
             }
@@ -316,13 +318,7 @@ namespace MCGDApp
                                                               rules.Select(r => r.Id).ToList(),
                                                               LevelOfDetail.LOD100,
                                                               new Vector3D(0, 0, heightOfset),
-                                                              new GenSettings(
-                                                                    Convert.ToInt32(this.textBoxIterations.Text),
-                                                                    Convert.ToDouble(this.textBoxMovement.Text),
-                                                                    Convert.ToDouble(this.textBoxRate.Text),
-                                                                    Convert.ToInt32(this.textBoxMoves.Text),
-                                                                    this.checkBoxShowRoute.Checked
-                                                                    )
+                                                              GDSettings
                                                               );
 
             APIResponse<string> response = await GDAPIController.PerformGenDesign(request);
@@ -333,6 +329,45 @@ namespace MCGDApp
             }
 
             buttonSignInDBMS_Click(null, null);
+
+            this.richTextBoxGenDesign.Text = "Done";
+        }
+
+        private void tableLayoutPanel3_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void buttonRight_Click(object sender, EventArgs e)
+        {
+            if (this.listBoxCatalogList.SelectedItem == null)
+            {
+                return;
+            }
+            this.listBoxSelectedCatalogList.Items.Add(this.listBoxCatalogList.SelectedItem);
+        }
+
+        private void buttonLeft_Click(object sender, EventArgs e)
+        {
+            if (this.listBoxSelectedCatalogList.SelectedItem == null)
+            {
+                return;
+            }
+            if (this.listBoxSelectedCatalogList.Items.Count > 0)
+            {
+                this.listBoxSelectedCatalogList.Items.RemoveAt(this.listBoxSelectedCatalogList.SelectedIndex);
+            }
+        }
+
+        private void buttonGDSettings_Click(object sender, EventArgs e)
+        {
+            GenerativeDesignSettingsForm gdsf = new GenerativeDesignSettingsForm(GDSettings);
+            if (gdsf.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            GDSettings = gdsf.Settings;
         }
     }
 }

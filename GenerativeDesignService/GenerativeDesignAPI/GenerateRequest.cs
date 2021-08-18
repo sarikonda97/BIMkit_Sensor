@@ -1,4 +1,5 @@
 ﻿using DbmsApi.API;
+using GenerativeDesignPackage;
 using MathPackage;
 using RuleAPI.Models;
 using System;
@@ -19,9 +20,9 @@ namespace GenerativeDesignAPI
         public LevelOfDetail LOD;
         public Vector3D StartLocation;
 
-        public GenSettings GenSettings;
+        public GenerativeDesignSettings GenSettings;
 
-        public GenerativeRequest(TokenData dbmsToken, string rmsUsername, string modelId, string catalogID, List<string> ruleIds, LevelOfDetail lod, Vector3D startLocation, GenSettings genSettings)
+        public GenerativeRequest(TokenData dbmsToken, string rmsUsername, string modelId, string catalogID, List<string> ruleIds, LevelOfDetail lod, Vector3D startLocation, GenerativeDesignSettings genSettings)
         {
             ModelID = modelId;
             CatalogID = catalogID;
@@ -31,24 +32,6 @@ namespace GenerativeDesignAPI
             LOD = lod;
             StartLocation = startLocation;
             GenSettings = genSettings;
-        }
-    }
-
-    public class GenSettings
-    {
-        public int itterations;
-        public double movement;
-        public double rate;
-        public int moves;
-        public bool showRoute;
-
-        public GenSettings(int itterations, double movement, double rate, int moves, bool showRoute)
-        {
-            this.itterations = itterations;
-            this.movement = movement;
-            this.rate = rate;
-            this.moves = moves;
-            this.showRoute = showRoute;
         }
     }
 }

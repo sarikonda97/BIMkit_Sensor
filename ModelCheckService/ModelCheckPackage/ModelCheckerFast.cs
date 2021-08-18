@@ -14,21 +14,24 @@ using System.Threading.Tasks;
 
 namespace ModelCheckPackage
 {
-    public class ModelChecker
+    public class ModelCheckerFast
     {
-        private static Dictionary<ObjectTypes, MethodInfo> VOMethods;
         private static Dictionary<string, MethodInfo> PropMethods;
         private static Dictionary<string, MethodInfo> RelMethods;
 
         public RuleCheckModel Model { get; private set; }
-        public List<RuleCheckObject> VirtualObjectsCreated { get; private set; }
         public List<Rule> Rules { get; private set; }
         public List<Tuple<Rule, Type, MethodInfo>> CompiledRules { get; private set; }
         public List<RuleResult> RuleResults { get; private set; }
 
+        public RuleCheckObject NewObject { get; private set; }
+
+        private static Dictionary<string,Properties> NewProperties;
+        private static Dictionary<string, Dictionary<string, RuleCheckRelation>> NewRelations;
+
         #region Setup Methods:
 
-        public ModelChecker(Model model, List<Rule> rules)
+        public ModelCheckerFast(Model model, List<Rule> rules)
         {
             // Add all the Functions:
             GetAllMethods();
@@ -39,7 +42,13 @@ namespace ModelCheckPackage
         public void SetNewModel(Model model)
         {
             Model = new RuleCheckModel(model);
-            CheckAndCreateTypesIfNeeded();
+
+            RuleResults = new List<RuleResult>();
+        }
+
+        public void SetNewModel(RuleCheckModel model)
+        {
+            Model = model;
 
             RuleResults = new List<RuleResult>();
         }
@@ -58,56 +67,15 @@ namespace ModelCheckPackage
             CompiledRules = compiledRules;
         }
 
+        public void SetNewObjet(ModelCatalogObject newObject)
+        {
+            NewObject = new RuleCheckObject(newObject, newObject.CatalogId);
+        }
+
         public void GetAllMethods()
         {
-            VOMethods = MethodFinder.GetAllVOMethodInfos();
             PropMethods = MethodFinder.GetAllPropertyInfos();
             RelMethods = MethodFinder.GetAllRelationInfos();
-        }
-
-        public void RecreateVirtualObjects()
-        {
-            RemoveVirtualObjects();
-            CheckAndCreateTypesIfNeeded();
-        }
-
-        public void RemoveVirtualObjects()
-        {
-            foreach (var vo in VirtualObjectsCreated)
-            {
-                Model.RemoveObject(vo.ID);
-            }
-            VirtualObjectsCreated = new List<RuleCheckObject>();
-        }
-
-        public void CheckAndCreateTypesIfNeeded()
-        {
-            VirtualObjectsCreated = new List<RuleCheckObject>();
-
-            // Create any virtual objects needed
-            List<ObjectTypes> createdTypes = new List<ObjectTypes>();
-            foreach (Rule rule in Rules)
-            {
-                foreach (ExistentialClause ec in rule.ExistentialClauses.Values)
-                {
-                    if (VOMethods.ContainsKey(ec.Characteristic.Type) && (!createdTypes.Contains(ec.Characteristic.Type)))
-                    {
-                        List<RuleCheckObject> newVirtualObjs = CreateVirtualType(Model, ec.Characteristic.Type);
-                        VirtualObjectsCreated.AddRange(newVirtualObjs);
-                        Model.Objects.AddRange(newVirtualObjs);
-
-                        createdTypes.Add(ec.Characteristic.Type);
-                    }
-                }
-            }
-        }
-
-        public List<RuleCheckObject> CreateVirtualType(RuleCheckModel model, ObjectTypes objectType)
-        {
-            MethodInfo methodInfo = VOMethods[objectType];
-            object[] parametersArray = new object[] { model };
-            List<RuleCheckObject> returnedObjects = (List<RuleCheckObject>)methodInfo.Invoke(this, parametersArray);
-            return returnedObjects;
         }
 
         private List<Tuple<Rule, Type, MethodInfo>> GetCompiledRules()
@@ -142,7 +110,7 @@ namespace ModelCheckPackage
 
         #region Check Methods:
 
-        public List<RuleResult> CheckModel(double defaultForNoOutput, ObjectTypes? relaventType = null)
+        public List<RuleResult> CheckModel(double defaultForNoOutput, ObjectTypes? objectTypes = null)
         {
             if (Model == null || Rules == null)
             {
@@ -158,23 +126,16 @@ namespace ModelCheckPackage
             foreach (Tuple<Rule, Type, MethodInfo> compiledRule in CompiledRules)
             {
                 Rule rule = compiledRule.Item1;
-                Stopwatch timer = new Stopwatch();
-                timer.Start();
-
-                // Compile the rule:
-                Tuple<Type, MethodInfo> compileResult = new Tuple<Type, MethodInfo>(compiledRule.Item2, compiledRule.Item3);
-
-                // Execute the rule:
-                RuleResult results = new RuleResult(rule, 0, new List<RuleInstance>());
-                if (RuleRelevance(relaventType, rule))
+                RuleResult result = new RuleResult(rule, 0, new List<RuleInstance>());
+                if (RuleRelevance(NewObject.Type, rule))
                 {
-                    results = ExecuteRule(compileResult, rule, this, defaultForNoOutput);
+                    Tuple<Type, MethodInfo> compileResult = new Tuple<Type, MethodInfo>(compiledRule.Item2, compiledRule.Item3);
+
+                    // Execute the rule:
+                    result = ExecuteRule(compileResult, rule, this, defaultForNoOutput);
                 }
 
-                timer.Stop();
-                TimeSpan ts = timer.Elapsed;
-                results.Runtime = ts;
-                RuleResults.Add(results);
+                RuleResults.Add(result);
             }
 
             return RuleResults;
@@ -197,13 +158,9 @@ namespace ModelCheckPackage
             return true;
         }
 
-        public static bool RuleRelevance(ObjectTypes? type, Rule rule)
+        public static bool RuleRelevance(ObjectTypes type, Rule rule)
         {
-            if (type == null)
-            {
-                return true;
-            }
-            return rule.ExistentialClauses.Select(ec => (ObjectTypes?)ec.Value.Characteristic.Type).Contains(type);
+            return rule.ExistentialClauses.Select(ec => ec.Value.Characteristic.Type).Contains(type);
         }
 
         public static string GenerateRuleCode(Rule rule)
@@ -216,29 +173,34 @@ namespace ModelCheckPackage
             returnVal += "{";
             returnVal += "    public class Rule" + rule.Id;
             returnVal += "    {";
-            returnVal += "        public static List<RuleInstance> Execute(Rule rule, ModelChecker modelCheck)";
+            returnVal += "        public static List<RuleInstance> Execute(Rule rule, ModelCheckerFast modelCheck)";
             returnVal += "        {";
             returnVal += "            var ruleInstances = new List<RuleInstance>();";
-            int ecCount = 0; //existentialClauseCount
             List<string> objs = new List<string>();
             foreach (var ecKvp in rule.ExistentialClauses)
             {
                 returnVal += "            var " + ecKvp.Key + "s = new List<KeyValuePair<string, RuleCheckObject>>();";
-                ecCount++;
             }
             returnVal += "            foreach (RuleCheckObject obj in modelCheck.Model.Objects)";
             returnVal += "            {";
-            ecCount = 0;
             foreach (var ecKvp in rule.ExistentialClauses)
             {
-                returnVal += "                if (ModelChecker.CheckIfObjectHasCharacteristics(obj, rule.ExistentialClauses[\"" + ecKvp.Key + "\"].Characteristic))";
+                returnVal += "                if (ModelCheckerFast.CheckIfObjectHasCharacteristics(obj, rule.ExistentialClauses[\"" + ecKvp.Key + "\"].Characteristic))";
                 returnVal += "                {";
                 returnVal += "                    " + ecKvp.Key + "s.Add(new KeyValuePair<string, RuleCheckObject>(\"" + ecKvp.Key + "\", obj));";
                 returnVal += "                }";
-                ecCount++;
             }
             returnVal += "            }";
-            ecCount = 0;
+            // ======================================================================================================================================================
+            foreach (var ecKvp in rule.ExistentialClauses)
+            {
+                returnVal += "            if (ModelCheckerFast.CheckIfObjectHasCharacteristics(modelCheck.NewObject, rule.ExistentialClauses[\"" + ecKvp.Key + "\"].Characteristic))";
+                returnVal += "            {";
+                returnVal += "                " + ecKvp.Key + "s.Add(new KeyValuePair<string, RuleCheckObject>(\"" + ecKvp.Key + "\", modelCheck.NewObject));";
+                returnVal += "            }";
+            }
+            // ======================================================================================================================================================
+            int ecCount = 0;
             foreach (var ecKvp in rule.ExistentialClauses)
             {
                 returnVal += "            foreach (var obj" + ecCount + " in " + ecKvp.Key + "s)";
@@ -264,7 +226,7 @@ namespace ModelCheckPackage
             }
             returnVal += "                var objList = new List<KeyValuePair<string, RuleCheckObject>>() { " + string.Join(", ", objs) + " };";
             returnVal += "                List<RuleCheckRelation> relations = new List<RuleCheckRelation>();";
-            returnVal += "                double passed = ModelChecker.GetRuleInstanceResult(modelCheck, rule, objList.ToDictionary(x => x.Key, x => x.Value), ref relations);";
+            returnVal += "                double passed = ModelCheckerFast.GetRuleInstanceResult(rule, objList.ToDictionary(x => x.Key, x => x.Value), ref relations);";
             returnVal += "                ruleInstances.Add(new RuleInstance(objList.Select(x=>x.Value).ToList(), passed, rule, relations));";
             foreach (var ecKvp in rule.ExistentialClauses)
             {
@@ -291,7 +253,7 @@ namespace ModelCheckPackage
                 //OutputAssembly = "CompiledRules.dll"
             };
             parameters.ReferencedAssemblies.Add(Assembly.GetCallingAssembly().Location);
-            parameters.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof(ModelChecker)).Location);
+            parameters.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof(ModelCheckerFast)).Location);
             parameters.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof(Rule)).Location);
             parameters.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof(Model)).Location);
             parameters.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof(Enumerable)).Location);
@@ -313,7 +275,7 @@ namespace ModelCheckPackage
             return new Tuple<Type, MethodInfo>(program, execute);
         }
 
-        public static RuleResult ExecuteRule(Tuple<Type, MethodInfo> compileResult, Rule rule, ModelChecker modelCheck, double defaultForNoOutput)
+        public static RuleResult ExecuteRule(Tuple<Type, MethodInfo> compileResult, Rule rule, ModelCheckerFast modelCheck, double defaultForNoOutput)
         {
             Type program = compileResult.Item1;
             MethodInfo execute = compileResult.Item2;
@@ -343,7 +305,6 @@ namespace ModelCheckPackage
             }
             //calls recursive function
             double rulePassVal = RFunction(output, positions, defaultForNoOutput);
-
             RuleResult result = new RuleResult(rule, rulePassVal, output);
 
             return result;
@@ -495,9 +456,9 @@ namespace ModelCheckPackage
         public static Property GetOrAddPropertyToObject(RuleCheckObject obj, string propertyName)
         {
             // Check if the object has the property already:
-            if (obj.Properties.ContainsKey(propertyName))
+            if (NewProperties[obj.ID].ContainsKey(propertyName))
             {
-                return obj.Properties[propertyName];
+                return NewProperties[obj.ID][propertyName];
             }
 
             // Find the function that matches the property:
@@ -519,7 +480,7 @@ namespace ModelCheckPackage
                 }
             }
             newProp = newProp ?? new PropertyString(propertyName, "null");
-            obj.Properties.Add(newProp);
+            NewProperties[obj.ID].Add(newProp);
 
             return newProp;
         }
@@ -527,9 +488,9 @@ namespace ModelCheckPackage
         public static Property GetOrAddPropertyToRelation(RuleCheckRelation relation, string propertyName)
         {
             // Check if the relation has the property already:
-            if (relation.Properties.ContainsKey(propertyName))
+            if (NewRelations[relation.FirstObj.ID][relation.SecondObj.ID].Properties.ContainsKey(propertyName))
             {
-                return relation.Properties[propertyName];
+                return NewRelations[relation.FirstObj.ID][relation.SecondObj.ID].Properties[propertyName];
             }
 
             Property newProp = null;
@@ -550,30 +511,32 @@ namespace ModelCheckPackage
                 }
             }
             newProp = newProp ?? new PropertyString(propertyName, "null");
-            relation.Properties.Add(newProp);
+            NewRelations[relation.FirstObj.ID][relation.SecondObj.ID].Properties.Add(newProp);
 
             return newProp;
         }
 
-        public static RuleCheckRelation FindOrCreateObjectRelation(RuleCheckModel model, RuleCheckObject obj1, RuleCheckObject obj2)
+        public static RuleCheckRelation FindOrCreateObjectRelation(RuleCheckObject obj1, RuleCheckObject obj2)
         {
-            List<RuleCheckRelation> matchingRelations = model.Relations.Where(rel => rel.FirstObj == obj1 && rel.SecondObj == obj2).ToList();
-            if (matchingRelations.Count > 0)
+            if (NewRelations.ContainsKey(obj1.ID))
             {
-                return matchingRelations.First();
+                if (NewRelations[obj1.ID].ContainsKey(obj2.ID))
+                {
+                    return NewRelations[obj1.ID][obj2.ID];
+                }
             }
             RuleCheckRelation newObjRel = new RuleCheckRelation(obj1, obj2);
-            model.Relations.Add(newObjRel);
+            NewRelations[obj1.ID][obj2.ID] = newObjRel;
 
             return newObjRel;
         }
 
-        public static double GetRuleInstanceResult(ModelChecker modelCheck, Rule rule, Dictionary<string, RuleCheckObject> objects, ref List<RuleCheckRelation> relations)
+        public static double GetRuleInstanceResult(Rule rule, Dictionary<string, RuleCheckObject> objects, ref List<RuleCheckRelation> relations)
         {
-            return GetLogicalExpressionResult(modelCheck, rule.LogicalExpression, objects, ref relations);
+            return GetLogicalExpressionResult(rule.LogicalExpression, objects, ref relations);
         }
 
-        public static double GetLogicalExpressionResult(ModelChecker modelCheck, LogicalExpression logicExp, Dictionary<string, RuleCheckObject> objects, ref List<RuleCheckRelation> relations)
+        public static double GetLogicalExpressionResult(LogicalExpression logicExp, Dictionary<string, RuleCheckObject> objects, ref List<RuleCheckRelation> relations)
         {
             double result = 1.0;
             bool firstResult = true;
@@ -605,7 +568,7 @@ namespace ModelCheckPackage
             }
             foreach (RelationCheck rc in logicExp.RelationChecks)
             {
-                RuleCheckRelation rel = FindOrCreateObjectRelation(modelCheck.Model, objects[rc.Obj1Name], objects[rc.Obj2Name]);
+                RuleCheckRelation rel = FindOrCreateObjectRelation(objects[rc.Obj1Name], objects[rc.Obj2Name]);
                 relations.Add(rel);
                 relations = relations.Distinct().ToList();
                 Property props = GetOrAddPropertyToRelation(rel, rc.PropertyCheck.Name);
@@ -634,7 +597,7 @@ namespace ModelCheckPackage
             }
             foreach (LogicalExpression le in logicExp.LogicalExpressions)
             {
-                double leResult = GetLogicalExpressionResult(modelCheck, le, objects, ref relations);
+                double leResult = GetLogicalExpressionResult(le, objects, ref relations);
                 if (firstResult)
                 {
                     result = leResult;
