@@ -56,13 +56,18 @@ namespace DbmsApi
                 Couch = 501,
                 Chair = 510,
                 Table = 520,
+                    CoffeeTable = 521,
+                    KitchenTable = 522,
                 Bed = 530,
                 Plant = 540,
                 Cabinet = 550,
                     WallCabinet = 551,
                     CornerCabinet = 552,
+                        BaseCornerCabinet = 553,
+                        WallCornerCabinet = 554,
                     BaseCabinet = 555,
                 Shelf = 570,
+                TVStand = 575,
                 Container = 580,
         DistributionElement = 1000,
             DistributionControlElement = 1001,
@@ -152,6 +157,7 @@ namespace DbmsApi
                             WashingMashine = 1723,
                             Shower = 1724,
                             Bath = 1725,
+                            Dishwasher = 1726,
                         SpaceHeater = 1800
         //              StackTerminal
         //              WasteTerminal
@@ -243,13 +249,18 @@ namespace DbmsApi
             ObjectType Couch = new ObjectType(ObjectTypes.Couch, FurnishingElement);
             ObjectType Chair = new ObjectType(ObjectTypes.Chair, FurnishingElement);
             ObjectType Table = new ObjectType(ObjectTypes.Table, FurnishingElement);
+            ObjectType CoffeeTable = new ObjectType(ObjectTypes.CoffeeTable, Table);
+            ObjectType KitchenTable = new ObjectType(ObjectTypes.KitchenTable, Table);
             ObjectType Bed = new ObjectType(ObjectTypes.Bed, FurnishingElement);
             ObjectType Plant = new ObjectType(ObjectTypes.Plant, FurnishingElement);
             ObjectType Cabinet = new ObjectType(ObjectTypes.Cabinet, FurnishingElement);
             ObjectType CornerCabinet = new ObjectType(ObjectTypes.CornerCabinet, Cabinet);
+            ObjectType BaseCornerCabinet = new ObjectType(ObjectTypes.BaseCornerCabinet, CornerCabinet);
+            ObjectType WallCornerCabinet = new ObjectType(ObjectTypes.WallCornerCabinet, CornerCabinet);
             ObjectType WallCabinet = new ObjectType(ObjectTypes.WallCabinet, Cabinet);
             ObjectType BaseCabinet = new ObjectType(ObjectTypes.BaseCabinet, Cabinet);
             ObjectType Shelf = new ObjectType(ObjectTypes.Shelf, FurnishingElement);
+            ObjectType TVStand = new ObjectType(ObjectTypes.TVStand, FurnishingElement);
             ObjectType Container = new ObjectType(ObjectTypes.Container, FurnishingElement);
             ObjectType DistributionElement = new ObjectType(ObjectTypes.DistributionElement, Real);
             ObjectType DistributionControlElement = new ObjectType(ObjectTypes.DistributionControlElement, DistributionElement);
@@ -289,6 +300,7 @@ namespace DbmsApi
             ObjectType Toilet = new ObjectType(ObjectTypes.Toilet, SanitaryTerminal);
             ObjectType Bath = new ObjectType(ObjectTypes.Bath, SanitaryTerminal);
             ObjectType WashingMashine = new ObjectType(ObjectTypes.WashingMashine, SanitaryTerminal);
+            ObjectType Dishwasher = new ObjectType(ObjectTypes.Dishwasher, SanitaryTerminal);
             ObjectType SpaceHeater = new ObjectType(ObjectTypes.SpaceHeater, FlowTerminal);
 
             return Root;
