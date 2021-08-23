@@ -1,6 +1,7 @@
 ﻿using DbmsApi;
 using DbmsApi.API;
 using GenerativeDesignAPI;
+using GenerativeDesignPackage;
 using MathPackage;
 using ModelCheckAPI;
 using ModelCheckPackage;
@@ -789,7 +790,7 @@ public class GameController : MonoBehaviour
                                                           rules,
                                                           LevelOfDetail.LOD100,
                                                           VectorConvert(GeneratingObject.transform.position),
-                                                          new GenSettings(
+                                                          new GenerativeDesignSettings(
                                                                 Convert.ToInt32(20),
                                                                 Convert.ToDouble(20),
                                                                 Convert.ToDouble(0.5),

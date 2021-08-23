@@ -291,6 +291,8 @@ namespace AdminApp
             }
 
             SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "BIMkit File (*.bpm)|*.bpm|All files (*.*)|*.*";
+            sfd.FileName = response.Data.Name + ".bpm";
             if (sfd.ShowDialog() == DialogResult.Cancel)
             {
                 return;

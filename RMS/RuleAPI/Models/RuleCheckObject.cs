@@ -77,10 +77,6 @@ namespace RuleAPI.Models
 
             GlobalVerticies = globalMesh.VertexList;
             Triangles = globalMesh.TriangleList;
-            Vector3D realCenter, realDimentions;
-            Utils.GetXYZDimentions(LocalVerticies, out realCenter, out realDimentions);
-            Dimentions = realDimentions;
-            Location = realCenter;
             Orientation = Utils.GetQuaterion(new Vector3D(1, 0, 0), 0);
 
             Matrix4 orientationMatrix = Utils.GetTranslationMatrixFromLocationOrientation(new Vector3D(0, 0, 0), Orientation);
@@ -90,6 +86,11 @@ namespace RuleAPI.Models
 
             Matrix4 translationMatrix = Utils.GetTranslationMatrixFromLocationOrientation(Location, Orientation).GetTranspose();
             LocalVerticies = GlobalVerticies.Select(v => Matrix4.Multiply(translationMatrix, v.Get4D(1.0)).Get3D()).ToList();
+
+            Vector3D realCenter, realDimentions;
+            Utils.GetXYZDimentions(LocalVerticies, out realCenter, out realDimentions);
+            Dimentions = realDimentions;
+            Location = realCenter;
         }
 
         public RuleCheckObject(string name, ObjectTypes type, Mesh localMesh, Vector3D location, Vector4D orientation, bool virtualObj = true)
