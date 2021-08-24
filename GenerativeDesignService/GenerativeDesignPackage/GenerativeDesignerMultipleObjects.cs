@@ -25,7 +25,7 @@ namespace GenerativeDesignPackage
             Locations = initialLoc;
         }
 
-        public Model ExecuteGenDesign(int Itterations, double moveAmount, double reductionRate, int movesPerItteration, bool showRoute)
+        public Model ExecuteGenDesignRoundRobin(GenerativeDesignSettings settings)
         {
             List<Configuration> configsList = new List<Configuration>();
 
@@ -37,92 +37,6 @@ namespace GenerativeDesignPackage
                 Utils.GetQuaterion(new Vector3D(0, 0, 1), 180.0 * Math.PI / 180.0),
                 Utils.GetQuaterion(new Vector3D(0, 0, 1), 270.0 * Math.PI / 180.0)
             };
-
-            List<Configuration> configurations = new List<Configuration>();
-            for (int i = 0; i < CatalogObjects.Count; i++)
-            {
-                Configuration config = new Configuration()
-                {
-                    Location = Locations[i],
-                    CatalogObject = CatalogObjects[i],
-                    Orientation = orientations.First()
-                };
-                configurations.Add(config);
-            }
-
-            foreach (Configuration catalogObject in configurations)
-            {
-
-                //inital placement of model
-                string objectId = ModelCheck.Model.AddObject(catalogObject.CatalogObject, catalogObject.Location, catalogObject.Orientation);
-                double bestEval = evaluateModel();
-                int interationNum = 0;
-                double currentMoveAmount = moveAmount;
-
-                while (Itterations > interationNum)
-                {
-                    interationNum++;
-
-                    currentMoveAmount *= reductionRate;
-
-
-                    //double moveAmount = Math.Pow(Math.E, -alphaMove * interationNum) * MoveSTD;
-                    List<Vector3D> locations = new List<Vector3D>();
-                    for (int j = 0; j < movesPerItteration; j++)
-                    {
-                        double deltaX = RandomGausian(0, moveAmount);
-                        double deltaY = RandomGausian(0, moveAmount);
-                        locations.Add(new Vector3D(catalogObject.Location.x + deltaX, catalogObject.Location.y + deltaY, catalogObject.Location.z));
-                    }
-
-                    //remove object
-                    ModelCheck.Model.RemoveObject(objectId);
-
-                    getBestPlacement(catalogObject, locations, orientations, bestEval);
-
-                    //place object
-                    objectId = ModelCheck.Model.AddObject(catalogObject.CatalogObject, catalogObject.Location, catalogObject.Orientation);
-
-                    bestEval = evaluateModel();
-
-
-                    // All rules passed so may as well stop
-                    if (bestEval == ModelCheck.Rules.Count)
-                    {
-                        break;
-                    }
-                }
-            }
-
-
-
-
-            // Put the best back in:
-            if (showRoute)
-            {
-                foreach (Configuration config in configsList)
-                {
-                    ModelCheck.Model.AddObject(config.CatalogObject, config.Location, config.Orientation);
-                }
-            }
-
-            return ModelCheck.Model.FullModel();
-        }
-
-        public Model ExecuteGenDesignRoundRobin(int Itterations, double moveAmount, double reductionRate, int movesPerItteration, int swap, int stopSwap, bool showRoute)
-        {
-            List<Configuration> configsList = new List<Configuration>();
-
-            // Get all the possible orientations:
-            List<Vector4D> orientations = new List<Vector4D>()
-            {
-                Utils.GetQuaterion(new Vector3D(0, 0, 1), 0.0 * Math.PI / 180.0),
-                Utils.GetQuaterion(new Vector3D(0, 0, 1), 90.0 * Math.PI / 180.0),
-                Utils.GetQuaterion(new Vector3D(0, 0, 1), 180.0 * Math.PI / 180.0),
-                Utils.GetQuaterion(new Vector3D(0, 0, 1), 270.0 * Math.PI / 180.0)
-            };
-
-
 
             List<CatalogObjectPlacement> objectsToPlace = new List<CatalogObjectPlacement>();
             for (int i = 0; i < CatalogObjects.Count; i++)
@@ -133,54 +47,20 @@ namespace GenerativeDesignPackage
                     CatalogObject = CatalogObjects[i],
                     Orientation = orientations.First()
                 };
+
                 //place inital config in scene
                 string newObjId = ModelCheck.Model.AddObject(config.CatalogObject, config.Location, config.Orientation);
-
                 objectsToPlace.Add(new CatalogObjectPlacement(config, newObjId));
             }
 
             double bestEval = evaluateModel();
             int interationNum = 0;
-            int MovesTillSwap = swap;
-
-            while (Itterations > interationNum)
+            double moveAmount = settings.Movement;
+            double reductionRate = settings.Rate;
+            int movesPerItteration = settings.Moves;
+            while (settings.Itterations > interationNum)
             {
-                if (MovesTillSwap <= 0 && stopSwap > interationNum)
-                {
-                    //swap
-                    int index1 = random.Next(objectsToPlace.Count);
-                    int index2 = random.Next(objectsToPlace.Count);
-                    CatalogObjectPlacement objectToSwap1 = objectsToPlace[index1];
-                    CatalogObjectPlacement objectToSwap2 = objectsToPlace[index2];
-
-                    if (objectToSwap1 != objectToSwap2)
-                    {
-                        Vector3D newLoc1 = new Vector3D(objectToSwap2.Location.x, objectToSwap2.Location.y, objectToSwap1.Location.z);
-                        Vector4D newOri1 = new Vector4D(objectToSwap2.Orientation.x, objectToSwap2.Orientation.y, objectToSwap2.Orientation.z, objectToSwap2.Orientation.w);
-
-
-                        Vector3D newLoc2 = new Vector3D(objectToSwap1.Location.x, objectToSwap1.Location.y, objectToSwap2.Location.z);
-                        Vector4D newOri2 = new Vector4D(objectToSwap1.Orientation.x, objectToSwap1.Orientation.y, objectToSwap1.Orientation.z, objectToSwap1.Orientation.w);
-
-
-                        ModelCheck.Model.RemoveObject(objectToSwap1.id);
-                        ModelCheck.Model.RemoveObject(objectToSwap2.id);
-
-
-                        objectsToPlace[index1].configuration.Location = newLoc1;
-                        objectsToPlace[index1].configuration.Orientation = newOri1;
-                        objectsToPlace[index1].id = ModelCheck.Model.AddObject(objectsToPlace[index1].CatalogObject, objectsToPlace[index1].Location, objectsToPlace[index1].Orientation);
-
-                        objectsToPlace[index2].configuration.Location = newLoc2;
-                        objectsToPlace[index2].configuration.Orientation = newOri2;
-                        objectsToPlace[index2].id = ModelCheck.Model.AddObject(objectsToPlace[index2].CatalogObject, objectsToPlace[index2].Location, objectsToPlace[index2].Orientation);
-
-                        bestEval = evaluateModel();
-                    }
-                    MovesTillSwap = swap;
-                }
                 interationNum++;
-                MovesTillSwap--;
                 moveAmount *= reductionRate;
 
                 for (int i = 0; i < objectsToPlace.Count; i++)
@@ -215,7 +95,7 @@ namespace GenerativeDesignPackage
             }
 
             // Put the best back in:
-            if (showRoute)
+            if (settings.ShowRoute)
             {
                 foreach (Configuration config in configsList)
                 {

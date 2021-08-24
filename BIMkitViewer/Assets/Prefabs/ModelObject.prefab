@@ -44,3 +44,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsHighlighted: 0
+  LinePrefab: {fileID: 4016222606690338295, guid: 8784ccdc7d442cb48aaf9ccfd3624a09,
+    type: 3}

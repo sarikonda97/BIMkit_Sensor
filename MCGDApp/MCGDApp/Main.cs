@@ -369,5 +369,57 @@ namespace MCGDApp
 
             GDSettings = gdsf.Settings;
         }
+
+        private async void buttonGDMultiple_Click(object sender, EventArgs e)
+        {
+            // Get the model, object, and rules
+            ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
+            APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return;
+            }
+
+            List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
+            List<CatalogObject> catalogObjects = new List<CatalogObject>();
+            List<Vector3D> initialLocations = new List<Vector3D>();
+            foreach (var catalogObjectMeta in catalogObjectsMeta)
+            {
+                APIResponse<CatalogObject> response2 = await DBMSController.GetCatalogObject(new ItemRequest(catalogObjectMeta.CatalogObjectId, LevelOfDetail.LOD100));
+                if (response2.Code != System.Net.HttpStatusCode.OK)
+                {
+                    MessageBox.Show(response2.ReasonPhrase);
+                    return;
+                }
+
+                CatalogObject catalogObject = response2.Data;
+                float minZ = (float)catalogObject.Components.Min(c => c.Vertices.Min(v => v.z));
+                float maxZ = (float)catalogObject.Components.Max(c => c.Vertices.Max(v => v.z));
+                float heightOfset = (maxZ - minZ) / 2.0f + 0.0001f;
+                catalogObjects.Add(catalogObject);
+                initialLocations.Add(new Vector3D(0, 0, heightOfset));
+            }
+
+            Model model = response.Data;
+            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
+
+            // TODO: Should change the start location to the cetner of the whole model:
+            GenerativeDesignerMultipleObjects generativeDesigner = new GenerativeDesignerMultipleObjects(model, rules, catalogObjects, initialLocations);
+            Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin(GDSettings);
+
+            // Save the models:
+            newModel.Name = "Generated Model";
+            APIResponse<string> response3 = await DBMSController.CreateModel(newModel);
+            if (response3.Code != System.Net.HttpStatusCode.Created)
+            {
+                MessageBox.Show(response3.ReasonPhrase);
+                return;
+            }
+
+            buttonSignInDBMS_Click(null, null);
+
+            this.richTextBoxGenDesign.Text = "Done";
+        }
     }
 }

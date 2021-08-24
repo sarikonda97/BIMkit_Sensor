@@ -31,6 +31,12 @@ namespace MCGDApp
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.listBoxCatalogList = new System.Windows.Forms.ListBox();
+            this.listBoxSelectedCatalogList = new System.Windows.Forms.ListBox();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.buttonLeft = new System.Windows.Forms.Button();
+            this.buttonRight = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.treeViewRules = new System.Windows.Forms.TreeView();
             this.buttonSignInRMS = new System.Windows.Forms.Button();
@@ -50,25 +56,20 @@ namespace MCGDApp
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.buttonGDSettings = new System.Windows.Forms.Button();
             this.richTextBoxGenDesign = new System.Windows.Forms.RichTextBox();
             this.buttonGDLocal = new System.Windows.Forms.Button();
             this.buttonGDWeb = new System.Windows.Forms.Button();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.listBoxSelectedCatalogList = new System.Windows.Forms.ListBox();
-            this.listBoxCatalogList = new System.Windows.Forms.ListBox();
-            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
-            this.buttonLeft = new System.Windows.Forms.Button();
-            this.buttonRight = new System.Windows.Forms.Button();
-            this.buttonGDSettings = new System.Windows.Forms.Button();
+            this.buttonGDMultiple = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
-            this.tableLayoutPanel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -102,6 +103,87 @@ namespace MCGDApp
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Objects";
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel3.ColumnCount = 3;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.Controls.Add(this.listBoxCatalogList, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.listBoxSelectedCatalogList, 2, 0);
+            this.tableLayoutPanel3.Controls.Add(this.tableLayoutPanel4, 1, 0);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(6, 19);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 1;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(312, 223);
+            this.tableLayoutPanel3.TabIndex = 2;
+            this.tableLayoutPanel3.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel3_Paint);
+            // 
+            // listBoxCatalogList
+            // 
+            this.listBoxCatalogList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBoxCatalogList.FormattingEnabled = true;
+            this.listBoxCatalogList.Location = new System.Drawing.Point(3, 3);
+            this.listBoxCatalogList.Name = "listBoxCatalogList";
+            this.listBoxCatalogList.Size = new System.Drawing.Size(125, 212);
+            this.listBoxCatalogList.TabIndex = 3;
+            // 
+            // listBoxSelectedCatalogList
+            // 
+            this.listBoxSelectedCatalogList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBoxSelectedCatalogList.FormattingEnabled = true;
+            this.listBoxSelectedCatalogList.Location = new System.Drawing.Point(184, 3);
+            this.listBoxSelectedCatalogList.Name = "listBoxSelectedCatalogList";
+            this.listBoxSelectedCatalogList.Size = new System.Drawing.Size(125, 212);
+            this.listBoxSelectedCatalogList.TabIndex = 2;
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel4.ColumnCount = 1;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.Controls.Add(this.buttonLeft, 0, 2);
+            this.tableLayoutPanel4.Controls.Add(this.buttonRight, 0, 1);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(134, 3);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 4;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(44, 217);
+            this.tableLayoutPanel4.TabIndex = 4;
+            // 
+            // buttonLeft
+            // 
+            this.buttonLeft.Location = new System.Drawing.Point(3, 111);
+            this.buttonLeft.Name = "buttonLeft";
+            this.buttonLeft.Size = new System.Drawing.Size(38, 27);
+            this.buttonLeft.TabIndex = 1;
+            this.buttonLeft.Text = "<";
+            this.buttonLeft.UseVisualStyleBackColor = true;
+            this.buttonLeft.Click += new System.EventHandler(this.buttonLeft_Click);
+            // 
+            // buttonRight
+            // 
+            this.buttonRight.Location = new System.Drawing.Point(3, 61);
+            this.buttonRight.Name = "buttonRight";
+            this.buttonRight.Size = new System.Drawing.Size(38, 25);
+            this.buttonRight.TabIndex = 2;
+            this.buttonRight.Text = ">";
+            this.buttonRight.UseVisualStyleBackColor = true;
+            this.buttonRight.Click += new System.EventHandler(this.buttonRight_Click);
             // 
             // groupBox2
             // 
@@ -314,6 +396,7 @@ namespace MCGDApp
             this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox5.Controls.Add(this.buttonGDMultiple);
             this.groupBox5.Controls.Add(this.buttonGDSettings);
             this.groupBox5.Controls.Add(this.richTextBoxGenDesign);
             this.groupBox5.Controls.Add(this.buttonGDLocal);
@@ -324,6 +407,17 @@ namespace MCGDApp
             this.groupBox5.TabIndex = 1;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Generative Design";
+            // 
+            // buttonGDSettings
+            // 
+            this.buttonGDSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonGDSettings.Location = new System.Drawing.Point(6, 245);
+            this.buttonGDSettings.Name = "buttonGDSettings";
+            this.buttonGDSettings.Size = new System.Drawing.Size(99, 23);
+            this.buttonGDSettings.TabIndex = 22;
+            this.buttonGDSettings.Text = "Settings";
+            this.buttonGDSettings.UseVisualStyleBackColor = true;
+            this.buttonGDSettings.Click += new System.EventHandler(this.buttonGDSettings_Click);
             // 
             // richTextBoxGenDesign
             // 
@@ -356,97 +450,15 @@ namespace MCGDApp
             this.buttonGDWeb.UseVisualStyleBackColor = true;
             this.buttonGDWeb.Click += new System.EventHandler(this.buttonGDWeb_Click);
             // 
-            // tableLayoutPanel3
+            // buttonGDMultiple
             // 
-            this.tableLayoutPanel3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel3.ColumnCount = 3;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel3.Controls.Add(this.listBoxCatalogList, 0, 0);
-            this.tableLayoutPanel3.Controls.Add(this.listBoxSelectedCatalogList, 2, 0);
-            this.tableLayoutPanel3.Controls.Add(this.tableLayoutPanel4, 1, 0);
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(6, 19);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 1;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(312, 223);
-            this.tableLayoutPanel3.TabIndex = 2;
-            this.tableLayoutPanel3.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel3_Paint);
-            // 
-            // listBoxSelectedCatalogList
-            // 
-            this.listBoxSelectedCatalogList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.listBoxSelectedCatalogList.FormattingEnabled = true;
-            this.listBoxSelectedCatalogList.Location = new System.Drawing.Point(184, 3);
-            this.listBoxSelectedCatalogList.Name = "listBoxSelectedCatalogList";
-            this.listBoxSelectedCatalogList.Size = new System.Drawing.Size(125, 212);
-            this.listBoxSelectedCatalogList.TabIndex = 2;
-            // 
-            // listBoxCatalogList
-            // 
-            this.listBoxCatalogList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.listBoxCatalogList.FormattingEnabled = true;
-            this.listBoxCatalogList.Location = new System.Drawing.Point(3, 3);
-            this.listBoxCatalogList.Name = "listBoxCatalogList";
-            this.listBoxCatalogList.Size = new System.Drawing.Size(125, 212);
-            this.listBoxCatalogList.TabIndex = 3;
-            // 
-            // tableLayoutPanel4
-            // 
-            this.tableLayoutPanel4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel4.ColumnCount = 1;
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.Controls.Add(this.buttonLeft, 0, 2);
-            this.tableLayoutPanel4.Controls.Add(this.buttonRight, 0, 1);
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(134, 3);
-            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
-            this.tableLayoutPanel4.RowCount = 4;
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(44, 217);
-            this.tableLayoutPanel4.TabIndex = 4;
-            // 
-            // buttonLeft
-            // 
-            this.buttonLeft.Location = new System.Drawing.Point(3, 111);
-            this.buttonLeft.Name = "buttonLeft";
-            this.buttonLeft.Size = new System.Drawing.Size(38, 27);
-            this.buttonLeft.TabIndex = 1;
-            this.buttonLeft.Text = "<";
-            this.buttonLeft.UseVisualStyleBackColor = true;
-            this.buttonLeft.Click += new System.EventHandler(this.buttonLeft_Click);
-            // 
-            // buttonRight
-            // 
-            this.buttonRight.Location = new System.Drawing.Point(3, 61);
-            this.buttonRight.Name = "buttonRight";
-            this.buttonRight.Size = new System.Drawing.Size(38, 25);
-            this.buttonRight.TabIndex = 2;
-            this.buttonRight.Text = ">";
-            this.buttonRight.UseVisualStyleBackColor = true;
-            this.buttonRight.Click += new System.EventHandler(this.buttonRight_Click);
-            // 
-            // buttonGDSettings
-            // 
-            this.buttonGDSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonGDSettings.Location = new System.Drawing.Point(6, 245);
-            this.buttonGDSettings.Name = "buttonGDSettings";
-            this.buttonGDSettings.Size = new System.Drawing.Size(99, 23);
-            this.buttonGDSettings.TabIndex = 22;
-            this.buttonGDSettings.Text = "Settings";
-            this.buttonGDSettings.UseVisualStyleBackColor = true;
-            this.buttonGDSettings.Click += new System.EventHandler(this.buttonGDSettings_Click);
+            this.buttonGDMultiple.Location = new System.Drawing.Point(6, 135);
+            this.buttonGDMultiple.Name = "buttonGDMultiple";
+            this.buttonGDMultiple.Size = new System.Drawing.Size(97, 52);
+            this.buttonGDMultiple.TabIndex = 23;
+            this.buttonGDMultiple.Text = "Generative Design (Multiple)";
+            this.buttonGDMultiple.UseVisualStyleBackColor = true;
+            this.buttonGDMultiple.Click += new System.EventHandler(this.buttonGDMultiple_Click);
             // 
             // Main
             // 
@@ -460,6 +472,8 @@ namespace MCGDApp
             this.Text = "Model Check App";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
+            this.tableLayoutPanel3.ResumeLayout(false);
+            this.tableLayoutPanel4.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -467,8 +481,6 @@ namespace MCGDApp
             this.tableLayoutPanel2.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel4.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -506,6 +518,7 @@ namespace MCGDApp
         private System.Windows.Forms.Button buttonLeft;
         private System.Windows.Forms.Button buttonRight;
         private System.Windows.Forms.Button buttonGDSettings;
+        private System.Windows.Forms.Button buttonGDMultiple;
     }
 }
 
