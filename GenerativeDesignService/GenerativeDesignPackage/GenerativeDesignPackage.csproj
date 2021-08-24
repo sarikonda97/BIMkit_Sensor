@@ -53,7 +53,6 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="GenerativeDesigner.cs" />
-    <Compile Include="GenerativeDesignerMultipleObjects.cs" />
     <Compile Include="GenerativeDesignSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

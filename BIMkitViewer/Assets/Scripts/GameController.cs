@@ -129,8 +129,6 @@ public class GameController : MonoBehaviour
     #region Camera Controls
 
     public float cameraSpeed = 200f;
-    float minFov = 10f;
-    float maxFov = 90f;
     float sensitivity = 30f;
 
     public void MoveCamera()
@@ -155,11 +153,6 @@ public class GameController : MonoBehaviour
         {
             MainCamera.transform.position += MainCamera.transform.forward * Input.GetAxis("Mouse ScrollWheel") * sensitivity;
         }
-
-        //float fov = MainCamera.fieldOfView;
-        //fov -= Input.GetAxis("Mouse ScrollWheel") * sensitivity;
-        //fov = Mathf.Clamp(fov, minFov, maxFov);
-        //MainCamera.fieldOfView = fov;
     }
 
     #endregion
@@ -368,7 +361,6 @@ public class GameController : MonoBehaviour
     {
         ResetCanvas();
         this.RuleSelectCanvas.SetActive(true);
-        modelCheckMode = true;
         GenDesignButton.gameObject.SetActive(false);
         ModelCheckButton.gameObject.SetActive(true);
     }
@@ -398,8 +390,6 @@ public class GameController : MonoBehaviour
 
     public async void SaveModelClicked()
     {
-        DBMSReadWrite.WriteModel(CurrentModel, System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop) + "\\temp.bpm");
-
         LoadingCanvas.SetActive(true);
         APIResponse<string> response = await this.DBMSController.UpdateModel(CurrentModel);
         if (response.Code != System.Net.HttpStatusCode.OK)
@@ -772,7 +762,6 @@ public class GameController : MonoBehaviour
 
         ResetCanvas();
         CheckResultCanvas.SetActive(true);
-        modelCheckMode = false;
     }
 
     private GameObject GeneratingObject;
@@ -783,13 +772,13 @@ public class GameController : MonoBehaviour
         List<string> rules = RuleButtonData.Where(rbd => rbd.Clicked).Select(r => ((Rule)r.Item).Id).ToList();
 
         ModelCatalogObject mo = (ModelCatalogObject)GeneratingObject.GetComponent<ModelObjectScript>().ModelObject;
+        CatalogInitializerID catalogInitializerID = new CatalogInitializerID() { CatalogID = mo.CatalogId, Location = VectorConvert(GeneratingObject.transform.position) };
         GenerativeRequest request = new GenerativeRequest(DBMSController.Token,
                                                           RuleAPIController.CurrentUser.Username,
                                                           CurrentModel.Id,
-                                                          mo.CatalogId,
+                                                          new List<CatalogInitializerID>() { catalogInitializerID },
                                                           rules,
                                                           LevelOfDetail.LOD100,
-                                                          VectorConvert(GeneratingObject.transform.position),
                                                           new GenerativeDesignSettings(
                                                                 Convert.ToInt32(20),
                                                                 Convert.ToDouble(20),
@@ -818,7 +807,6 @@ public class GameController : MonoBehaviour
     {
         this.ResetCanvas();
         this.ModelViewCanvas.SetActive(true);
-        modelCheckMode = false;
         genDesignMode = false;
     }
 
@@ -838,8 +826,6 @@ public class GameController : MonoBehaviour
     #endregion
 
     #region Model Check Mode
-
-    bool modelCheckMode;
 
     private void ResultButtonClicked(RuleResult result)
     {

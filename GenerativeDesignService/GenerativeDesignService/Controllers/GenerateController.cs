@@ -25,17 +25,25 @@ namespace GenerativeDesignService.Controllers
             {
                 DBMSAPIController.SetSessionToken(request.DBMSToken);
 
-                // Get the model, object, and rules
+                // Get the model
                 APIResponse<Model> response = await DBMSAPIController.GetModel(new ItemRequest(request.ModelID, request.LOD));
                 if (response.Code != HttpStatusCode.OK)
                 {
                     return Request.CreateResponse(response.Code, response.ReasonPhrase);
                 }
+                Model model = response.Data;
 
-                APIResponse<CatalogObject> response2 = await DBMSAPIController.GetCatalogObject(new ItemRequest(request.CatalogID, request.LOD));
-                if (response2.Code != System.Net.HttpStatusCode.OK)
+                // Get the Objects
+                List<CatalogInitializer> catalogObjectsInit = new List<CatalogInitializer>();
+                foreach (var catalogObjectsInitId in request.CatalogInitializers)
                 {
-                    return Request.CreateResponse(response2.Code, response2.ReasonPhrase);
+                    APIResponse<CatalogObject> response2 = await DBMSAPIController.GetCatalogObject(new ItemRequest(catalogObjectsInitId.CatalogID, request.LOD));
+                    if (response2.Code != System.Net.HttpStatusCode.OK)
+                    {
+                        return Request.CreateResponse(response2.Code, response2.ReasonPhrase);
+                    }
+
+                    catalogObjectsInit.Add(new CatalogInitializer() { CatalogObject = response2.Data, Location = catalogObjectsInitId.Location });
                 }
 
                 // Get the rules
@@ -50,11 +58,8 @@ namespace GenerativeDesignService.Controllers
                     }
                 }
 
-                Model model = response.Data;
-                CatalogObject catalogObject = response2.Data;
-
-                GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObject, request.StartLocation);
-                Model newModel = generativeDesigner.ExecuteGenDesign(request.GenSettings);
+                GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInit);
+                Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin(request.GenSettings);
 
                 // Save the models:
                 newModel.Name = "Generated Model";
@@ -63,7 +68,6 @@ namespace GenerativeDesignService.Controllers
                 {
                     return Request.CreateResponse(response3.Code, response3.ReasonPhrase);
                 }
-
 
                 return Request.CreateResponse(HttpStatusCode.OK, response3.Data);
             }

@@ -13,7 +13,7 @@ namespace GenerativeDesignAPI
     public class GenerativeRequest
     {
         public string ModelID;
-        public string CatalogID;
+        public List<CatalogInitializerID> CatalogInitializers;
         public List<string> RuleIDs;
         public TokenData DBMSToken;
         public string RMSUsername;
@@ -22,15 +22,14 @@ namespace GenerativeDesignAPI
 
         public GenerativeDesignSettings GenSettings;
 
-        public GenerativeRequest(TokenData dbmsToken, string rmsUsername, string modelId, string catalogID, List<string> ruleIds, LevelOfDetail lod, Vector3D startLocation, GenerativeDesignSettings genSettings)
+        public GenerativeRequest(TokenData dbmsToken, string rmsUsername, string modelId, List<CatalogInitializerID> catalogInitializers, List<string> ruleIds, LevelOfDetail lod, GenerativeDesignSettings genSettings)
         {
             ModelID = modelId;
-            CatalogID = catalogID;
+            CatalogInitializers = catalogInitializers;
             RuleIDs = ruleIds;
             DBMSToken = dbmsToken;
             RMSUsername = rmsUsername;
             LOD = lod;
-            StartLocation = startLocation;
             GenSettings = genSettings;
         }
     }

@@ -154,6 +154,8 @@ namespace ModelCheckPackage
                 CompiledRules = GetCompiledRules();
             }
 
+            RecreateVirtualObjects();
+
             RuleResults = new List<RuleResult>();
             foreach (Tuple<Rule, Type, MethodInfo> compiledRule in CompiledRules)
             {
