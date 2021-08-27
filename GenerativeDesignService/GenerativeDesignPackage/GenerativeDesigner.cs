@@ -44,9 +44,13 @@ namespace GenerativeDesignPackage
                     Orientation = orientations.First()
                 };
                 string newObjId = ModelCheck.Model.AddObject(config.CatalogObject, config.Location, config.Orientation);
-                config.Eval = ModelCheck.CheckModel(0, config.CatalogObject.TypeId).Sum(r => r.PassVal);
                 config.ObjectModelID = newObjId;
                 configsList.Add(config);
+            }
+
+            foreach (Configuration config in configsList)
+            {
+                config.Eval = ModelCheck.CheckModel(0, config.CatalogObject.TypeId).Sum(r => r.PassVal);
             }
 
             double bestEval = ModelCheck.CheckModel(0).Sum(r => r.PassVal);
@@ -80,15 +84,22 @@ namespace GenerativeDesignPackage
                     //remove object
                     ModelCheck.Model.RemoveObject(currentConfig.ObjectModelID);
 
-                    currentConfig = GetBestPlacement(currentConfig, locations, orientations);
+                    double improveVal = GetBestPlacement(ref currentConfig, locations, orientations);
 
                     //place object
                     currentConfig.ObjectModelID = ModelCheck.Model.AddObject(currentConfig.CatalogObject, currentConfig.Location, currentConfig.Orientation);
 
-                    double newEval = ModelCheck.CheckModel(0).Sum(r => r.PassVal);
+                    //double newEval = ModelCheck.CheckModel(0).Sum(r => r.PassVal);
+                    double newEval = bestEval + improveVal;
                     if (bestEval < newEval)
                     {
                         bestEval = newEval;
+
+                        // All rules passed so may as well stop
+                        if (bestEval == ModelCheck.Rules.Count)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -96,8 +107,9 @@ namespace GenerativeDesignPackage
             return ModelCheck.Model.FullModel();
         }
 
-        private Configuration GetBestPlacement(Configuration config, List<Vector3D> newLocations, List<Vector4D> newOrientations)
+        private double GetBestPlacement(ref Configuration config, List<Vector3D> newLocations, List<Vector4D> newOrientations)
         {
+            double ImprovementVal = 0;
             foreach (Vector3D location in newLocations)
             {
                 foreach (Vector4D orienation in newOrientations)
@@ -108,6 +120,7 @@ namespace GenerativeDesignPackage
                     // Keep the best one
                     if (config.Eval < newEval)
                     {
+                        ImprovementVal += newEval - config.Eval;
                         config.Eval = newEval;
                         config.Location = location;
                         config.Orientation = orienation;
@@ -116,7 +129,7 @@ namespace GenerativeDesignPackage
                     ModelCheck.Model.RemoveObject(newObjId);
                 }
             }
-            return config;
+            return ImprovementVal;
         }
 
         private Random random = new Random();

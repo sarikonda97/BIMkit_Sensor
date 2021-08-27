@@ -24,6 +24,8 @@ using Mesh = UnityEngine.Mesh;
 
 public class GameController : MonoBehaviour
 {
+    #region Fields
+
     public Camera MainCamera;
 
     public Material HighlightMatRed;
@@ -69,6 +71,7 @@ public class GameController : MonoBehaviour
     public GameObject AddObjectCanvas;
     public GameObject CatalogObjectListViewContent;
     public Button CatalogObjectButtonPrefab;
+    public Button ContinueToGenButton;
 
     private RuleAPIController RuleAPIController;
     private DBMSAPIController DBMSController;
@@ -82,6 +85,8 @@ public class GameController : MonoBehaviour
     private Model CurrentModel;
     private List<ModelObjectScript> ModelObjects = new List<ModelObjectScript>();
 
+    #endregion
+
     // Start is called before the first frame update
     void Start()
     {
@@ -92,6 +97,10 @@ public class GameController : MonoBehaviour
 
         ResetCanvas();
         this.ModelSelectCanvas.SetActive(true);
+        // Some buttons should all start disabled:
+        GenDesignButton.gameObject.SetActive(false);
+        ModelCheckButton.gameObject.SetActive(false);
+        ContinueToGenButton.gameObject.SetActive(false);
 
         List<ObjectTypes> types = ObjectTypeTree.ObjectDict.Keys.ToList();
         List<ObjectType> leafTypes = types.Select(t => ObjectTypeTree.GetNode(t)).Where(t => t.Children.Count == 0).ToList();
@@ -376,6 +385,7 @@ public class GameController : MonoBehaviour
         RefreshCatalogClicked();
         ResetCanvas();
         AddObjectCanvas.SetActive(true);
+        ContinueToGenButton.gameObject.SetActive(false);
     }
 
     public void GenDesignClicked()
@@ -386,6 +396,7 @@ public class GameController : MonoBehaviour
         genDesignMode = true;
         GenDesignButton.gameObject.SetActive(true);
         ModelCheckButton.gameObject.SetActive(false);
+        ContinueToGenButton.gameObject.SetActive(true);
     }
 
     public async void SaveModelClicked()
@@ -621,8 +632,7 @@ public class GameController : MonoBehaviour
 
             if (genDesignMode)
             {
-                GeneratingObject = EditingGameObject;
-                SelectRulesClicked();
+                GeneratingObjects.Add(EditingGameObject);
             }
 
             return;
@@ -764,25 +774,30 @@ public class GameController : MonoBehaviour
         CheckResultCanvas.SetActive(true);
     }
 
-    private GameObject GeneratingObject;
+    private List<GameObject> GeneratingObjects = new List<GameObject>();
     public async void PerfromGenDesignClicked()
     {
         LoadingCanvas.SetActive(true);
 
         List<string> rules = RuleButtonData.Where(rbd => rbd.Clicked).Select(r => ((Rule)r.Item).Id).ToList();
 
-        ModelCatalogObject mo = (ModelCatalogObject)GeneratingObject.GetComponent<ModelObjectScript>().ModelObject;
-        CatalogInitializerID catalogInitializerID = new CatalogInitializerID() { CatalogID = mo.CatalogId, Location = VectorConvert(GeneratingObject.transform.position) };
+        List<CatalogInitializerID> catalogInitializerIDs = new List<CatalogInitializerID>();
+        foreach (var generatingObj in GeneratingObjects)
+        {
+            ModelCatalogObject mo = (ModelCatalogObject)generatingObj.GetComponent<ModelObjectScript>().ModelObject;
+            CatalogInitializerID newCatInit = new CatalogInitializerID() { CatalogID = mo.CatalogId, Location = VectorConvert(generatingObj.transform.position) };
+            catalogInitializerIDs.Add(newCatInit);
+        }
         GenerativeRequest request = new GenerativeRequest(DBMSController.Token,
                                                           RuleAPIController.CurrentUser.Username,
                                                           CurrentModel.Id,
-                                                          new List<CatalogInitializerID>() { catalogInitializerID },
+                                                          catalogInitializerIDs,
                                                           rules,
                                                           LevelOfDetail.LOD100,
                                                           new GenerativeDesignSettings(
-                                                                Convert.ToInt32(20),
+                                                                Convert.ToInt32(50),
                                                                 Convert.ToDouble(20),
-                                                                Convert.ToDouble(0.5),
+                                                                Convert.ToDouble(0.75),
                                                                 Convert.ToInt32(10),
                                                                 false
                                                                 )
@@ -796,8 +811,7 @@ public class GameController : MonoBehaviour
             return;
         }
 
-        GeneratingObject = null;
-        genDesignMode = false;
+        RestGenDesignMode();
         ExitClicked();
         SignInClicked();
         LoadDBMSModel(response.Data);
@@ -807,6 +821,12 @@ public class GameController : MonoBehaviour
     {
         this.ResetCanvas();
         this.ModelViewCanvas.SetActive(true);
+        RestGenDesignMode();
+    }
+
+    public void RestGenDesignMode()
+    {
+        GeneratingObjects = new List<GameObject>();
         genDesignMode = false;
     }
 
@@ -816,7 +836,7 @@ public class GameController : MonoBehaviour
 
     bool genDesignMode;
 
-    public void SelectRulesClicked()
+    public void ContinueToRulesclicked()
     {
         ResetCanvas();
         this.RuleSelectCanvas.SetActive(true);

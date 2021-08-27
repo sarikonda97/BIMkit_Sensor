@@ -62,7 +62,6 @@ namespace DbmsApi.API
         }
     }
 
-
     //public class PropertiesConverter : JsonConverter
     //{
     //    static JsonSerializerSettings SpecifiedSubclassConversion = new JsonSerializerSettings() { ContractResolver = new PropertiesSpecifiedConcreteClassConverter() };
