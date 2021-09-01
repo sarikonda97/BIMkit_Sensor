@@ -58,16 +58,16 @@ namespace GenerativeDesignPackage
             double moveAmount = settings.Movement;
             double reductionRate = settings.Rate;
             int movesPerItteration = settings.Moves;
+            bool itemMoved = false;
             while (settings.Itterations > interationNum)
             {
+                itemMoved = false;
+
                 // All rules passed so may as well stop
                 if (bestEval == ModelCheck.Rules.Count)
                 {
                     break;
                 }
-
-                interationNum++;
-                moveAmount *= reductionRate;
 
                 for (int i = 0; i < configsList.Count; i++)
                 {
@@ -94,6 +94,7 @@ namespace GenerativeDesignPackage
                     if (bestEval < newEval)
                     {
                         bestEval = newEval;
+                        itemMoved = true;
 
                         // All rules passed so may as well stop
                         if (bestEval == ModelCheck.Rules.Count)
@@ -101,6 +102,12 @@ namespace GenerativeDesignPackage
                             break;
                         }
                     }
+                }
+
+                interationNum++;
+                if (!itemMoved)
+                {
+                    moveAmount *= reductionRate;
                 }
             }
 

@@ -87,6 +87,19 @@ public class GameController : MonoBehaviour
 
     #endregion
 
+    // string is the Type of the object, next part is Width (x), Height (z), Depth (y) (values are in Meters)
+    public static Dictionary<string, Tuple<float, float, float>> TypeDimentionDictionary = new Dictionary<string, Tuple<float, float, float>>()
+    {
+        { "Chair", new Tuple<float, float, float>(0.4f, 1.3f, 0.5f) },
+        { "Table", new Tuple<float, float, float>(1.3f, 1.0f, 0.5f) },
+        { "Cabinet", new Tuple<float, float, float>(1.5f, 1.0f, 1.0f) },
+        { "Shelf", new Tuple<float, float, float>(1.3f, 2.0f, 0.5f) },
+        { "Couch", new Tuple<float, float, float>(1.5f, 1.3f, 0.8f) },
+        { "CoffeeTable", new Tuple<float, float, float>(1.3f, 0.6f, 0.5f) },
+        { "Plant", new Tuple<float, float, float>(0.6f, 1.5f, 0.6f) },
+        { "Lamp", new Tuple<float, float, float>(0.3f, 2.0f, 0.3f) },
+    };
+
     // Start is called before the first frame update
     void Start()
     {
