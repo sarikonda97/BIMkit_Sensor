@@ -27,6 +27,8 @@
 #main-content{
   height: 100%;
   width: auto;/*switched to auto*/
+
+  box-sizing: border-box;
   
   color: white;
   display: flex;
@@ -40,13 +42,17 @@
 }
 
 #main-content div{
-  padding-bottom: 1em;
   width: 100%;
 }
 
+#App-header, #category-buttons, .wrapper{
+  padding-bottom: 1em;
+}
+
+
 #category-buttons{
   width: 70%;
-  
+  min-width: 1000px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -128,6 +134,7 @@
   white-space: pre-wrap;
   text-align: left;
   font-size: medium;
+  margin-bottom: 20px;
 }
 
 #delete-button{

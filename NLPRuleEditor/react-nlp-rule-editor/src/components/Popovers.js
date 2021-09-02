@@ -7,7 +7,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 
 const styles = {
   occurrence: {
-    color: 'rgba(255, 146, 45, 1.0)',
+    color: 'rgb(255, 122, 45)',
     //orange
   },
   type: {
@@ -24,11 +24,11 @@ const styles = {
       //green
   },
   operation: {
-      color: 'rgba(240,253,199, 1.0)',
+      color: 'rgb(198, 207, 167)',
       //mimosa
   },
   value: {
-      color: 'rgba(20, 99, 112, 1.0)',
+      color: 'rgb(207, 91, 163)',
       //darker cyan
   },
   unit: {
@@ -36,7 +36,7 @@ const styles = {
       //Sweet Pink
   },
   logicalOperator: {
-      color: 'rgba(198, 198, 255, 1.0)',
+      color: 'rgb(70, 154, 255)',
       //purple
   },
   relation: {
@@ -77,7 +77,7 @@ const popoverType = (
 const popoverNegation = (
   <Popover id="popover-basic">
     <Popover.Content>
-    Negation (Not etc.)
+    Negation (Not)
     </Popover.Content>
   </Popover>
 );
@@ -101,7 +101,7 @@ const popoverOperation = (
 const popoverValue = (
   <Popover id="popover-basic">
     <Popover.Content>
-    Numeric Value (0, 1, 2 etc.)
+    Numeric Value (0, 1, 2, etc.)
     </Popover.Content>
   </Popover>
 );
@@ -109,7 +109,7 @@ const popoverValue = (
 const popoverUnit = (
   <Popover id="popover-basic">
     <Popover.Content>
-    Units of measurement used (in, ft, m).
+    Units of measurement used (in, ft, m, etc.).
     </Popover.Content>
   </Popover>
 );
@@ -117,7 +117,7 @@ const popoverUnit = (
 const popoverLogicalOperator = (
   <Popover id="popover-basic">
     <Popover.Content>
-    Logical Operator to connect check expressions (AND, OR, XOR).
+    Logical Operator to connect expressions (and, or, xor).
     </Popover.Content>
   </Popover>
 );
@@ -166,7 +166,7 @@ export const TypeButton = () => (
 );
 
 export const NegationButton = () => (
-  <OverlayTrigger trigger={["hover", "focus"]} placement="top" overlay={popoverProperty}>
+  <OverlayTrigger trigger={["hover", "focus"]} placement="top" overlay={popoverNegation}>
     <Button /*variant="outline-success"*/ id="Negation_Button">Negation</Button>
   </OverlayTrigger>
 );
@@ -179,13 +179,13 @@ export const PropertyButton = () => (
 );
 
 export const OperationButton = () => (
-  <OverlayTrigger trigger={["hover", "focus"]} placement="top" overlay={popoverProperty}>
+  <OverlayTrigger trigger={["hover", "focus"]} placement="top" overlay={popoverOperation}>
     <Button /*variant="outline-success"*/ id="Operation_Button">Operation</Button>
   </OverlayTrigger>
 );
 
 export const ValueButton = () => (
-  <OverlayTrigger trigger={["hover", "focus"]} placement="top" overlay={popoverUnit}>
+  <OverlayTrigger trigger={["hover", "focus"]} placement="top" overlay={popoverValue}>
     <Button /*variant="outline-info"*/ id="Value_Button">Value</Button>
   </OverlayTrigger>
 );
@@ -197,7 +197,7 @@ export const UnitButton = () => (
 );
 
 export const LogicalOperatorButton = () => (
-  <OverlayTrigger trigger={["hover", "focus"]} placement="top" overlay={popoverUnit}>
+  <OverlayTrigger trigger={["hover", "focus"]} placement="top" overlay={popoverLogicalOperator}>
     <Button /*variant="outline-info"*/ id="LogicalOperator_Button">LogicalOperator</Button>
   </OverlayTrigger>
 );

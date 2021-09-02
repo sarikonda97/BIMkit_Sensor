@@ -4,24 +4,53 @@ import _ from "lodash";
 import Button from 'react-bootstrap/Button';
 import { InputEditor } from './InputEditor';
 import './InputForm.css'
-
+import { Tokens } from './Token';
+import { Translation,groupTokens } from './Translation.js';
 
 
 //Input form is the component that sends user input to the backend through a socket.io endpoint. It receives text coloring from InputEditor.
 export function InputForm(props) {
     // functions that let us access and change state
     const [value, setValue] = useState(props.activeRule.description);
-    const [response, setResponse] = useState(props.activeRule.translation);
-    const [retranslation, setRetranslation] = useState(props.activeRule.retranslation);
-    const [priorityLevel, setPriorityLevel] = useState(props.activeRule.ErrorLevel)
+    const [responseObjects, setResponse] = useState(props.activeRule.translation);
+    const [responseObjectChecks, setResponseChecks] = useState(props.activeRule.translation);
+    const [responseRelations, setResponseRelations] = useState(props.activeRule.translation);
 
-    // useCallback prevents from initializing new debounce function when re-rendered, which breaks the functionality of debouncing.
-    //const debouncedEmit = useCallback(_.debounce(function emitMessage(data) { props.socket.emit("GetParsedComponents", data); }, 200), []);
+
+    const [retranslation, setRetranslation] = useState(props.activeRule.retranslation);
+    const [priorityLevel, setPriorityLevel] = useState(props.activeRule.ErrorLevel);
+    const[tokens, setTokens] = useState(new Tokens());
+
+
+
+    const updateTokens = (type, newTokens) => {
+        let updatedTokens = tokens;
+        updatedTokens.updateTokensOfType(type, newTokens);
+        setTokens(updatedTokens);
+    }
+
+    const handleSubmit2 = () => {
+        console.log(tokens);
+        let currentTokens = tokens;
+        console.log(currentTokens);
+        currentTokens.lemmatizeTokens();
+        let sortedTokens = currentTokens.allTokensSortedByIndex;
+        console.log(currentTokens.allTokens);
+        console.log(sortedTokens);
+        let groupedTokens = new groupTokens(sortedTokens);
+        groupedTokens.groupECS();
+        groupedTokens.groupLogicalExpression();
+
+        /*
+        console.log(groupedTokens.ECSTokens);
+        console.log(groupedTokens.objectChecks);
+        console.log(groupedTokens.relationChecks);*/
+    }
+    
+
 
     useEffect(() => {
-        console.log(100);
-        console.log(props.activeRule);
-        // Each time the activeRule is changed from our props, we update state to be re-rendered.
+
         setValue(props.activeRule.description);
         setPriorityLevel(props.activeRule.ErrorLevel);
         setResponse(props.activeRule.translation);
@@ -31,15 +60,9 @@ export function InputForm(props) {
 
     // Callback function, something that can be called from child to set "value" from our state to the contents of the Draft.js textbox
     const setValueFromChild = (childData) => {
-        //console.log(childData); childData = text from editor
-        //console.log("went to call back");
-        //console.log(childData !== value);
         if (childData !== value) {
             setValue(childData);
             props.updateActiveRuleDescription(childData);
-            //debouncedEmit(childData);
-            //props.updateActiveRuleDescription(childData);
-            //console.log(value);
         }
         
     }
@@ -50,111 +73,93 @@ export function InputForm(props) {
         props.updateActiveRuleErrorLevel(e.target.value);
     }
 
-    function handleSubmit(event) {
-        // Runs every time the submit button is pressed, or the user presses enter.
-        event.preventDefault();
-        //todo: translate data
 
-        //set state to translated data
-        var obj = {
-            Name: "New Ruleset",
-            Description: "Ruleset",
-            Rules: [{
-                    Name: "Rule1",
-                    Description: "All windows should have a width of no less than 15 inch and a height of no more than 2 feet and is above a sink.",
-                    ExistentialClauses: {
-                        Object0: {
-                            OccurenceRule: "ALL",
-                            Characteristic: {
-                                Type: "Window",
-                                PropertyChecks: []
-                            }
-                        },
-                        Object1: {
-                            OccurenceRule: "ANY",
-                            Characteristic: {
-                                Type: "Sink",
-                                PropertyChecks: []
-                            }
-                        }
-                    },
-                    LogicalExpression: {
-                        ObjectChecks: [
-                            {
-                                ObjName: "Object0",
-                                Negation: "MUST_HAVE",
-                                PropertyCheck: {
-                                    Operation: "GREATER-THAN-OR-EQUAL",
-                                    Value: 15,
-                                    ValueUnit: "inch",
-                                    Name: "Width",
-                                    PCType: "NUM"
-                                }
-                            },
-                            {
-                                ObjName: "Object0",
-                                Negation: "MUST_HAVE",
-                                PropertyCheck: {
-                                    Operation: "LESS-THAN-OR-EQUAL",
-                                    Value: 2,
-                                    ValueUnit: "feet",
-                                    Name: "Height",
-                                    PCType: "NUM"
-                                }
-                            }
-                        ],
-                        RelationChecks: [
-                            {
-                                Obj1Name: "Object0",
-                                Obj2Name: "Object1",
-                                Negation: "MUST_HAVE",
-                                PropertyCheck: {
-                                    Operation: "EQUAL",
-                                    Value: true,
-                                    Name: "IsAbove",
-                                    PCType: "BOOL"
-                                }
-                            }
-                        ],
-                        LogicalExpressions: [],
-                        LogicalOperator: "AND"
-                    },
-                    ErrorLevel: "Recommended"
-                }
-            ]
-        }
-        setResponse(JSON.stringify(obj, null));
-        setRetranslation(value);
-        //let rule = {description: value, translation: "1212", retranslation: retranslation, Name: "Rule 1", ErrorLevel: priorityLevel}
-        //props.updateActiveRule(rule);
 
-        console.log(value);
-        console.log(props.customObjects);
+    const handleSubmit = (event) => {
+        //get rule object
+        let updatedRule = props.activeRule;
 
-        /*postData('/api/translate', { 'rule': value, 'customobjects': props.customObjects }).then(data => {
-            try {
-                setResponse(data.response);
-                let rule = JSON.parse(data.rule);
-                rule.translation = data.response;
-                rule.retranslation = data.retranslation;
-                rule.Name = props.activeRule.Name;
-                rule.ErrorLevel = priorityLevel;
-                props.updateActiveRule(rule);
-            } catch (err) {
-                console.log(err);
+        let currentTokens = tokens;
+        currentTokens.lemmatizeTokens();
+        let sortedTokens = currentTokens.allTokensSortedByIndex;
+        
+
+        
+        let groupedTokens = new groupTokens(sortedTokens);
+        groupedTokens.groupECS();
+        groupedTokens.groupLogicalExpression();
+
+
+        console.log(groupedTokens.ECSTokens);
+        console.log(groupedTokens.objectChecks);
+        console.log(groupedTokens.relationChecks);
+
+
+
+        updatedRule.ExistentialClauses = groupedTokens.ECSTokens;
+        updatedRule.LogicalExpression = groupedTokens.logicalExpression;
+
+ 
+        let objectstring = '';
+        for(var key in groupedTokens.ECSTokens){
+            objectstring += "\t\t" + key + ": " + groupedTokens.ECSTokens[key]['OccurrenceRule'].toUpperCase() + " " +groupedTokens.ECSTokens[key]['Characteristic']['Type'];
+            if(groupedTokens.ECSTokens[key]['Characteristic']['PropertyChecks'].length > 0){
+                var i = 0;
+                
+                groupedTokens.ECSTokens[key]['Characteristic']['PropertyChecks'].forEach(property => {
+                    if(i == 0){
+                        objectstring += " with ";
+                    }
+                    else{
+                        objectstring += " AND ";
+                    }
+                    objectstring += property['Name'] + " " + property['Operation'].toLowerCase() + " " + property['Value'] + " " + property['ValueUnit'];
+                    i++;
+                });
             }
-        });*/
+            objectstring += '\n';
+        }
+
+        let objectCheckString = '';
+        for(var key in groupedTokens.objectChecks){
+            let check = groupedTokens.objectChecks[key];
+            objectCheckString += "\t\t" + check['ObjName'] + ' ' + check['Negation'] + " " ;
+            let property = check['PropertyCheck'];
+            objectCheckString += property['Name'] + " " + property['Operation'].toLowerCase()
+            if(property.type == "NUM"){
+                relationCheckString += " " + property['Value'] + " " + property['ValueUnit'];
+            }
+            objectCheckString += '\n';
+        }
+
+        let relationCheckString = '';
+        for(var key in groupedTokens.relationChecks){
+            let check = groupedTokens.relationChecks[key];
+            relationCheckString += "\t\t" + check['Obj1Name'] + ' ' + check['Negation'] + " " ;
+            let property = check['PropertyCheck'];
+            relationCheckString += property['Name'] + " "+ check['Obj2Name'] 
+            if(property.type == "NUM"){
+                relationCheckString += " "+ property['Operation'].toLowerCase() + " " + property['Value'];
+            } 
+           relationCheckString += '\n';
+        }
+
+        setResponse("Objects:\n"+objectstring);
+        setResponseChecks("ObjectChecks:\n"+objectCheckString);
+        setResponseRelations("RelationChecks:\n"+relationCheckString);
+
+
+        setRetranslation(value);
+        console.log(updatedRule);
+        
     }
+    
     
     return (
         <form id='editor-input-output' onSubmit={handleSubmit}>
-            <div id="response-wrapper"style={{display:'none'}}>
-                    <div id="response-content" style={{visibility:'hidden'}}>{response}</div>
-                    <br/>
-                    <div id="retranslation-content" style={{visibility:'hidden'}}>{retranslation}</div>
-            </div>
             <div id="input-form">
-                <InputEditor className="input-editor" parentCallback={setValueFromChild} activeRule={props.activeRule} customObjects = {props.customObjects}/>
+                <InputEditor className="input-editor" parentCallback={setValueFromChild} activeRule={props.activeRule} customObjects = {props.customObjects} 
+                updateTokens={updateTokens}/>
                 <div className="wrapper">
                         <br/>
                         <select className="select-css" onChange={selectChange} value={priorityLevel}>
@@ -164,17 +169,15 @@ export function InputForm(props) {
                         </select>
                 </div>
                 <Button onClick={handleSubmit} variant="outline-primary" size="lg" block>Submit</Button>
-                <div id="response-wrapper" style={{display:'none'}}>
-                    <br/>
-                    <div id="response-content" >{response}</div>
-                    <br/>
+                <div className="response-wrapper" style={{display:'block'}}>
+                
+                    <div id="response-content"> 
+                        <div>{responseObjects}</div>
+                        <div>{responseObjectChecks}</div>
+                        <div>{responseRelations}</div>
+                    </div>
                     <div id="retranslation-content">{retranslation}</div>
                 </div>
-            </div>
-            <div id="response-wrapper" style={{display:'none'}}>
-                    <div id="response-content">{response}</div>
-                    <br/>
-                    <div id="retranslation-content">{retranslation}</div>
             </div>
         </form>
     )

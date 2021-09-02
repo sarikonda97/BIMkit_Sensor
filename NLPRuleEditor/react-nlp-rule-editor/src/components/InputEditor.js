@@ -7,42 +7,10 @@ import _ from "lodash";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import { popoverSuggestion } from './Popovers.js';
 import 'draft-js/dist/Draft.css';
-import {fetchData} from '../tools/Fetch';
 
 
-async function fetchTypes(){
-    try{
-        console.log('123');
-        var result= await fetchData("https://localhost:44370/api/method/type");
-        console.log(result);
-        var values = Object.values(result);
-        var regex = 'Relation';
-        for(var i =0; i < values.length; i++){
-            regex += '|'+values[i];
-        }
-        TYPE_MATCH = RegExp(regex, 'gi');
-        return;
-    }
-    catch{
-        console.log("Failed to fetch property methods. Reload page to try again or continue with default.");
-       //use default
-       TYPE_MATCH = RegExp('Type|Chairs*|Sofas*|Oven', 'gi');
-    }
-    
-    return;
-}
-
-var OCCURRENCE_MATCH = RegExp('Occurrence|ANY|ALL|NONE', 'gi')
-var TYPE_MATCH = RegExp('Type|Chairs*|Sofas*|Oven|Microwave|Windows', 'gi');
-fetchTypes();
-var NEGATION_MATCH = RegExp('Negation|Not', 'gi')
-var PROPERTY_MATCH = RegExp('Property|DISTANCE|FunctionOfObj|Width|Height|Length', 'gi')
-var OPERATION_MATCH = RegExp('Operation|less than|more than', 'gi')
-var VALUE_MATCH = RegExp('Value|[0-9]','gi')
-var UNIT_MATCH = RegExp('Unit|MM|CM|M|meter|INCH|FT|feet|DEG|RAD', 'gi')
-var LOGICAL_OPERATOR_MATCH = RegExp('LOGICAL OPERATOR|AND|OR|ANY', 'gi')
-var RELATION_MATCH = RegExp('Relation|Next to|Above', 'gi')
-var UNKNOWN_MATCH = RegExp('Unknown', 'gi')
+import { Token } from './Token';
+import { OCCURRENCE_MATCH, TYPE_MATCH, NEGATION_MATCH, PROPERTY_MATCH, OPERATION_MATCH, PROPERTY_BOOLEAN_MATCH, VALUE_MATCH, UNIT_MATCH, LOGICAL_OPERATOR_MATCH, OBJECTCHECK_MATCH, RELATION_MATCH, UNKNOWN_MATCH} from './regexTokens';
 
 // Component for text input field that handles text coloring with the Draft.js library.
 // Resides within InputForm
@@ -50,6 +18,110 @@ export class InputEditor extends React.Component {
 
     constructor(props) {
         super(props);
+
+        const occurrenceStrategy = (contentBlock, callback, contentState) => {
+            let occurrenceTokens = findCategory(OCCURRENCE_MATCH.regex, contentBlock, callback);
+            occurrenceTokens.forEach(token =>{
+                token.type = OCCURRENCE_MATCH.type
+            });
+            props.updateTokens(OCCURRENCE_MATCH.type, occurrenceTokens);
+        }
+
+        const typeStrategy = (contentBlock, callback, contentState) => {
+            let typeTokens = findCategory(TYPE_MATCH.regex, contentBlock, callback);
+            typeTokens.forEach(token =>{
+                token.type = TYPE_MATCH.type
+            });
+            props.updateTokens(TYPE_MATCH.type, typeTokens);
+        }
+
+        function negationStrategy(contentBlock, callback, contentState) {
+            let negationTokens = findCategory(NEGATION_MATCH.regex, contentBlock, callback);
+            negationTokens.forEach(token =>{
+                token.type = NEGATION_MATCH.type
+            });
+            props.updateTokens(NEGATION_MATCH.type, negationTokens);
+        }
+
+        function propertyStrategy(contentBlock, callback, contentState) {
+            let propertyTokens = findCategory(PROPERTY_MATCH.regex, contentBlock, callback);
+
+            propertyTokens.forEach(token =>{
+                token.type = 'property'
+            });
+            props.updateTokens('property', propertyTokens);
+        }
+
+        function propertyBooleanStrategy(contentBlock, callback, contentState) {
+            let propertyTokens = findCategory(PROPERTY_BOOLEAN_MATCH.regex, contentBlock, callback);
+
+            propertyTokens.forEach(token =>{
+                token.type = PROPERTY_BOOLEAN_MATCH.type
+            });
+            props.updateTokens(PROPERTY_BOOLEAN_MATCH.type, propertyTokens);
+        }
+
+        function operationStrategy(contentBlock, callback, contentState) {
+            let operationTokens = findCategory(OPERATION_MATCH.regex, contentBlock, callback);
+
+            operationTokens.forEach(token =>{
+                token.type = OPERATION_MATCH.type
+            });
+            props.updateTokens(OPERATION_MATCH.type, operationTokens);
+        }
+        
+        function valueStrategy(contentBlock, callback, contentState) {
+            
+            let valueTokens = findCategory(VALUE_MATCH.regex, contentBlock, callback);
+
+            valueTokens.forEach(token =>{
+                token.type = VALUE_MATCH.type
+            });
+            props.updateTokens(VALUE_MATCH.type, valueTokens);
+        }
+        
+        function logicalOperatorStrategy(contentBlock, callback, contentState) {
+            let logicalOperatorTokens =findCategory(LOGICAL_OPERATOR_MATCH.regex, contentBlock, callback);
+            logicalOperatorTokens.forEach(token =>{
+                token.type = LOGICAL_OPERATOR_MATCH.type
+            });
+            props.updateTokens(LOGICAL_OPERATOR_MATCH.type, logicalOperatorTokens);
+        }
+        
+        function unitStrategy(contentBlock, callback, contentState) {
+            
+            let unitTokens = findCategory(UNIT_MATCH.regex, contentBlock, callback);
+            unitTokens.forEach(token =>{
+                token.type = UNIT_MATCH.type
+            });
+            props.updateTokens(UNIT_MATCH.type, unitTokens);
+        }
+        
+        function relationStrategy(contentBlock, callback, contentState) {
+            
+            let relationTokens = findCategory(RELATION_MATCH.regex, contentBlock, callback);
+            relationTokens.forEach(token =>{
+                token.type = RELATION_MATCH.type
+            });
+            props.updateTokens(RELATION_MATCH.type, relationTokens);
+        }
+
+        function objectCheckStrategy(contentBlock, callback, contentState) {
+            
+            let checkTokens = findCategory(OBJECTCHECK_MATCH.regex, contentBlock, callback);
+            checkTokens.forEach(token =>{
+                token.type = OBJECTCHECK_MATCH.type
+            });
+            props.updateTokens(OBJECTCHECK_MATCH.type, checkTokens);
+        }
+
+        
+
+        function unknownStrategy(contentBlock, callback, contentState) {
+            findCategory(UNKNOWN_MATCH, contentBlock, callback);
+        }
+        
+
         this.compositeDecorator = new CompositeDecorator([
             {
                 strategy: occurrenceStrategy,
@@ -68,17 +140,23 @@ export class InputEditor extends React.Component {
                 component: propertySpan,
             },
             {
+                strategy: propertyBooleanStrategy,
+                component: propertySpan,
+            },
+            {
                 strategy: operationStrategy,
                 component: operationSpan,
+            },
+            
+            {
+                strategy: unitStrategy,
+                component: unitSpan,
             },
             {
                 strategy: valueStrategy,
                 component:valueSpan,
             },
-            {
-                strategy: unitStrategy,
-                component: unitSpan,
-            },
+            
             {
                 strategy: logicalOperatorStrategy,
                 component: logicalOperatorSpan,
@@ -88,10 +166,16 @@ export class InputEditor extends React.Component {
                 component: relationSpan,
             },
             {
+                strategy: objectCheckStrategy,
+                component: null,
+            },
+            {
                 strategy: unknownStrategy,
                 component: unknownSpan,
             },
         ]);
+
+       
 
         this.state = {
             editorState: EditorState.createEmpty(this.compositeDecorator),
@@ -114,6 +198,9 @@ export class InputEditor extends React.Component {
             this.setState({ editorState: editorState });
         }
     }
+    
+
+    
 
     componentDidUpdate(oldProps) {
         //console.log(12344);
@@ -150,56 +237,20 @@ export class InputEditor extends React.Component {
 
 
 
-function occurrenceStrategy(contentBlock, callback, contentState) {
-    findCategory(OCCURRENCE_MATCH, contentBlock, callback);
-}
-
-function typeStrategy(contentBlock, callback, contentState) {
-    findCategory(TYPE_MATCH, contentBlock, callback);
-}
-
-function negationStrategy(contentBlock, callback, contentState) {
-    findCategory(NEGATION_MATCH, contentBlock, callback);
-}
-
-function propertyStrategy(contentBlock, callback, contentState) {
-    findCategory(PROPERTY_MATCH, contentBlock, callback);
-}
-
-function operationStrategy(contentBlock, callback, contentState) {
-    findCategory(OPERATION_MATCH, contentBlock, callback);
-}
-
-function valueStrategy(contentBlock, callback, contentState) {
-    findCategory(VALUE_MATCH, contentBlock, callback);
-}
-
-function logicalOperatorStrategy(contentBlock, callback, contentState) {
-    findCategory(LOGICAL_OPERATOR_MATCH, contentBlock, callback);
-}
-
-function unitStrategy(contentBlock, callback, contentState) {
-    findCategory(UNIT_MATCH, contentBlock, callback);
-}
-
-function relationStrategy(contentBlock, callback, contentState) {
-    findCategory(RELATION_MATCH, contentBlock, callback);
-}
-
-function unknownStrategy(contentBlock, callback, contentState) {
-    findCategory(UNKNOWN_MATCH, contentBlock, callback);
-}
 
 
 
 
 function findCategory(regex, contentBlock, callback) {
+    let tokens = [];
     const text = contentBlock.getText();
     let matchArr, start;
     while ((matchArr = regex.exec(text)) !== null) {
         start = matchArr.index;
+        tokens.push(new Token(start, matchArr[0]))
         callback(start, start + matchArr[0].length);
     }
+    return tokens;
 }
 
 
@@ -335,7 +386,7 @@ const styles = {
         textAlign: 'center',
     },
     occurrence: {
-        color: 'rgba(255, 146, 45, 1.0)',
+        color: 'rgb(255, 122, 45)',
         //orange
     },
     type: {
@@ -352,19 +403,19 @@ const styles = {
         //green
     },
     operation: {
-        color: 'rgba(240,253,199, 1.0)',
+        color: 'rgb(198, 207, 167)',
         //mimosa
     },
     value: {
-        color: 'rgba(20, 99, 112, 1.0)',
+        color: 'rgb(207, 91, 163)',
         //darker cyan
     },
     unit: {
-        color: 'rgba(252,153,163, 1.0)',
+        color: '#0dcaf0',
         //Sweet Pink
     },
     logicalOperator: {
-        color: 'rgba(198, 198, 255, 1.0)',
+        color: 'rgb(70, 154, 255)',
         //purple
     },
     relation: {

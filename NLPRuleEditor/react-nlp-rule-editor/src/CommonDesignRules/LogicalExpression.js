@@ -1,7 +1,7 @@
 
 
 
-class LogicalExpression
+export class LogicalExpression
 {
     constructor(objectChecks, relationChecks, logicalExpressions, logicalOperator){
         this.ObjectChecks = objectChecks;

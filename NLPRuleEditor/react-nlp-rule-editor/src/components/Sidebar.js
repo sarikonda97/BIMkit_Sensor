@@ -15,13 +15,13 @@ function Sidebar(props) {
   const [activeRuleText, setActiveRuleText] = useState(ruleset.Rules[0].Name);
 
   useEffect(() => {
-    console.log(0);
+    //console.log(0);
     setRuleset(props.ruleset);
     setActiveRuleText(props.activeRule.Name);
   }, [props.ruleset, props.activeRule]);
 
   function optionClicked(event) {
-    console.log(event.target.innerText);
+    //console.log(event.target.innerText);
     props.selectActiveRule(props.ruleset.Rules.find(rule => rule.Name === event.target.innerText));
     setActiveRuleText(event.target.innerText);
   }
@@ -46,7 +46,7 @@ function Sidebar(props) {
   }
 
   function setNewRuleName(event){
-    console.log(event.target.value);
+    //console.log(event.target.value);
     //rule.Name = event.target.value;
     setActiveRuleText(event.target.value)
     props.updateActiveRuleName(event.target.value)
