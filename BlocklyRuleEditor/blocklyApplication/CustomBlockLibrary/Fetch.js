@@ -8,9 +8,7 @@ async function fetchData(url){
       method: 'GET'
     });
     if(response.ok){
-      //parse data
       let result = await response.json();
-      //return data
       return result;
     }
     else{

@@ -2,11 +2,11 @@
 class ExistentialClause
 {
     constructor(occuranceRule, characteristic){
-        this.OccurenceRule = occuranceRule;
+        this.OccurrenceRule = occuranceRule;
         this.Characteristic = characteristic;
     }
     set occurenceRule(x) {
-        this.OccurenceRule = x;
+        this.OccurrenceRule = x;
     }
     set characteristic(x) {
         this.Characteristic = x;

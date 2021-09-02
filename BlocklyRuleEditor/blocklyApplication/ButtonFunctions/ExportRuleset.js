@@ -16,7 +16,6 @@ function UpdateExportColor(isValid){
 
 //function to export the ruleset into a file
 function ExportRuleset() {
-    console.log(Blockly.Xml.workspaceToDom(Workspace));
     try {
         //update json for all rules in ruleset
         CurrentRuleSet.updateAll();
