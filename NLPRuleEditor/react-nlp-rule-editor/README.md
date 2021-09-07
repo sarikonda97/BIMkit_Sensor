@@ -17,7 +17,7 @@ Write a rule in the text box and press submit. This will update the current rule
 The natural language text is translated into a rule by tokenizing important words and then grouping the tokens into design rule components such as property, ecs, relation etc.
 
 The tokenizing works by iterating through the text and matching regular expressions to each word. If the regex matches then that word is hgihlighted with the appropriate color.
-These regular expressions can be found in regexTokens.js. If you choose to add another word to the regex it is important to also add it to the mapping property. The mapping property is a dictionary with a key == a word in the regex expression and a value == what is written into the json document. 
+These regular expressions can be found in regexTokens.js. If you choose to add another word to the regex it is important to also add it to the mapping property. The mapping property is a dictionary with a key == a word in the regex expression and a value == what should be written into the json document. i.e. the word you add to the regex is "all" and the mapping is {all:"ALL"} then when "all" is typed it is highlighted but when it is translated to a design rule "ALL" is used instead. This is important so that the spelling is consistent with other applications.
 
 The grouping works by using the order that the tokens come in and the type of token to create design rule components. 
 A few things to keep in mind when writing natural language rules:
