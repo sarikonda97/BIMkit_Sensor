@@ -67,6 +67,12 @@ namespace RuleAPI.Models
             Relations.RemoveAll(r => r.FirstObj.ID == objectId || r.SecondObj.ID == objectId);
         }
 
+        public string MoveObject(string objectId, CatalogObject catalogObject, Vector3D location, Vector4D orientation)
+        {
+            RemoveObject(objectId);
+            return AddObject(catalogObject, location, orientation);
+        }
+
         public Model FullModel()
         {
             // Go over each object and update it based on the RuleCheck Changes (only changes to location orientation and Porperties is permited)

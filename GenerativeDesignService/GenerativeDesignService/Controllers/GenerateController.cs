@@ -58,8 +58,8 @@ namespace GenerativeDesignService.Controllers
                     }
                 }
 
-                GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInit);
-                Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin(request.GenSettings);
+                GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInit, request.GenSettings);
+                Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
 
                 // Save the models:
                 newModel.Name = "Generated Model";

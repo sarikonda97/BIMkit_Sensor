@@ -273,8 +273,9 @@ namespace MCGDApp
             List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
 
             // TODO: Should change the start location to the cetner of the whole model:
-            GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits);
-            Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin(GDSettings);
+            //GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits, GDSettings);
+            GenerativeDesignerThread generativeDesigner = new GenerativeDesignerThread(model, rules, catalogObjectsInits, GDSettings);
+            Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
 
             // Save the models:
             newModel.Name = "Generated Model";

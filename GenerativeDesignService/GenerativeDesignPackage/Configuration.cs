@@ -1,5 +1,6 @@
 ﻿using DbmsApi.API;
 using MathPackage;
+using ModelCheckPackage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +9,25 @@ using System.Threading.Tasks;
 
 namespace GenerativeDesignPackage
 {
-    public class Configuration
+    public class ObjectConfiguration
     {
         public string ObjectModelID;
         public CatalogObject CatalogObject;
         public Vector3D Location;
         public Vector4D Orientation;
         public double Eval = 0;
+    }
+
+    public class SceneConfiguration
+    {
+        public List<ObjectConfiguration> ObjectConfigurations;
+        public double Eval = 0;
+    }
+
+    public class ThreadConfiguration
+    {
+        public SceneConfiguration SceneConfiguration;
+        public ModelChecker ModelChecker;
     }
 
     public class CatalogInitializerID
