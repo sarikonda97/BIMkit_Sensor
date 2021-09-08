@@ -132,7 +132,6 @@ function assignObjectToRule(ObjectToAssign){
     });
     newRule.ExistentialClauses = assingedECSs;
     //check if each logical expression is valid
-    //console.log(newRule.LogicalExpression);
     newRule.LogicalExpression = assignObjectToLogicalExpression(newRule.LogicalExpression);
 
     //return valid assinged rule object
@@ -293,7 +292,6 @@ function assignObjectToLogicalExpression(ObjectToAssign){
         var assignedLE = assignObjectToLogicalExpression(ObjectToAssign.LogicalExpressions[i]);
         assingedLogicalExpressions.push(assignedLE);
     }
-    console.log(assingedLogicalExpressions);
     ObjectToAssign.LogicalExpressions = assingedLogicalExpressions;
 
     //assign object to logical expression

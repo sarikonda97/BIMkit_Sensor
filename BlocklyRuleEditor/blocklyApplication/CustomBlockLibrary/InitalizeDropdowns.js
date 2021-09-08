@@ -121,7 +121,7 @@ async function fetchECSMethods(){
     for(var i =0; i < values.length; i++){
       methods.push([values[i], values[i]]);
     }
-    ecsOptions  = methods;
+    ECSOptions  = methods;
   }
   catch{
     console.log("Failed to fetch ecs methods");

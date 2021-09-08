@@ -1,7 +1,7 @@
 
 
 
-class SingleRelation
+export class SingleRelation
 {
     constructor(index, negation, propertyCheck){
         this.ObjName = index;

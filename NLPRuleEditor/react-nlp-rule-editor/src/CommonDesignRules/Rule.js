@@ -1,21 +1,14 @@
 
 
-class Rule{
-    constructor(ID, name, description, errorLevel){//, ecsCount){
-        this.ID = ID;
+export class Rule{
+    constructor(name = "", description = "", errorLevel = "Recommended"){
+        //this.ID = ID;
         this.Valid = true;
-
         this.Name = name;
         this.Description = description;
         this.ErrorLevel = errorLevel;
         this.ExistentialClauses = {};
         this.LogicalExpression = {};
-    }
-    get id(){
-        return this.ID;
-    }
-    set id(x){
-        this.ID = x;
     }
     get valid(){
         return this.Valid;

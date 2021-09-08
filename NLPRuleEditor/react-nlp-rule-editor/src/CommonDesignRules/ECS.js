@@ -1,23 +1,19 @@
 
-class ExistentialClause
+export class ExistentialClause
 {
     constructor(occuranceRule, characteristic){
-        this.OccurenceRule = occuranceRule;
+        this.OccurrenceRule = occuranceRule;
         this.Characteristic = characteristic;
     }
-    set occurenceRule(x) {
-        this.OccurenceRule = x;
+    set occurrenceRule(x) {
+        this.OccurrenceRule = x;
     }
     set characteristic(x) {
         this.Characteristic = x;
     }
-
-    
 }
 
-
-
-class Characteristic
+export class Characteristic
 {
     constructor(type, propertyChecks){
         this.Type = type;

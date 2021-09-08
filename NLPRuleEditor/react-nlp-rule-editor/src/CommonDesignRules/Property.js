@@ -1,4 +1,4 @@
-
+const PropertyNegation = {MUST_HAVE : 'EQUAL', MUST_NOT_HAVE : 'NOT_EQUAL'}
 
 //UnitEnums = {MM:'0', CM:'1', M:'2', INCH:'3', FT:'4', DEG:'5', RAD:'6'}
 //takes in a numeric value and a unit and returns the value in standard value
@@ -25,7 +25,7 @@ function ValueToStandardValue(value, unit){
 
 
 
-class PropertyCheckBool
+export class PropertyCheckBool
 {
     constructor(operation, name){
         this.Value = operation == PropertyNegation.MUST_HAVE;
@@ -36,7 +36,7 @@ class PropertyCheckBool
     
 }
 
-class PropertyCheckNumeric
+export class PropertyCheckNumeric
 {
     constructor(operation, value, ValueInStandardUnit, ValueUnit, name){
         

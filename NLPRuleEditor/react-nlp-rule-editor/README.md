@@ -1,70 +1,27 @@
-# Getting Started with Create React App
+# Overview
+A rule editor web application used for creating design rules from natural language.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Old documentation: [here](https://ualberta-cmput401.github.io/natural-language-rules/).
 
-## Available Scripts
+## Development
+### Set Up
+1. Clone repo
+2. Download and install node.js and npm: https://nodejs.org/en/download/
+3. Open react-nlp-rule-editor folder in vs code or another ide.
+4. In the terminal use command: npm install 
+5. Now the application can be started with command: npm start. (make sure to open bimkit solution first so that it can connect to the database)
 
-In the project directory, you can run:
+### How To Use
+Write a rule in the text box and press submit. This will update the current rule that is open. To create a new rule open the sidebar on the left and click the + symbol. To export the rule click the export button in the sidebar.
 
-### `yarn start`
+The natural language text is translated into a rule by tokenizing important words and then grouping the tokens into design rule components such as property, ecs, relation etc.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The tokenizing works by iterating through the text and matching regular expressions to each word. If the regex matches then that word is hgihlighted with the appropriate color.
+These regular expressions can be found in regexTokens.js. If you choose to add another word to the regex it is important to also add it to the mapping property. The mapping property is a dictionary with a key == a word in the regex expression and a value == what should be written into the json document. i.e. the word you add to the regex is "all" and the mapping is {all:"ALL"} then when "all" is typed it is highlighted but when it is translated to a design rule "ALL" is used instead. This is important so that the spelling is consistent with other applications.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+The grouping works by using the order that the tokens come in and the type of token to create design rule components. 
+A few things to keep in mind when writing natural language rules:
+1. Properties and objectchecks are very similar to make a distinction between the two it is important to use a OBJECTCHECK token (i.e. "must", "should", "require", "need") before object checks. This means a property would be written as: All Chairs with length of 9 inches. A objectcheck is written as: All Chairs **must** have length of 9 inches
+2. Make sure that a relation token (ie. "above", "below", etc.) always has an ECS before and after it.
+3. If a token is not being highlighted with the appropriate colour try a different spelling or updating the regex expression in regexTokens.js
 
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

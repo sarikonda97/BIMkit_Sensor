@@ -11,35 +11,37 @@ import Sidebar from "./components/Sidebar";
 import { WarningList } from "./components/WarningList";
 import { postData } from "./tools/Tools";
 //import '../node_modules/draft-js/dist/Draft.css';
+import { Rule } from "./CommonDesignRules/Rule";
 
 function App() {
   // Example page was built based on the following: https://blog.miguelgrinberg.com/post/how-to-create-a-react--flask-project
 
   // Page itself has some state, as it stores the current ruleset object. It also has an "Active Rule", which it keeps track of which rule is in focus.
-  const [ruleset, setRuleset] = useState(new Ruleset("New Ruleset", "Ruleset", [new TempRule("Rule1", "", "Recommended")]));
+  const [ruleset, setRuleset] = useState(new Ruleset("New Ruleset", "Ruleset", [new Rule("Rule1", "", "Recommended")]));
   const [ruleCount, setRuleCount] = useState(1); // Used for default names of Rules
   const [activeRule, setActiveRule] = useState(ruleset.Rules[0])
   const [customObjects, setCustomObjects] = useState([]) // Words in this list will be passed on to use in the final rule
 
   // Callback function to update active rule from InputForm
   const updateActiveRuleDescription = (description) => {
-    //console.log("update Active");
-    //console.log(activeRule);
-    ///console.log(description);
-    activeRule.description = description;
-    //ruleset.update(activeRule, newRule);
-    //console.log(ruleset);
-    //setActiveRule(newRule);
+    let updatedRule = activeRule;
+    updatedRule.description = description;
+    setActiveRule(updatedRule);
   }
   const updateActiveRuleErrorLevel = (errorLevel) => {
-    activeRule.ErrorLevel = errorLevel;
-    //ruleset.update(activeRule, newRule);
-    //console.log(ruleset);
-    //setActiveRule(newRule);
+    let updatedRule = activeRule;
+    updatedRule.ErrorLevel = errorLevel;
+    setActiveRule(updatedRule);
   }
   const updateActiveRuleName = (name) => {
-    activeRule.Name = name;
+    let updatedRule = activeRule;
+    updatedRule.Name = name;
+    setActiveRule(updatedRule);
   }
+  const updateActiveRule = (updatedRule) => {
+    setActiveRule(updatedRule);
+  }
+
   
   const selectActiveRule = (rule) => {
     setActiveRule(rule);
@@ -47,7 +49,7 @@ function App() {
   const deleteActiveRule = () => {
     if (ruleset.Rules.length === 1) {
       // We need to make a new one to focus on
-      ruleset.addTempRule("Rule1", "")
+      ruleset.addRule("Rule1", "")
     }
     let pos = ruleset.Rules.indexOf(activeRule);
     if (pos === (ruleset.Rules.length - 1)) {
@@ -64,7 +66,7 @@ function App() {
     // Increment the last number
     let newName = "Rule" + (ruleCount + 1);
     setRuleCount(ruleCount + 1);
-    ruleset.addTempRule(
+    ruleset.addRule(
       newName, ""
     )
   }
@@ -76,11 +78,11 @@ function App() {
   const exportJson = () => {
     // Generate ruleset JSON file and download it
     let toExport = JSON.parse(JSON.stringify(ruleset));
-    let filteredRules = toExport.Rules.filter((rule) => !(rule instanceof TempRule));
+    let filteredRules = toExport.Rules.filter((rule) => !(rule instanceof Rule));
     filteredRules.map(rule => {delete rule.translation; delete rule.retranslation;});
     toExport.Rules = filteredRules;
     // from https://stackoverflow.com/a/30727676 
-    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify([toExport]));
+    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(toExport));
     let a = document.createElement('a');
     a.href = 'data:' + dataStr;
     a.download = ruleset.Name + '.json'
@@ -94,7 +96,7 @@ function App() {
       try {
         let importedRulesets = JSON.parse(text);
         // We create new ruleset object using our class
-        let newRuleset = new Ruleset(importedRulesets[0].Name, importedRulesets[0].Description, importedRulesets[0].Rules);
+        let newRuleset = new Ruleset(importedRulesets.Name, importedRulesets.Description, importedRulesets.Rules);
         // The translation for a rule is not stored in the JSON of the rule, 
         for (let rule of newRuleset.Rules) {
           postData('/api/translate', { 'rule': rule.Description }).then(data => {
@@ -109,7 +111,7 @@ function App() {
         setRuleset(newRuleset);
         setRuleCount(newRuleset.Rules.length);
         if (ruleCount === 0) {
-          ruleset.addTempRule("Rule1", "");
+          ruleset.addRule("Rule1", "");
         }
         setActiveRule(newRuleset.Rules[0]);
       } catch {
@@ -174,15 +176,15 @@ function App() {
 
 // Rulset object class definition
 class Ruleset {
-  constructor(name = "Name", description = "Description", Rules = [new TempRule()]) {
+  constructor(name = "Name", description = "Description", Rules = [new Rule()]) {
     this.Name = name;
     this.Description = description;
     this.Rules = Rules;
   }
-  addTempRule(name, description) {
+  addRule(name, description) {
     // For adding a rule to the list before replacing it with a translated rule object.
-    var tempRule = new TempRule(name, description);
-    this.Rules.push(tempRule);
+    var rule = new Rule(name, description);
+    this.Rules.push(rule);
   }
   update(tempRule, rule) {
     // Once we have received a rule object from translation phase, replace it in the list
@@ -196,6 +198,7 @@ class Ruleset {
   }
 }
 
+/*
 // Class for a mock rule which only contains name and description
 class TempRule {
   constructor(name = "Rule", description = "", ErrorLevel = "Recommended") {
@@ -207,6 +210,6 @@ class TempRule {
     this.Description = x;
   }
 }
-
+*/
 
 export default App;
