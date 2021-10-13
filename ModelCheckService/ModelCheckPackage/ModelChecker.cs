@@ -16,7 +16,7 @@ namespace ModelCheckPackage
 {
     public class ModelChecker
     {
-        private static Dictionary<ObjectTypes, MethodInfo> VOMethods;
+        private static Dictionary<string, MethodInfo> VOMethods;
         private static Dictionary<string, MethodInfo> PropMethods;
         private static Dictionary<string, MethodInfo> RelMethods;
 
@@ -85,7 +85,7 @@ namespace ModelCheckPackage
             VirtualObjectsCreated = new List<RuleCheckObject>();
 
             // Create any virtual objects needed
-            List<ObjectTypes> createdTypes = new List<ObjectTypes>();
+            List<string> createdTypes = new List<string>();
             foreach (Rule rule in Rules)
             {
                 foreach (ExistentialClause ec in rule.ExistentialClauses.Values)
@@ -102,7 +102,7 @@ namespace ModelCheckPackage
             }
         }
 
-        public List<RuleCheckObject> CreateVirtualType(RuleCheckModel model, ObjectTypes objectType)
+        public List<RuleCheckObject> CreateVirtualType(RuleCheckModel model, string objectType)
         {
             MethodInfo methodInfo = VOMethods[objectType];
             object[] parametersArray = new object[] { model };
@@ -142,7 +142,7 @@ namespace ModelCheckPackage
 
         #region Check Methods:
 
-        public List<RuleResult> CheckModel(double defaultForNoOutput, ObjectTypes? relaventType = null)
+        public List<RuleResult> CheckModel(double defaultForNoOutput, string relaventType = null)
         {
             if (Model == null || Rules == null)
             {
@@ -199,13 +199,13 @@ namespace ModelCheckPackage
             return true;
         }
 
-        public static bool RuleRelevance(ObjectTypes? type, Rule rule)
+        public static bool RuleRelevance(string type, Rule rule)
         {
             if (type == null)
             {
                 return true;
             }
-            return rule.ExistentialClauses.Select(ec => (ObjectTypes?)ec.Value.Characteristic.Type).Contains(type);
+            return rule.ExistentialClauses.Select(ec => ec.Value.Characteristic.Type).Contains(type);
         }
 
         public static string GenerateRuleCode(Rule rule)
@@ -436,7 +436,7 @@ namespace ModelCheckPackage
         public static bool CheckIfObjectHasCharacteristics(RuleCheckObject obj, Characteristic charic)
         {
             // check that the object matches the characteristic type:
-            if (!RecusiveTypeCheck(charic.Type, ObjectTypeTree.GetNode(obj.Type)))
+            if (!RecusiveTypeCheck(ObjectTypeTree.GetType(charic.Type), ObjectTypeTree.GetType(obj.Type)))
             {
                 return false;
             }
@@ -459,17 +459,17 @@ namespace ModelCheckPackage
             return allCharacterChecksPass;
         }
 
-        public static bool RecusiveTypeCheck(ObjectTypes checkType, ObjectType objType)
+        public static bool RecusiveTypeCheck(ObjectType checkType, ObjectType objType)
         {
             if (objType == null)
             {
                 return false;
             }
-            if (objType.ID == checkType)
+            if (objType.Name == checkType.Name)
             {
                 return true;
             }
-            return RecusiveTypeCheck(checkType, objType.Parent);
+            return RecusiveTypeCheck(checkType, ObjectTypeTree.GetType(objType.ParentName));
         }
 
         public static double OnePropertyPassesPropertyCheck(Property property, PropertyCheck pCheck)

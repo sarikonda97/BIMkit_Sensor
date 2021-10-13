@@ -1,4 +1,5 @@
 ﻿using DbmsApi;
+using DbmsApi.API;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +14,7 @@ namespace RuleAdminApp
 {
     public partial class MethodDisplayForm : Form
     {
-        public MethodDisplayForm(List<ObjectTypes> types, Dictionary<ObjectTypes, string> VOs, Dictionary<string, Type> properties, Dictionary<string, Type> relations)
+        public MethodDisplayForm(List<ObjectType> types, Dictionary<ObjectType, string> VOs, Dictionary<string, Type> properties, Dictionary<string, Type> relations)
         {
             InitializeComponent();
 

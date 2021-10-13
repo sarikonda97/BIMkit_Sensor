@@ -778,24 +778,105 @@ namespace DbmsApi
 
         #endregion
 
-        #region
+        #region Types
 
         /// <summary>
-        /// Gets a list of the available types as strings
+        /// Retrieve a type by id
         /// </summary>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<APIResponse<List<ObjectTypes>>> GetTypesList()
+        public async Task<APIResponse<ObjectType>> GetType(string id)
+        {
+            HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("type/" + id));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new APIResponse<ObjectType>(response, await response.Content.ReadAsAsync<ObjectType>(mediaTypeFormatters));
+            }
+            else
+            {
+                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
+                return new APIResponse<ObjectType>(response, default);
+            }
+        }
+
+        /// <summary>
+        /// Retrieve all types
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<APIResponse<List<ObjectType>>> GetTypes()
         {
             HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("type"));
 
             if (response.IsSuccessStatusCode)
             {
-                return new APIResponse<List<ObjectTypes>>(response, await response.Content.ReadAsAsync<List<ObjectTypes>>(mediaTypeFormatters));
+                return new APIResponse<List<ObjectType>>(response, await response.Content.ReadAsAsync<List<ObjectType>>(mediaTypeFormatters));
             }
             else
             {
                 response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
-                return new APIResponse<List<ObjectTypes>>(response, default);
+                return new APIResponse<List<ObjectType>>(response, default);
+            }
+        }
+
+        /// <summary>
+        /// Create a new type 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public async Task<APIResponse<string>> CreateType(ObjectType type)
+        {
+            HttpResponseMessage response = await TryCatchFunctionAsync(client.PostAsJsonAsync("type", type));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new APIResponse<string>(response, await response.Content.ReadAsAsync<string>());
+            }
+            else
+            {
+                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
+                return new APIResponse<string>(response, default);
+            }
+        }
+
+        /// <summary>
+        /// Update an existing type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public async Task<APIResponse<string>> UpdateType(ObjectType type)
+        {
+            HttpResponseMessage response = await TryCatchFunctionAsync(client.PutAsJsonAsync("type", type));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new APIResponse<string>(response, await response.Content.ReadAsAsync<string>());
+            }
+            else
+            {
+                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
+                return new APIResponse<string>(response, default);
+            }
+        }
+
+        /// <summary>
+        /// Delete an existing type
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<APIResponse<string>> DeleteType(string id)
+        {
+            HttpResponseMessage response = await TryCatchFunctionAsync(client.DeleteAsync("type/" + id));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new APIResponse<string>(response, await response.Content.ReadAsAsync<string>());
+            }
+            else
+            {
+                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
+                return new APIResponse<string>(response, default);
             }
         }
 

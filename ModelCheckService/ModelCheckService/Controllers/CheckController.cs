@@ -25,6 +25,14 @@ namespace ModelCheckService.Controllers
             {
                 // Use token to access the model
                 DBMSAPIController.SetSessionToken(request.DBMSToken);
+
+                APIResponse<List<ObjectType>> responseType = await DBMSAPIController.GetTypes();
+                if (responseType.Code != System.Net.HttpStatusCode.OK)
+                {
+                    return Request.CreateResponse(responseType.Code, responseType.ReasonPhrase);
+                }
+                ObjectTypeTree.BuildTypeTree(responseType.Data);
+
                 APIResponse<Model> response = await DBMSAPIController.GetModel(new ItemRequest(request.ModelID, request.LOD));
                 if (response.Code != HttpStatusCode.OK)
                 {

@@ -1,4 +1,5 @@
 ﻿using DbmsApi;
+using DbmsApi.API;
 using DbmsApi.Mongo;
 using MathPackage;
 using RuleAPI.Models;
@@ -16,13 +17,15 @@ namespace RuleAPI.Methods
         public static List<RuleCheckObject> KitchenWorkingTriangle(RuleCheckModel model)
         {
             // Here need to find all model object that are sinks, fridges, and stoves/ranges
-            List<RuleCheckObject> sinks = model.Objects.Where(o => o.Type == DbmsApi.ObjectTypes.Sink).ToList();
-            List<RuleCheckObject> refrigerators = model.Objects.Where(o => o.Type == DbmsApi.ObjectTypes.Refrigerator).ToList();
-            List<RuleCheckObject> cookTops = model.Objects.Where(o => o.Type == DbmsApi.ObjectTypes.CookTop || o.Type == DbmsApi.ObjectTypes.Stove || o.Type == DbmsApi.ObjectTypes.Range).ToList();
+            List<RuleCheckObject> sinks = model.Objects.Where(o => o.Type == ObjectTypeTree.GetType("Sink").Name).ToList();
+            List<RuleCheckObject> refrigerators = model.Objects.Where(o => o.Type == ObjectTypeTree.GetType("Refrigerator").Name).ToList();
+            List <RuleCheckObject> cookTops = model.Objects.Where(o => o.Type == ObjectTypeTree.GetType("CookTop").Name ||
+                                                                       o.Type == ObjectTypeTree.GetType("Stove").Name || 
+                                                                       o.Type == ObjectTypeTree.GetType("Range").Name).ToList();
 
             // Create a triangle that connects the three
             // (Might need to make sure that they are in the same kitchen somehow...)
-            List<RuleCheckObject> newVirtualObjs = new List<RuleCheckObject>();
+            List <RuleCheckObject> newVirtualObjs = new List<RuleCheckObject>();
             foreach (RuleCheckObject sink in sinks)
             {
                 Vector3D sinkFront = Vector3D.Add(sink.Location, Vector3D.Multiply(sink.ForwardDirectionY, sink.Dimentions.y / 2.0));
@@ -44,7 +47,7 @@ namespace RuleAPI.Methods
 
                         Mesh newTriangleMesh = Utils.CreateTriangleMesh(sinkFront, fridgeFront, cooktopFront, bottomHeight, bottomHeight);
 
-                        RuleCheckObject newObj = new RuleCheckObject("KitchenWorkingTriangle" + newVirtualObjs.Count.ToString(), ObjectTypes.KitchenWorkingTriangle, newTriangleMesh);
+                        RuleCheckObject newObj = new RuleCheckObject("KitchenWorkingTriangle" + newVirtualObjs.Count.ToString(), ObjectTypeTree.GetType("KitchenWorkingTriangle"), newTriangleMesh);
                         newVirtualObjs.Add(newObj);
                     }
                 }
@@ -56,7 +59,7 @@ namespace RuleAPI.Methods
         {
             List<RuleCheckObject> newVirtualObjs = new List<RuleCheckObject>();
 
-            List<RuleCheckObject> wallObjs = model.Objects.Where(o => o.Type == DbmsApi.ObjectTypes.Wall).ToList();
+            List<RuleCheckObject> wallObjs = model.Objects.Where(o => o.Type == ObjectTypeTree.GetType("Wall").Name).ToList();
 
             // go over all walls with other walls:
             for (int i = 0; i < wallObjs.Count; i++)
@@ -116,7 +119,7 @@ namespace RuleAPI.Methods
                         double bottom = Math.Max(bottomA, bottomB);
 
                         Mesh newCornerMesh = Utils.CreateExtrudedMesh(new List<Vector3D>() { A1B1, A2B1, A2B2, A1B2 }, top, bottom);
-                        RuleCheckObject newObj = new RuleCheckObject("Corner" + newVirtualObjs.Count.ToString(), ObjectTypes.Corner, newCornerMesh);
+                        RuleCheckObject newObj = new RuleCheckObject("Corner" + newVirtualObjs.Count.ToString(), ObjectTypeTree.GetType("Corner"), newCornerMesh);
                         newVirtualObjs.Add(newObj);
                     }
                 }
@@ -130,8 +133,8 @@ namespace RuleAPI.Methods
 
             List<RuleCheckObject> newVirtualObjs = new List<RuleCheckObject>();
 
-            List<RuleCheckObject> cornerCabinets = model.Objects.Where(o => o.Type == DbmsApi.ObjectTypes.CornerCabinet).ToList();
-            List<RuleCheckObject> cabinets = model.Objects.Where(o => o.Type == DbmsApi.ObjectTypes.Cabinet).ToList();
+            List<RuleCheckObject> cornerCabinets = model.Objects.Where(o => o.Type == ObjectTypeTree.GetType("CornerCabinet").Name).ToList();
+            List<RuleCheckObject> cabinets = model.Objects.Where(o => o.Type == ObjectTypeTree.GetType("Cabinet").Name).ToList();
 
 
             List<Tuple<Vector3D, List<RuleCheckObject>>> cabinetGroups = new List<Tuple<Vector3D, List<RuleCheckObject>>>();
@@ -235,7 +238,7 @@ namespace RuleAPI.Methods
                 }
                 newMesh.VertexList = newMeshVects;
 
-                RuleCheckObject newObj = new RuleCheckObject("KitchenLandingArea" + newVirtualObjs.Count.ToString(), ObjectTypes.KitchenLandingArea, newMesh);
+                RuleCheckObject newObj = new RuleCheckObject("KitchenLandingArea" + newVirtualObjs.Count.ToString(), ObjectTypeTree.GetType("KitchenLandingArea"), newMesh);
                 newVirtualObjs.Add(newObj);
             }
 
@@ -244,8 +247,8 @@ namespace RuleAPI.Methods
         public static List<RuleCheckObject> FurnishingCoM(RuleCheckModel model)
         {
             // Here need to find all model object that are type furnishing
-            List<RuleCheckObject> furnishingObj = model.Objects.Where(o => o.Type == ObjectTypes.FurnishingElement).ToList();
-            List<RuleCheckObject> newVirtualObjs = new List<RuleCheckObject>();
+            List<RuleCheckObject> furnishingObj = model.Objects.Where(o => o.Type == ObjectTypeTree.GetType("FurnishingElement").Name).ToList();
+            List <RuleCheckObject> newVirtualObjs = new List<RuleCheckObject>();
             Vector3D ApSum = new Vector3D();
             double ASum = 0;
             foreach (RuleCheckObject o in furnishingObj)
@@ -259,7 +262,7 @@ namespace RuleAPI.Methods
             Vector3D centroid = Vector3D.Divide(ApSum, ASum);
             Mesh newTriangleMesh = Utils.CreateTriangleMesh(Vector3D.Add(centroid, new Vector3D(0, 0.1, 0)), Vector3D.Add(centroid, new Vector3D(0.1, -0.1, 0)), Vector3D.Add(centroid, new Vector3D(-0.1, -0.1, 0)), 0.0, 0.0);
 
-            RuleCheckObject newObj = new RuleCheckObject("FurnishingCoM" + newVirtualObjs.Count.ToString(), ObjectTypes.FurnishingCoM, newTriangleMesh);
+            RuleCheckObject newObj = new RuleCheckObject("FurnishingCoM" + newVirtualObjs.Count.ToString(), ObjectTypeTree.GetType("FurnishingCoM"), newTriangleMesh);
             newVirtualObjs.Add(newObj);
 
             return newVirtualObjs;
@@ -267,13 +270,13 @@ namespace RuleAPI.Methods
         public static List<RuleCheckObject> RoomCentroid(RuleCheckModel model)
         {
             // Here need to find all model object that are type furnishing
-            List<RuleCheckObject> floorObj = model.Objects.Where(o => o.Type == ObjectTypes.Floor).ToList();
+            List<RuleCheckObject> floorObj = model.Objects.Where(o => o.Type == ObjectTypeTree.GetType("Floor").Name).ToList();
 
             List<RuleCheckObject> newVirtualObjs = new List<RuleCheckObject>();
             foreach (RuleCheckObject o in floorObj)
             {
                 Mesh newTriangleMesh = Utils.CreateTriangleMesh(Vector3D.Add(o.Location, new Vector3D(0, 0.1, 0)), Vector3D.Add(o.Location, new Vector3D(0.1, -0.1, 0)), Vector3D.Add(o.Location, new Vector3D(-0.1, -0.1, 0)), 0.0, 0.0);
-                RuleCheckObject newObj = new RuleCheckObject("RoomCentroid" + newVirtualObjs.Count.ToString(), ObjectTypes.RoomCentroid, newTriangleMesh);
+                RuleCheckObject newObj = new RuleCheckObject("RoomCentroid" + newVirtualObjs.Count.ToString(), ObjectTypeTree.GetType("RoomCentroid"), newTriangleMesh);
                 newVirtualObjs.Add(newObj);
             }
 

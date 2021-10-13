@@ -10,7 +10,7 @@ namespace DbmsApi.API
     {
         public string CatalogID;
         public string Name;
-        public ObjectTypes TypeId;
+        public string TypeId;
         public Properties Properties;
         public List<Component> Components = new List<Component>();
     }

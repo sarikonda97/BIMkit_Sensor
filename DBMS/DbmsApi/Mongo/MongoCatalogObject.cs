@@ -8,7 +8,7 @@ namespace DbmsApi.Mongo
     public class MongoCatalogObject : MongoDocument
     {
         public string Name;
-        public ObjectTypes TypeId;
+        public string TypeId;
 
         public Properties Properties;
         public List<MeshRep> MeshReps = new List<MeshRep>();

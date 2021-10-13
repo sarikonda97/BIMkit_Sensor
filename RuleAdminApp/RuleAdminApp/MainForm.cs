@@ -1,4 +1,5 @@
 ﻿using DbmsApi;
+using DbmsApi.API;
 using RuleAPI;
 using RuleAPI.Models;
 using System;
@@ -324,17 +325,17 @@ namespace RuleAdminApp
 
         private async void buttonMethodCheck_Click(object sender, EventArgs e)
         {
-            APIResponse<List<ObjectTypes>> response = await DBMSController.GetTypesList();
+            APIResponse<List<ObjectType>> response = await DBMSController.GetTypes();
             if (response.Code != System.Net.HttpStatusCode.OK)
             {
                 MessageBox.Show(response.ReasonPhrase);
             }
-            APIResponse<List<ObjectTypes>> response0 = await RuleAPIController.GetTypesList();
+            APIResponse<List<ObjectType>> response0 = await RuleAPIController.GetTypesList();
             if (response0.Code != System.Net.HttpStatusCode.OK)
             {
                 MessageBox.Show(response0.ReasonPhrase);
             }
-            APIResponse<Dictionary<ObjectTypes, string>> response1 = await RuleAPIController.GetVOMethodsAsync();
+            APIResponse<Dictionary<ObjectType, string>> response1 = await RuleAPIController.GetVOMethodsAsync();
             if (response1.Code != System.Net.HttpStatusCode.OK)
             {
                 MessageBox.Show(response1.ReasonPhrase);

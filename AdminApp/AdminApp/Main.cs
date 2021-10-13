@@ -47,7 +47,7 @@ namespace AdminApp
             {
                 this.Enabled = true;
                 this.User = login.User;
-                Refresh();
+                RefreshAsync();
 
                 this.groupBoxCO.Enabled = User.IsAdmin;
                 this.groupBoxMaterial.Enabled = User.IsAdmin;
@@ -66,7 +66,7 @@ namespace AdminApp
 
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
-            Refresh();
+            RefreshAsync();
         }
 
         private void ResetStuff()
@@ -90,10 +90,11 @@ namespace AdminApp
             this.dataGridViewModels.Rows.Clear();
         }
 
-        private void Refresh()
+        private async Task RefreshAsync()
         {
             ResetStuff();
 
+            await GetTypes();
             SetTypeTree();
 
             DisplayUserData();
@@ -468,7 +469,7 @@ namespace AdminApp
             string colId = this.dataGridViewCatalogObjects.SelectedRows[0].Cells[1].Value as string;
             CatalogObjectMetadata com = CatalogMetadatas[colId];
 
-            TypeChangeForm tcf = new TypeChangeForm();
+            TypeChangeForm tcf = new TypeChangeForm(ObjectTypeTree.GetAllTypes());
             if (tcf.ShowDialog() != DialogResult.OK)
             {
                 return;
@@ -852,65 +853,61 @@ namespace AdminApp
 
         #region Types
 
+        private async Task GetTypes()
+        {
+            APIResponse<List<ObjectType>> response3 = await Controller.GetTypes();
+            if (response3.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response3.ReasonPhrase);
+                return;
+            }
+            ObjectTypeTree.BuildTypeTree(response3.Data);
+        }
+
         private void SetTypeTree()
         {
             // Empty treeview
             this.treeViewTypes.Nodes.Clear();
 
             // Get type tree
-            ObjectType ttnRoot = ObjectTypeTree.Root;
+            ObjectType ttnRoot = ObjectTypeTree.GetType("Root");
 
             // Create matching root node
-            TreeNode tnRoot = new TreeNode(ttnRoot.ID.ToString());
+            TreeNode tnRoot = new TreeNode(ttnRoot.Name.ToString());
             tnRoot.Tag = ttnRoot;
             this.treeViewTypes.Nodes.Add(tnRoot);
 
             // Recursively create matching treenodes
-            Action<ObjectType, TreeNode> generateRecursive = null;
-            generateRecursive = (ttn, tn) =>
+            void generateRecursive(ObjectType ttn, TreeNode tn)
             {
-                foreach (ObjectType _ttn in ttn.Children)
+                foreach (ObjectType _ttn in ObjectTypeTree.GetTypeChildren(ttn.Name))
                 {
-                    var _tn = new TreeNode(_ttn.ID.ToString());
+                    var _tn = new TreeNode(_ttn.Name.ToString());
                     _tn.Tag = _ttn;
                     tn.Nodes.Add(_tn);
                     generateRecursive(_ttn, _tn);
                 }
-            };
+            }
+
             generateRecursive(ttnRoot, tnRoot);
 
             // Expand the tree
             tnRoot.ExpandAll();
         }
 
-        private void buttonDownload_Click(object sender, EventArgs e)
+        private void buttonAddType_Click(object sender, EventArgs e)
         {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Text File | *.txt";
-            sfd.FileName = "BIMKit_TypeTree.txt";
-            if (sfd.ShowDialog() != DialogResult.OK)
-            {
-                return;
-            }
 
-            List<string> outputStr = new List<string>();
+        }
 
-            // Recursively create matching treenodes
-            Action<ObjectType> getTypeString = null;
-            getTypeString = (tn) =>
-            {
-                outputStr.Add(tn.ID.ToString());
-                foreach (ObjectType _tnChild in tn.Children)
-                {
-                    getTypeString(_tnChild);
-                }
-            };
+        private void buttonEditType_Click(object sender, EventArgs e)
+        {
 
-            // Get type tree
-            ObjectType tnRoot = ObjectTypeTree.Root;
-            getTypeString(tnRoot);
+        }
 
-            File.WriteAllLines(sfd.FileName, outputStr.ToArray());
+        private void buttonDeleteType_Click(object sender, EventArgs e)
+        {
+
         }
 
         #endregion

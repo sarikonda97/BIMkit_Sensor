@@ -1,4 +1,5 @@
 ﻿using DbmsApi;
+using DbmsApi.API;
 using RuleAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -324,35 +325,35 @@ namespace RuleAPI
 
         #region VO/Relation/Properties Methods:
 
-        public async Task<APIResponse<Dictionary<ObjectTypes, string>>> GetVOMethodsAsync()
+        public async Task<APIResponse<Dictionary<ObjectType, string>>> GetVOMethodsAsync()
         {
             // Perform POST request
             HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("method/vo"));
 
             if (response.IsSuccessStatusCode)
             {
-                return new APIResponse<Dictionary<ObjectTypes, string>>(response, await response.Content.ReadAsAsync<Dictionary<ObjectTypes, string>>(mediaTypeFormatters));
+                return new APIResponse<Dictionary<ObjectType, string>>(response, await response.Content.ReadAsAsync<Dictionary<ObjectType, string>>(mediaTypeFormatters));
             }
             else
             {
                 response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
-                return new APIResponse<Dictionary<ObjectTypes, string>>(response, default);
+                return new APIResponse<Dictionary<ObjectType, string>>(response, default);
             }
         }
 
-        public async Task<APIResponse<List<ObjectTypes>>> GetTypesList()
+        public async Task<APIResponse<List<ObjectType>>> GetTypesList()
         {
             // Perform POST request
             HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("method/type"));
 
             if (response.IsSuccessStatusCode)
             {
-                return new APIResponse<List<ObjectTypes>>(response, await response.Content.ReadAsAsync<List<ObjectTypes>>(mediaTypeFormatters));
+                return new APIResponse<List<ObjectType>>(response, await response.Content.ReadAsAsync<List<ObjectType>>(mediaTypeFormatters));
             }
             else
             {
                 response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
-                return new APIResponse<List<ObjectTypes>>(response, default);
+                return new APIResponse<List<ObjectType>>(response, default);
             }
         }
 

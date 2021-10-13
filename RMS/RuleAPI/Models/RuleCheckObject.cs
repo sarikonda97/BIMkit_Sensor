@@ -13,7 +13,7 @@ namespace RuleAPI.Models
     {
         public string ID;
         public string Name;
-        public ObjectTypes Type;
+        public string Type;
         public string CatalogId;
         public Vector3D Location;
         public Vector4D Orientation;
@@ -67,11 +67,11 @@ namespace RuleAPI.Models
             GlobalVerticies = LocalVerticies.Select(v => Matrix4.Multiply(translationMatrix, v.Get4D(1.0)).Get3D()).ToList();
         }
 
-        public RuleCheckObject(string name, ObjectTypes type, Mesh globalMesh, bool virtualObj = true)
+        public RuleCheckObject(string name, ObjectType type, Mesh globalMesh, bool virtualObj = true)
         {
             ID = new Guid().ToString();
             Name = name;
-            Type = type;
+            Type = type.Name;
             VirtualObject = virtualObj;
             Properties = new Properties();
 
@@ -93,11 +93,11 @@ namespace RuleAPI.Models
             Location = realCenter;
         }
 
-        public RuleCheckObject(string name, ObjectTypes type, Mesh localMesh, Vector3D location, Vector4D orientation, bool virtualObj = true)
+        public RuleCheckObject(string name, ObjectType type, Mesh localMesh, Vector3D location, Vector4D orientation, bool virtualObj = true)
         {
             ID = new Guid().ToString();
             Name = name;
-            Type = type;
+            Type = type.Name;
             VirtualObject = virtualObj;
             Properties = new Properties();
 

@@ -1,4 +1,5 @@
 ﻿using DbmsApi;
+using DbmsApi.API;
 using RuleAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace BIMRuleEditor
         public ExistencialClauseForm(string name, List<string> keys)
         {
             InitializeComponent();
-            this.ExistentialClause = new ExistentialClause(OccurrenceRule.ALL, new Characteristic(ObjectTypes.BuildingElement, new List<PropertyCheck>()));
+            this.ExistentialClause = new ExistentialClause(OccurrenceRule.ALL, new Characteristic(ObjectTypeTree.GetType("BuildingElement").Name, new List<PropertyCheck>()));
             ClauseName = name;
             takenKeys = keys;
 
@@ -43,7 +44,7 @@ namespace BIMRuleEditor
             {
                 this.comboBoxObjectExistence.Items.Add(occurrence);
             }
-            foreach (ObjectTypes type in Enum.GetValues(typeof(ObjectTypes)))
+            foreach (ObjectType type in ObjectTypeTree.GetAllTypes())
             {
                 this.comboBoxObjectType.Items.Add(type);
             }
@@ -71,7 +72,7 @@ namespace BIMRuleEditor
 
         private void comboBoxObjectType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ExistentialClause.Characteristic.Type = Enum.GetValues(typeof(ObjectTypes)).Cast<ObjectTypes>().ToList()[this.comboBoxObjectType.SelectedIndex];
+            ExistentialClause.Characteristic.Type = (string)this.comboBoxObjectType.SelectedItem;
         }
 
         private void buttonAddProperty_Click(object sender, EventArgs e)

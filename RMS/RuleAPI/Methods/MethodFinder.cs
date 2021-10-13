@@ -1,4 +1,5 @@
 ﻿using DbmsApi;
+using DbmsApi.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,9 @@ namespace RuleAPI.Methods
     {
         public static readonly double SchrinkAmount = 1.0;
 
-        public static List<ObjectTypes> GetAllTypes()
+        public static List<ObjectType> GetAllTypes()
         {
-            return Enum.GetValues(typeof(ObjectTypes)).Cast<ObjectTypes>().ToList();
+            return ObjectTypeTree.GetAllTypes();
         }
 
         public static Dictionary<string, Type> GetAllPropertyMethods()
@@ -41,28 +42,28 @@ namespace RuleAPI.Methods
             return methodNames;
         }
 
-        public static Dictionary<ObjectTypes, string> GetAllVOMethods()
+        public static Dictionary<ObjectType, string> GetAllVOMethods()
         {
             MethodInfo[] methodInfos = typeof(VirtualObjects).GetMethods(BindingFlags.Public | BindingFlags.Static);
 
-            Dictionary<ObjectTypes, string> methodNames = new Dictionary<ObjectTypes, string>();
-            foreach (var methodInfo in methodInfos)
+            Dictionary<ObjectType, string> methodNames = new Dictionary<ObjectType, string>();
+            foreach (MethodInfo methodInfo in methodInfos)
             {
-                ObjectTypes methodVOType = Enum.GetValues(typeof(ObjectTypes)).Cast<ObjectTypes>().Where(e => Enum.GetName(typeof(ObjectTypes), e).Contains(methodInfo.Name)).First();
+                ObjectType methodVOType = GetAllTypes().Where(e => e.Name.Contains(methodInfo.Name)).First();
                 methodNames.Add(methodVOType, methodInfo.Name);
             }
             return methodNames;
         }
 
-        public static Dictionary<ObjectTypes, MethodInfo> GetAllVOMethodInfos()
+        public static Dictionary<string, MethodInfo> GetAllVOMethodInfos()
         {
             MethodInfo[] methodInfos = typeof(VirtualObjects).GetMethods(BindingFlags.Public | BindingFlags.Static);
 
-            Dictionary<ObjectTypes, MethodInfo> methodInfoDict = new Dictionary<ObjectTypes, MethodInfo>();
+            Dictionary<string, MethodInfo> methodInfoDict = new Dictionary<string, MethodInfo>();
             foreach (var methodInfo in methodInfos)
             {
-                ObjectTypes methodVOType = Enum.GetValues(typeof(ObjectTypes)).Cast<ObjectTypes>().Where(e => Enum.GetName(typeof(ObjectTypes), e).Contains(methodInfo.Name)).First();
-                methodInfoDict.Add(methodVOType, methodInfo);
+                //ObjectType methodVOType = GetAllTypes().Where(e => e.Name.Contains(methodInfo.Name)).First();
+                methodInfoDict.Add(methodInfo.Name, methodInfo);
             }
             return methodInfoDict;
         }

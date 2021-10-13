@@ -1,4 +1,5 @@
 ﻿using DbmsApi;
+using DbmsApi.API;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,20 +14,20 @@ namespace AdminApp
 {
     public partial class TypeChangeForm : Form
     {
-        public ObjectTypes Type;
+        public string Type;
 
-        public TypeChangeForm()
+        public TypeChangeForm(List<ObjectType> types)
         {
             InitializeComponent();
 
             this.comboBoxTypes.Items.Clear();
-            this.comboBoxTypes.Items.AddRange(ObjectTypeTree.ObjectDict.Keys.Select(t => t.ToString()).ToArray());
+            this.comboBoxTypes.Items.AddRange(types.Select(t=>t.Name).ToArray());
             this.comboBoxTypes.SelectedIndex = 0;
         }
 
         private void buttonDone_Click(object sender, EventArgs e)
         {
-            this.Type = (ObjectTypes)Enum.Parse(typeof(ObjectTypes), this.comboBoxTypes.SelectedItem.ToString());
+            this.Type = (string)this.comboBoxTypes.SelectedItem;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using DbmsApi.API;
 
 namespace RuleAPI.Models
 {
     public class Characteristic
     {
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ObjectTypes Type { get; set; }
+        //[JsonConverter(typeof(StringEnumConverter))]
+        public string Type { get; set; }
 
         public List<PropertyCheck> PropertyChecks { get; set; }
 
-        public Characteristic(ObjectTypes type, List<PropertyCheck> propertyChecks)
+        public Characteristic(string type, List<PropertyCheck> propertyChecks)
         {
             Type = type;
             PropertyChecks = propertyChecks;

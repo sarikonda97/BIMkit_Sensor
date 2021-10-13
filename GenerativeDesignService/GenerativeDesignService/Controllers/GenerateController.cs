@@ -25,6 +25,13 @@ namespace GenerativeDesignService.Controllers
             {
                 DBMSAPIController.SetSessionToken(request.DBMSToken);
 
+                APIResponse<List<ObjectType>> responseType = await DBMSAPIController.GetTypes();
+                if (responseType.Code != System.Net.HttpStatusCode.OK)
+                {
+                    return Request.CreateResponse(responseType.Code, responseType.ReasonPhrase);
+                }
+                ObjectTypeTree.BuildTypeTree(responseType.Data);
+
                 // Get the model
                 APIResponse<Model> response = await DBMSAPIController.GetModel(new ItemRequest(request.ModelID, request.LOD));
                 if (response.Code != HttpStatusCode.OK)

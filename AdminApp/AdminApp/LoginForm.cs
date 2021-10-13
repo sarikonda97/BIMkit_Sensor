@@ -29,25 +29,22 @@ namespace AdminApp
         {
             APIResponse<TokenData> response = await DBMSAPIController.LoginAsync(this.textBoxUsername.Text, this.textBoxPassword.Text);
 
-            if (response.Code == System.Net.HttpStatusCode.OK)
-            {
-                APIResponse<UserData> response2 = await DBMSAPIController.GetUserData(this.textBoxUsername.Text);
-
-                if (response2.Code == System.Net.HttpStatusCode.OK)
-                {
-                    this.User = response2.Data;
-                    this.DialogResult = DialogResult.OK;
-                    this.Close();
-                }
-                else
-                {
-                    MessageBox.Show(response2.ReasonPhrase);
-                }
-            }
-            else
+            if (response.Code != System.Net.HttpStatusCode.OK)
             {
                 MessageBox.Show(response.ReasonPhrase);
+                return;
             }
+
+            APIResponse<UserData> response2 = await DBMSAPIController.GetUserData(this.textBoxUsername.Text);
+            if (response2.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response2.ReasonPhrase);
+                return;
+            }
+
+            this.User = response2.Data;
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
 
         private async void buttonSignUp_Click(object sender, EventArgs e)

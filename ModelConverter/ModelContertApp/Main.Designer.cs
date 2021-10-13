@@ -39,6 +39,7 @@
             this.checkBoxFlipTriangles = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.comboBoxModelUnits = new System.Windows.Forms.ComboBox();
+            this.buttonUpdateConverter = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonSelectInputFile
@@ -104,9 +105,9 @@
             // 
             this.buttonConvert.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonConvert.Location = new System.Drawing.Point(12, 116);
+            this.buttonConvert.Location = new System.Drawing.Point(153, 116);
             this.buttonConvert.Name = "buttonConvert";
-            this.buttonConvert.Size = new System.Drawing.Size(508, 28);
+            this.buttonConvert.Size = new System.Drawing.Size(367, 28);
             this.buttonConvert.TabIndex = 8;
             this.buttonConvert.Text = "Convert";
             this.buttonConvert.UseVisualStyleBackColor = true;
@@ -149,11 +150,22 @@
             this.comboBoxModelUnits.Size = new System.Drawing.Size(109, 21);
             this.comboBoxModelUnits.TabIndex = 12;
             // 
+            // buttonUpdateConverter
+            // 
+            this.buttonUpdateConverter.Location = new System.Drawing.Point(12, 116);
+            this.buttonUpdateConverter.Name = "buttonUpdateConverter";
+            this.buttonUpdateConverter.Size = new System.Drawing.Size(135, 28);
+            this.buttonUpdateConverter.TabIndex = 13;
+            this.buttonUpdateConverter.Text = "Update Converter";
+            this.buttonUpdateConverter.UseVisualStyleBackColor = true;
+            this.buttonUpdateConverter.Click += new System.EventHandler(this.buttonUpdateConverter_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(532, 156);
+            this.Controls.Add(this.buttonUpdateConverter);
             this.Controls.Add(this.comboBoxModelUnits);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.checkBoxFlipTriangles);
@@ -188,6 +200,7 @@
         private System.Windows.Forms.CheckBox checkBoxFlipTriangles;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox comboBoxModelUnits;
+        private System.Windows.Forms.Button buttonUpdateConverter;
     }
 }
 

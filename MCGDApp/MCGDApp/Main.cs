@@ -200,30 +200,6 @@ namespace MCGDApp
                     ruleInstanceTN.Nodes.Add(objTN);
                 }
 
-                //if (ModelChecker != null)
-                //{
-                //    foreach (RuleCheckObject obj1 in ruleInstance.Objs)
-                //    {
-                //        foreach (RuleCheckObject obj2 in ruleInstance.Objs)
-                //        {
-                //            if (obj1 == obj2)
-                //            {
-                //                continue;
-                //            }
-
-                //            //TreeNode relTN = new TreeNode("Object1 Name: " + obj1.IfcProduct.Name + " \nObject2 Name: " + obj2.IfcProduct.Name);
-                //            TreeNode relTN = new TreeNode(obj1.Name + " => " + obj2.Name);
-                //            RuleCheckRelation rel = ModelChecker.FindOrCreateObjectRelation(ModelChecker.Model, obj1, obj2);
-                //            foreach (Property prop in rel.Properties)
-                //            {
-                //                TreeNode propTN = new TreeNode(prop.String());
-                //                relTN.Nodes.Add(propTN);
-                //            }
-
-                //            ruleInstanceTN.Nodes.Add(relTN);
-                //        }
-                //    }
-                //}
                 foreach (RuleCheckRelation rel in ruleInstance.Rels)
                 {
                     TreeNode relTN = new TreeNode(rel.FirstObj.Name + " => " + rel.SecondObj.Name);

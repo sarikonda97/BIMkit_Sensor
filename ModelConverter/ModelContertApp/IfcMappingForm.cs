@@ -1,4 +1,5 @@
 ﻿using DbmsApi;
+using DbmsApi.API;
 using ModelConverter;
 using System;
 using System.Collections.Generic;
@@ -14,17 +15,17 @@ namespace ModelContertApp
 {
     public partial class IfcMappingForm : Form
     {
-        public IfcMappingForm(string ifcType)
+        public IfcMappingForm(string ifcType, List<ObjectType> types)
         {
             InitializeComponent();
             this.textBoxIfcType.Text = ifcType;
-            this.comboBoxBIMPlatformType.DataSource = Enum.GetValues(typeof(ObjectTypes));
+            this.comboBoxBIMPlatformType.Items.AddRange(types.Select(t => t.Name).ToArray());
         }
 
         private void buttonConvert_Click(object sender, EventArgs e)
         {
-            Enum.TryParse<ObjectTypes>(comboBoxBIMPlatformType.SelectedValue.ToString(), out ObjectTypes value);
-            IfcConverter.AddTypeConvert(this.textBoxIfcType.Text, value);
+            string type = (string)comboBoxBIMPlatformType.SelectedItem;
+            IfcConverter.AddTypeConvert(this.textBoxIfcType.Text, type);
             this.Close();
         }
     }

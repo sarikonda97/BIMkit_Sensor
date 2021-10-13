@@ -21,8 +21,8 @@ namespace ModelConverter
     public static class IfcConverter
     {
         private static string ifcTypeconverterFile = "../../typeConvertDict.json";
-        private static Dictionary<string, ObjectTypes> ifcTypeConverter { get; set; }
-        public static Dictionary<string, ObjectTypes> IfcTypeConverter
+        private static Dictionary<string, string> ifcTypeConverter { get; set; }
+        public static Dictionary<string, string> IfcTypeConverter
         {
             get
             {
@@ -40,7 +40,7 @@ namespace ModelConverter
             ifcTypeConverter = null;
         }
 
-        public static void AddTypeConvert(string key, ObjectTypes value)
+        public static void AddTypeConvert(string key, string value)
         {
             ifcTypeConverter.Add(key, value);
         }
@@ -267,16 +267,16 @@ namespace ModelConverter
             }
         }
 
-        public static Dictionary<string, ObjectTypes> GetTypeConvertDictionary()
+        public static Dictionary<string, string> GetTypeConvertDictionary()
         {
             try
             {
-                return new JavaScriptSerializer().Deserialize<Dictionary<string, ObjectTypes>>(File.ReadAllText(ifcTypeconverterFile));
+                return new JavaScriptSerializer().Deserialize<Dictionary<string, string>>(File.ReadAllText(ifcTypeconverterFile));
             }
             catch (FileNotFoundException)
             {
-                File.WriteAllText(ifcTypeconverterFile, new JavaScriptSerializer().Serialize(new Dictionary<string, ObjectTypes>()));
-                return new JavaScriptSerializer().Deserialize<Dictionary<string, ObjectTypes>>(File.ReadAllText(ifcTypeconverterFile));
+                File.WriteAllText(ifcTypeconverterFile, new JavaScriptSerializer().Serialize(new Dictionary<string, string>()));
+                return new JavaScriptSerializer().Deserialize<Dictionary<string, string>>(File.ReadAllText(ifcTypeconverterFile));
             }
         }
 

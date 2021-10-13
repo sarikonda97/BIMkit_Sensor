@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GenerativeDesignPackage
@@ -199,8 +200,6 @@ namespace GenerativeDesignPackage
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
-            Task[] tasks = new Task[ThreadCount - 1];
-
             foreach (ThreadConfiguration threadConfiguration in ThreadConfigurations)
             {
                 threadConfiguration.SceneConfiguration = new SceneConfiguration()
@@ -271,19 +270,20 @@ namespace GenerativeDesignPackage
                     }
 
                     // Parallel:
+                    Task[] tasks = new Task[ThreadCount - 1];
                     // In all Threads (not including the first since it it the one to beat), update the ith item so it is at a new  location and orientation, then evaluate it
                     for (int j = 1; j < ThreadCount; j++)
                     {
-                        ThreadConfiguration currentThreadConfig = ThreadConfigurations[j];
-                        int k = (i - 1 + currentThreadConfig.SceneConfiguration.ObjectConfigurations.Count) % currentThreadConfig.SceneConfiguration.ObjectConfigurations.Count;
-                        ObjectConfiguration configK = currentThreadConfig.SceneConfiguration.ObjectConfigurations[k];
-                        ObjectConfiguration bestConfigK = bestThreadForConfig.SceneConfiguration.ObjectConfigurations[k];
-                        ObjectConfiguration oConfig = currentThreadConfig.SceneConfiguration.ObjectConfigurations[i];
-                        oConfig.Location = locOrientPairs[j - 1].Item1;
-                        oConfig.Orientation = locOrientPairs[j - 1].Item2;
-
-                        Task newTask = Task.Run(() =>
+                        int val = j;
+                        Task newTask = Task.Run(()=>
                         {
+                            ThreadConfiguration currentThreadConfig = ThreadConfigurations[val];
+                            int k = (i - 1 + currentThreadConfig.SceneConfiguration.ObjectConfigurations.Count) % currentThreadConfig.SceneConfiguration.ObjectConfigurations.Count;
+                            ObjectConfiguration configK = currentThreadConfig.SceneConfiguration.ObjectConfigurations[k];
+                            ObjectConfiguration bestConfigK = bestThreadForConfig.SceneConfiguration.ObjectConfigurations[k];
+                            ObjectConfiguration oConfig = currentThreadConfig.SceneConfiguration.ObjectConfigurations[i];
+                            oConfig.Location = locOrientPairs[val - 1].Item1;
+                            oConfig.Orientation = locOrientPairs[val - 1].Item2;
                             // Make it match the best config again by removing the item that was last moved and putting it in the best spot again (k should be known as i-1):
                             configK.Location = bestConfigK.Location;
                             configK.Orientation = bestConfigK.Orientation;

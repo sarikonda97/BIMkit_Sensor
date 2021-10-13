@@ -13,26 +13,112 @@ namespace DBMS.Controllers.APIControllers
 {
     public class TypeController : ApiController
     {
+        protected MongoDbController db;
+        public TypeController() { db = MongoDbController.Instance; }
+        public TypeController(MongoDbController db) { this.db = db; }
+
         public HttpResponseMessage Get()
         {
-            List<ObjectTypes> listOfTypes = GetTypesRecusrive(ObjectTypeTree.Root);
+            List<ObjectType> listOfTypes = db.GetAllAvailableTypes();
 
             return Request.CreateResponseDBMS(HttpStatusCode.OK, listOfTypes);
         }
 
-        private List<ObjectTypes> GetTypesRecusrive(ObjectType type)
+        public HttpResponseMessage Get(string id)
         {
-            if (type.Children.Count == 0)
+            User user = db.GetUserFromToken(ActionContext.Request.Headers.Authorization.Parameter);
+            if (user == null)
             {
-                return new List<ObjectTypes>() { type.ID };
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Not Logged in or Session has ended");
             }
 
-            List<ObjectTypes> types = new List<ObjectTypes>();
-            foreach (var child in type.Children)
+            ObjectType type = db.RetrieveType(id);
+            if (type == null)
             {
-                types.AddRange(GetTypesRecusrive(child));
+                return Request.CreateResponseDBMS(HttpStatusCode.BadRequest, "No Type with that ID exists");
             }
-            return types;
+
+            return Request.CreateResponseDBMS(HttpStatusCode.OK, type);
+        }
+
+        public HttpResponseMessage Post([FromBody] ObjectType type)
+        {
+            User user = db.GetUserFromToken(ActionContext.Request.Headers.Authorization.Parameter);
+            if (user == null)
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Not Logged in or Session has ended");
+            }
+
+            if (!user.IsAdmin)
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Must be an Admin");
+            }
+
+            if (type == null || string.IsNullOrWhiteSpace(type.Name) || string.IsNullOrWhiteSpace(type.ParentName))
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.BadRequest, "Missing Type Info");
+            }
+
+            if (type.Name == "Root")
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Cannot edit Root");
+            }
+
+            string typeId = db.CreateType(type);
+            return Request.CreateResponseDBMS(HttpStatusCode.Created, typeId);
+        }
+
+        public HttpResponseMessage Put([FromBody] ObjectType type)
+        {
+            User user = db.GetUserFromToken(ActionContext.Request.Headers.Authorization.Parameter);
+            if (user == null)
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Not Logged in or Session has ended");
+            }
+
+            if (!user.IsAdmin)
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Must be an Admin");
+            }
+
+            if (type == null || string.IsNullOrWhiteSpace(type.Name) || string.IsNullOrWhiteSpace(type.ParentName) )
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.BadRequest, "Missing Type Info");
+            }
+
+            if (type.Name == "Root")
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Cannot edit Root");
+            }
+
+            if (!db.UpdateType(type, true))
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Creates Type Loop");
+            }
+
+            return Request.CreateResponseDBMS(HttpStatusCode.OK, "Update Successful");
+        }
+
+        public HttpResponseMessage Delete(string id)
+        {
+            User user = db.GetUserFromToken(ActionContext.Request.Headers.Authorization.Parameter);
+            if (user == null)
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Not Logged in or Session has ended");
+            }
+
+            if (!user.IsAdmin)
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Must be an Admin");
+            }
+
+            if (id == "Root")
+            {
+                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Cannot edit Root");
+            }
+
+            db.DeleteType(id);
+            return Request.CreateResponseDBMS(HttpStatusCode.OK, "Delete Successful");
         }
     }
 }

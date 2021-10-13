@@ -28,6 +28,7 @@ namespace DBMS.Controllers.DBControllers
         private IMongoCollection<Material> materialCollection;
         private IMongoCollection<MongoModel> modelCollection;
         private IMongoCollection<MongoCatalogObject> catalogObjectCollection;
+        private IMongoCollection<ObjectType> typeCollection;
 
         private MongoDbController()
         {
@@ -44,6 +45,7 @@ namespace DBMS.Controllers.DBControllers
             materialCollection = mongoDatabase.GetCollection<Material>("materials");
             modelCollection = mongoDatabase.GetCollection<MongoModel>("models");
             catalogObjectCollection = mongoDatabase.GetCollection<MongoCatalogObject>("catalogObjects");
+            typeCollection = mongoDatabase.GetCollection<ObjectType>("objectTypes");
         }
 
         private void CreateDefaults()
@@ -56,6 +58,13 @@ namespace DBMS.Controllers.DBControllers
             {
                 CreateMaterial(new Material() { Name = "Default", Properties = new Properties() });
             };
+            if (typeCollection.EstimatedDocumentCount() == 0.0)
+            {
+                foreach (ObjectType type in ObjectTypeTree.DefaultTypesList())
+                {
+                    CreateType(type);
+                }
+            }
         }
 
         #region USER
@@ -356,7 +365,7 @@ namespace DBMS.Controllers.DBControllers
 
         public void UpdateCatalogObjectMetaData(CatalogObjectMetadata catalogObject)
         {
-            catalogObjectCollection.FindOneAndUpdate(c => c.Id == catalogObject.CatalogObjectId, 
+            catalogObjectCollection.FindOneAndUpdate(c => c.Id == catalogObject.CatalogObjectId,
                                                     Builders<MongoCatalogObject>.Update.Set(c => c.Name, catalogObject.Name)
                                                                                        .Set(c => c.TypeId, catalogObject.Type)
                                                                                        .Set(c => c.Properties, catalogObject.Properties));
@@ -395,6 +404,59 @@ namespace DBMS.Controllers.DBControllers
         public List<Material> GetAllAvailableMaterials()
         {
             return materialCollection.Find(m => true).ToList();
+        }
+
+        #endregion
+
+        #region Types
+
+        public string CreateType(ObjectType type)
+        {
+            typeCollection.InsertOne(type);
+            return type.Name;
+        }
+
+        public ObjectType RetrieveType(string id)
+        {
+            return typeCollection.Find(t => t.Name == id).Limit(1).FirstOrDefault();
+        }
+
+        public bool UpdateType(ObjectType type, bool checkForLoop)
+        {
+            ObjectType previousType = RetrieveType(type.Name);
+            typeCollection.ReplaceOne(t => t.Name == type.Name, type);
+
+            if (checkForLoop)
+            {
+                // Need to make sure we do not have a loop (go up the tree and see if you get to either the root or back to yourself):
+                if (ObjectTypeTree.CreatesLoop(GetAllAvailableTypes(), type))
+                {
+                    typeCollection.ReplaceOne(t => t.Name == type.Name, previousType);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void DeleteType(string name)
+        {
+            ObjectTypeTree.BuildTypeTree(GetAllAvailableTypes());
+
+            // Need to update all the children to point to the parent
+            ObjectType removingType = RetrieveType(name);
+            ObjectType parentType = RetrieveType(removingType.ParentName);
+            foreach (ObjectType type in ObjectTypeTree.GetTypeChildren(removingType.Name))
+            {
+                UpdateType(new ObjectType(type.Name, parentType.Name), false);
+            }
+
+            typeCollection.DeleteOne(t => t.Name == removingType.Name);
+        }
+
+        public List<ObjectType> GetAllAvailableTypes()
+        {
+            return typeCollection.Find(t => true).ToList();
         }
 
         #endregion

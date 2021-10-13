@@ -10,7 +10,7 @@ namespace DbmsApi.API
         public string CatalogObjectId;
 
         public string Name;
-        public ObjectTypes Type;
+        public string Type;
         public Properties Properties;
 
         [JsonConstructor]

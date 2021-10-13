@@ -1,10 +1,12 @@
-﻿using DbmsApi.API;
+﻿using DbmsApi;
+using DbmsApi.API;
 using DbmsApi.Mongo;
 using ModelConverter;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using Xbim.Common.Step21;
@@ -16,6 +18,9 @@ namespace ModelContertApp
     public partial class Main : Form
     {
         JavaScriptSerializer JavaScriptSerializer = new JavaScriptSerializer() { MaxJsonLength = 2097152 / 4 * 1000 };
+        private DBMSAPIController DBMSController;
+        private string dbmsURL = "https://localhost:44322//api/";
+        List<ObjectType> Types;
 
         public Main()
         {
@@ -23,6 +28,27 @@ namespace ModelContertApp
             IfcStore.ModelProviderFactory.UseHeuristicModelProvider();
 
             this.comboBoxModelUnits.DataSource = Enum.GetValues(typeof(Units));
+
+            DBMSController = new DBMSAPIController(dbmsURL);
+            FetchTypes();
+        }
+
+        private async void FetchTypes()
+        {
+            APIResponse<List<ObjectType>> response = await DBMSController.GetTypes();
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+
+                // Should avoid using this...
+                ObjectTypeTree.BuildTypeTree(ObjectTypeTree.DefaultTypesList());
+            }
+            else
+            {
+                ObjectTypeTree.BuildTypeTree(response.Data);
+            }
+
+            Types = ObjectTypeTree.GetAllTypes();
         }
 
         private void buttonOpenFile_Click(object sender, EventArgs e)
@@ -130,13 +156,18 @@ namespace ModelContertApp
             {
                 if (!IfcConverter.IfcTypeConverter.ContainsKey(instanceType))
                 {
-                    IfcMappingForm ifcMappingForm = new IfcMappingForm(instanceType);
+                    IfcMappingForm ifcMappingForm = new IfcMappingForm(instanceType, Types);
                     ifcMappingForm.ShowDialog();
                 }
             }
 
             IfcConverter.SaveTypeConvertDictionary();
             return IfcConverter.GetObjectsFromIFC(ifcFile, scale, flipTriangles);
+        }
+
+        private void buttonUpdateConverter_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

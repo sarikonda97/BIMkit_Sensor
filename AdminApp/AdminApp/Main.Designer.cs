@@ -89,7 +89,6 @@ namespace AdminApp
             this.buttonEditUser = new System.Windows.Forms.Button();
             this.buttonAddUser = new System.Windows.Forms.Button();
             this.groupBoxTypes = new System.Windows.Forms.GroupBox();
-            this.buttonDownload = new System.Windows.Forms.Button();
             this.treeViewTypes = new System.Windows.Forms.TreeView();
             this.tabControlTypeMat = new System.Windows.Forms.TabControl();
             this.tabPageUser = new System.Windows.Forms.TabPage();
@@ -112,6 +111,9 @@ namespace AdminApp
             this.buttonEditAllModel = new System.Windows.Forms.Button();
             this.buttonAddAllModel = new System.Windows.Forms.Button();
             this.buttonRefresh = new System.Windows.Forms.Button();
+            this.buttonAddType = new System.Windows.Forms.Button();
+            this.buttonEditType = new System.Windows.Forms.Button();
+            this.buttonDeleteType = new System.Windows.Forms.Button();
             this.groupBoxUser.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCurrentUserProperties)).BeginInit();
             this.groupBoxModel.SuspendLayout();
@@ -843,7 +845,9 @@ namespace AdminApp
             this.groupBoxTypes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxTypes.Controls.Add(this.buttonDownload);
+            this.groupBoxTypes.Controls.Add(this.buttonDeleteType);
+            this.groupBoxTypes.Controls.Add(this.buttonEditType);
+            this.groupBoxTypes.Controls.Add(this.buttonAddType);
             this.groupBoxTypes.Controls.Add(this.treeViewTypes);
             this.groupBoxTypes.Location = new System.Drawing.Point(3, 3);
             this.groupBoxTypes.Name = "groupBoxTypes";
@@ -851,17 +855,6 @@ namespace AdminApp
             this.groupBoxTypes.TabIndex = 15;
             this.groupBoxTypes.TabStop = false;
             this.groupBoxTypes.Text = "Types";
-            // 
-            // buttonDownload
-            // 
-            this.buttonDownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonDownload.Location = new System.Drawing.Point(430, 19);
-            this.buttonDownload.Name = "buttonDownload";
-            this.buttonDownload.Size = new System.Drawing.Size(75, 23);
-            this.buttonDownload.TabIndex = 13;
-            this.buttonDownload.Text = "Download";
-            this.buttonDownload.UseVisualStyleBackColor = true;
-            this.buttonDownload.Click += new System.EventHandler(this.buttonDownload_Click);
             // 
             // treeViewTypes
             // 
@@ -1125,6 +1118,39 @@ namespace AdminApp
             this.buttonRefresh.UseVisualStyleBackColor = true;
             this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
             // 
+            // buttonAddType
+            // 
+            this.buttonAddType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonAddType.Location = new System.Drawing.Point(430, 19);
+            this.buttonAddType.Name = "buttonAddType";
+            this.buttonAddType.Size = new System.Drawing.Size(75, 23);
+            this.buttonAddType.TabIndex = 1;
+            this.buttonAddType.Text = "Add";
+            this.buttonAddType.UseVisualStyleBackColor = true;
+            this.buttonAddType.Click += new System.EventHandler(this.buttonAddType_Click);
+            // 
+            // buttonEditType
+            // 
+            this.buttonEditType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonEditType.Location = new System.Drawing.Point(430, 48);
+            this.buttonEditType.Name = "buttonEditType";
+            this.buttonEditType.Size = new System.Drawing.Size(75, 23);
+            this.buttonEditType.TabIndex = 2;
+            this.buttonEditType.Text = "Edit";
+            this.buttonEditType.UseVisualStyleBackColor = true;
+            this.buttonEditType.Click += new System.EventHandler(this.buttonEditType_Click);
+            // 
+            // buttonDeleteType
+            // 
+            this.buttonDeleteType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonDeleteType.Location = new System.Drawing.Point(430, 198);
+            this.buttonDeleteType.Name = "buttonDeleteType";
+            this.buttonDeleteType.Size = new System.Drawing.Size(75, 23);
+            this.buttonDeleteType.TabIndex = 3;
+            this.buttonDeleteType.Text = "Delete";
+            this.buttonDeleteType.UseVisualStyleBackColor = true;
+            this.buttonDeleteType.Click += new System.EventHandler(this.buttonDeleteType_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1235,7 +1261,6 @@ namespace AdminApp
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TabPage tabPageUsersAdmin;
         private System.Windows.Forms.TabPage tabPageModelAdmin;
-        private System.Windows.Forms.Button buttonDownload;
         private System.Windows.Forms.GroupBox groupBoxAllModels;
         private System.Windows.Forms.DataGridView dataGridViewAllModelProp;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn17;
@@ -1257,6 +1282,9 @@ namespace AdminApp
         private System.Windows.Forms.Button buttonDownloadModel;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnType;
         private System.Windows.Forms.Button buttonType;
+        private System.Windows.Forms.Button buttonDeleteType;
+        private System.Windows.Forms.Button buttonEditType;
+        private System.Windows.Forms.Button buttonAddType;
     }
 }
 

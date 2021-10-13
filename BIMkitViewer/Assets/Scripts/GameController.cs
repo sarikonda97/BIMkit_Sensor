@@ -87,19 +87,6 @@ public class GameController : MonoBehaviour
 
     #endregion
 
-    // string is the Type of the object, next part is Width (x), Height (z), Depth (y) (values are in Meters)
-    public static Dictionary<string, Tuple<float, float, float>> TypeDimentionDictionary = new Dictionary<string, Tuple<float, float, float>>()
-    {
-        { "Chair", new Tuple<float, float, float>(0.4f, 1.3f, 0.5f) },
-        { "Table", new Tuple<float, float, float>(1.3f, 1.0f, 0.5f) },
-        { "Cabinet", new Tuple<float, float, float>(1.5f, 1.0f, 1.0f) },
-        { "Shelf", new Tuple<float, float, float>(1.3f, 2.0f, 0.5f) },
-        { "Couch", new Tuple<float, float, float>(1.5f, 1.3f, 0.8f) },
-        { "CoffeeTable", new Tuple<float, float, float>(1.3f, 0.6f, 0.5f) },
-        { "Plant", new Tuple<float, float, float>(0.6f, 1.5f, 0.6f) },
-        { "Lamp", new Tuple<float, float, float>(0.3f, 2.0f, 0.3f) },
-    };
-
     // Start is called before the first frame update
     void Start()
     {
@@ -115,10 +102,7 @@ public class GameController : MonoBehaviour
         ModelCheckButton.gameObject.SetActive(false);
         ContinueToGenButton.gameObject.SetActive(false);
 
-        List<ObjectTypes> types = ObjectTypeTree.ObjectDict.Keys.ToList();
-        List<ObjectType> leafTypes = types.Select(t => ObjectTypeTree.GetNode(t)).Where(t => t.Children.Count == 0).ToList();
-        this.ObjectTypeChangeDropdown.options.Clear();
-        this.ObjectTypeChangeDropdown.options.AddRange(leafTypes.Select(t => new OptionData(t.ID.ToString())));
+        FetchTypes();
 
         this.LevelOfDetailDropdown.options.Clear();
         this.LevelOfDetailDropdown.options.AddRange(Enum.GetValues(typeof(LevelOfDetail)).Cast<LevelOfDetail>().Select(l => new OptionData(l.ToString())));
@@ -476,9 +460,8 @@ public class GameController : MonoBehaviour
         if (EditingGameObject != null)
         {
             string selectedType = ObjectTypeChangeDropdown.options[ObjectTypeChangeDropdown.value].text;
-            ObjectTypes newType = (ObjectTypes)Enum.Parse(typeof(ObjectTypes), selectedType);
             ModelObjectScript mos = EditingGameObject.GetComponent<ModelObjectScript>();
-            mos.ModelObject.TypeId = newType;
+            mos.ModelObject.TypeId = selectedType;
         }
     }
 
@@ -703,7 +686,7 @@ public class GameController : MonoBehaviour
             Components = o.Components,
             Name = o.Name,
             Properties = o.Properties,
-            TypeId = o.TypeId == 0 ? ObjectTypes.BuildingElement : o.TypeId
+            TypeId = o.TypeId
         };
     }
 
@@ -922,6 +905,27 @@ public class GameController : MonoBehaviour
     #endregion
 
     #region Random Methods
+
+    private async void FetchTypes()
+    {
+        APIResponse<List<ObjectType>> response = await DBMSController.GetTypes();
+        if (response.Code != System.Net.HttpStatusCode.OK)
+        {
+            Debug.LogWarning(response.ReasonPhrase);
+
+            // Should avoid using this...
+            ObjectTypeTree.BuildTypeTree(ObjectTypeTree.DefaultTypesList());
+        }
+        else
+        {
+            ObjectTypeTree.BuildTypeTree(response.Data);
+        }
+
+        List<string> types = ObjectTypeTree.GetAllTypes().Select(t => t.Name).ToList();
+        List<string> leafTypes = types.Where(t => ObjectTypeTree.GetTypeChildren(t).Count == 0).ToList();
+        this.ObjectTypeChangeDropdown.options.Clear();
+        this.ObjectTypeChangeDropdown.options.AddRange(types.Select(t => new OptionData(t)));
+    }
 
     public static void RemoveAllChidren(GameObject obj)
     {
