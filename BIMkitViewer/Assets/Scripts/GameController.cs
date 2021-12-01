@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using VoxelService;
 using static UnityEngine.UI.Dropdown;
 using Component = DbmsApi.API.Component;
 using Debug = UnityEngine.Debug;
@@ -32,6 +33,7 @@ public class GameController : MonoBehaviour
     public Material HighlightMatYellow;
     public Material HighlightMatGreen;
     public Material DefaultMat;
+    public Material VoxelMaterial;
 
     public GameObject LoadingCanvas;
 
@@ -84,6 +86,7 @@ public class GameController : MonoBehaviour
 
     private Model CurrentModel;
     private List<ModelObjectScript> ModelObjects = new List<ModelObjectScript>();
+    private GameObject VoxelParentGO;
 
     #endregion
 
@@ -331,23 +334,55 @@ public class GameController : MonoBehaviour
         if (Physics.Raycast(ray, out hitData, 1000))
         {
             ModelObjectScript mos;
+            VoxelScript vos;
             if (ViewingGameObject != null)
             {
                 mos = ViewingGameObject.GetComponent<ModelObjectScript>();
-                mos.UnHighlight();
+                if (mos != null)
+                {
+                    mos.UnHighlight();
+                }
+                vos = ViewingGameObject.GetComponent<VoxelScript>();
+                if (vos != null)
+                {
+                    vos.ModelObjectScript.UnHighlight();
+                }
             }
 
-            ViewingGameObject = hitData.collider.gameObject.transform.parent.gameObject;
-            DisplayObjectInfo();
+            GameObject hitObject = hitData.collider.gameObject;
+            if (hitObject.GetComponent<VoxelScript>() != null)
+            {
+                // Hit a voxel
+                ViewingGameObject = hitData.collider.gameObject;
+            }
+            else
+            {
+                // Hit a model object component
+                ViewingGameObject = hitData.collider.gameObject.transform.parent.gameObject;
+            }
 
             mos = ViewingGameObject.GetComponent<ModelObjectScript>();
-            mos.Highlight(HighlightMatYellow);
+            if (mos != null)
+            {
+                mos.Highlight(HighlightMatYellow);
+                DisplayObjectInfo(mos);
+            }
+            vos = ViewingGameObject.GetComponent<VoxelScript>();
+            if (vos != null)
+            {
+                vos.ModelObjectScript.Highlight(HighlightMatYellow);
+                DisplayObjectInfo(vos.ModelObjectScript);
+            }
         }
     }
 
-    private void DisplayObjectInfo()
+    private void DisplayObjectInfo(ModelObjectScript mos)
     {
-        ModelObjectScript mos = ViewingGameObject.GetComponent<ModelObjectScript>();
+        if (mos == null)
+        {
+            return;
+        }
+
         ObjectDataText.text = "Name: " + mos.ModelObject.Name + "\n";
         ObjectDataText.text += "Id: " + mos.ModelObject.Id + "\n";
 
@@ -900,6 +935,45 @@ public class GameController : MonoBehaviour
         UnHighlightAllObjects();
         this.ResetCanvas();
         this.ModelViewCanvas.SetActive(true);
+    }
+
+    #endregion
+
+    #region Voxel Methods
+
+    public void CreateVoxels()
+    {
+        if (VoxelParentGO != null)
+        {
+            Destroy(VoxelParentGO);
+            VoxelParentGO = null;
+            return;
+        }
+        if (CurrentModel == null)
+        {
+            return;
+        }
+
+        double size = 0.25;
+        VoxelCreater voxelCreater = new VoxelCreater(CurrentModel);
+        List<Voxel> voxels = voxelCreater.CreateVoxels(size);
+
+        VoxelParentGO = new GameObject("Voxels");
+        foreach (Voxel voxel in voxels)
+        {
+            if (voxel.ModelObjectID != null)
+            {
+                GameObject voxelObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                voxelObject.transform.parent = VoxelParentGO.transform;
+                voxelObject.transform.position = VectorConvert(voxel.Location);
+                voxelObject.transform.localScale = new Vector3((float)size, (float)size, (float)size);
+                voxelObject.name = ModelObjects.First(mos => mos.ModelObject.Id == voxel.ModelObjectID).ModelObject.Name;
+                VoxelScript voxelScript = voxelObject.AddComponent<VoxelScript>();
+                voxelScript.Voxel = voxel;
+                voxelScript.ModelObjectScript = ModelObjects.First(mos => mos.ModelObject.Id == voxel.ModelObjectID);
+                voxelObject.GetComponent<MeshRenderer>().material = VoxelMaterial;
+            }
+        }
     }
 
     #endregion

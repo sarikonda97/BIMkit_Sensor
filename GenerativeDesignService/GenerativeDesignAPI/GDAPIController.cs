@@ -141,7 +141,6 @@ namespace GenerativeDesignAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }

@@ -90,6 +90,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerativeDesignPackage", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerativeDesignAPI", "GenerativeDesignService\GenerativeDesignAPI\GenerativeDesignAPI.csproj", "{2FBC71DE-2EB2-4117-A694-11E88A4D413F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelService", "VoxelService\VoxelService\VoxelService.csproj", "{61939A6E-AD16-4FD9-BA8C-7AF101D952A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,6 +166,10 @@ Global
 		{2FBC71DE-2EB2-4117-A694-11E88A4D413F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FBC71DE-2EB2-4117-A694-11E88A4D413F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FBC71DE-2EB2-4117-A694-11E88A4D413F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61939A6E-AD16-4FD9-BA8C-7AF101D952A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61939A6E-AD16-4FD9-BA8C-7AF101D952A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61939A6E-AD16-4FD9-BA8C-7AF101D952A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61939A6E-AD16-4FD9-BA8C-7AF101D952A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

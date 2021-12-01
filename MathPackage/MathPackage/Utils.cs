@@ -522,18 +522,18 @@ namespace MathPackage
             return new Mesh(verticies, triangles);
         }
 
-        public static Mesh CreateBoundingBox(Vector3D dimentions, FaceSide faceSide)
+        public static Mesh CreateBoundingBox(Vector3D location, Vector3D dimentions, FaceSide faceSide)
         {
             List<Vector3D> cornerList = new List<Vector3D>
             {
-                new Vector3D(-dimentions.x / 2.0, -dimentions.y / 2.0, -dimentions.z / 2.0),
-                new Vector3D(dimentions.x / 2.0, -dimentions.y / 2.0, -dimentions.z / 2.0),
-                new Vector3D(dimentions.x / 2.0, dimentions.y / 2.0, -dimentions.z / 2.0),
-                new Vector3D(-dimentions.x / 2.0, dimentions.y / 2.0, -dimentions.z / 2.0),
-                new Vector3D(-dimentions.x / 2.0, -dimentions.y / 2.0, dimentions.z / 2.0),
-                new Vector3D(dimentions.x / 2.0, -dimentions.y / 2.0, dimentions.z / 2.0),
-                new Vector3D(dimentions.x / 2.0, dimentions.y / 2.0, dimentions.z / 2.0),
-                new Vector3D(-dimentions.x / 2.0, dimentions.y / 2.0, dimentions.z / 2.0)
+                new Vector3D(location.x-dimentions.x / 2.0, location.y-dimentions.y / 2.0, location.z-dimentions.z / 2.0),
+                new Vector3D(location.x+dimentions.x / 2.0, location.y-dimentions.y / 2.0, location.z-dimentions.z / 2.0),
+                new Vector3D(location.x+dimentions.x / 2.0, location.y+dimentions.y / 2.0, location.z-dimentions.z / 2.0),
+                new Vector3D(location.x-dimentions.x / 2.0, location.y+dimentions.y / 2.0, location.z-dimentions.z / 2.0),
+                new Vector3D(location.x-dimentions.x / 2.0, location.y-dimentions.y / 2.0, location.z+dimentions.z / 2.0),
+                new Vector3D(location.x+dimentions.x / 2.0, location.y-dimentions.y / 2.0, location.z+dimentions.z / 2.0),
+                new Vector3D(location.x+dimentions.x / 2.0, location.y+dimentions.y / 2.0, location.z+dimentions.z / 2.0),
+                new Vector3D(location.x-dimentions.x / 2.0, location.y+dimentions.y / 2.0, location.z+dimentions.z / 2.0)
             };
 
             List<int> tList = new List<int>();
@@ -592,6 +592,29 @@ namespace MathPackage
                     double dist = distTriangle3Triangle3.Get();
                     minDist = Math.Min(minDist, dist);
                 }
+            }
+
+            return minDist;
+        }
+
+        public static double PointToMeshDistance(Vector3D v, Mesh m)
+        {
+            double minDist = double.MaxValue;
+            for (int i = 0; i < m.TriangleList.Count; i += 3)
+            {
+                Vector3D v0 = m.VertexList[m.TriangleList[i]];
+                Vector3D v1 = m.VertexList[m.TriangleList[i + 1]];
+                Vector3D v2 = m.VertexList[m.TriangleList[i + 2]];
+
+                // Get the min distance of each triangle pair:
+                DistPoint3Triangle3 distTriangle3Triangle3 = new DistPoint3Triangle3(
+                                                                                Utils.V3DToV3d(v),
+                                                                                new Triangle3d(
+                                                                                                Utils.V3DToV3d(v0),
+                                                                                                Utils.V3DToV3d(v1),
+                                                                                                Utils.V3DToV3d(v2)));
+                double dist = distTriangle3Triangle3.Get();
+                minDist = Math.Min(minDist, dist);
             }
 
             return minDist;

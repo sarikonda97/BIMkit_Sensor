@@ -17,7 +17,7 @@ namespace ModelContertApp
 {
     public partial class Main : Form
     {
-        JavaScriptSerializer JavaScriptSerializer = new JavaScriptSerializer() { MaxJsonLength = 2097152 / 4 * 1000 };
+        //JavaScriptSerializer JavaScriptSerializer = new JavaScriptSerializer() { MaxJsonLength = 2097152 / 4 * 1000 };
         private DBMSAPIController DBMSController;
         private string dbmsURL = "https://localhost:44322//api/";
         List<ObjectType> Types;
@@ -127,14 +127,16 @@ namespace ModelContertApp
             if (extension == ".bpm")
             {
                 Model dbmsModel = GetDBMSApiModelFromIfc(this.textBoxFileName.Text, scale, flipTriangles);
-                File.WriteAllText(this.textBoxSaveFileLocation.Text, JavaScriptSerializer.Serialize(dbmsModel));
+                DBMSReadWrite.WriteModel(dbmsModel, this.textBoxSaveFileLocation.Text);
+                //File.WriteAllText(this.textBoxSaveFileLocation.Text, JavaScriptSerializer.Serialize(dbmsModel));
             }
 
             if (extension == ".bpo")
             {
                 FileStream fileStream = new FileStream(this.textBoxFileName.Text, FileMode.Open);
                 CatalogObject dbmsObject = ObjConverter.ConvertObjFile(fileStream, name, scale, flipTriangles, flipYZ);
-                File.WriteAllText(this.textBoxSaveFileLocation.Text, JavaScriptSerializer.Serialize(dbmsObject));
+                DBMSReadWrite.WriteCatalogObject(dbmsObject, this.textBoxSaveFileLocation.Text);
+                //File.WriteAllText(this.textBoxSaveFileLocation.Text, JavaScriptSerializer.Serialize(dbmsObject));
                 fileStream.Close();
             }
         }

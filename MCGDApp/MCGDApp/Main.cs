@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using VoxelService;
 using Rule = RuleAPI.Models.Rule;
 
 namespace MCGDApp
@@ -356,6 +357,22 @@ namespace MCGDApp
             }
 
             GDSettings = gdsf.Settings;
+        }
+
+        private async void buttonVoxelCreator_Click(object sender, EventArgs e)
+        {
+            ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
+            APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD500));
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return;
+            }
+
+            Model model = response.Data;
+
+            VoxelCreater voxelCreater = new VoxelCreater(model);
+            List<Voxel> voxels = voxelCreater.CreateVoxels(0.5);
         }
     }
 }

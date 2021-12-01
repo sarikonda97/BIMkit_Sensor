@@ -12,5 +12,6 @@ namespace DbmsApi.API
         public string MaterialId;
         public List<Vector3D> Vertices = new List<Vector3D>();
         public List<int[]> Triangles = new List<int[]>();
+        public Properties Properties;
     }
 }

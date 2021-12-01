@@ -110,7 +110,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<RuleUser>(response, default);
             }
         }
@@ -126,7 +125,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<RuleUser>(response, default);
             }
         }
@@ -142,7 +140,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse(response);
             }
         }
@@ -168,7 +165,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<Rule>(response, default);
             }
         }
@@ -184,7 +180,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<Rule>>(response, default);
             }
         }
@@ -200,7 +195,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -216,7 +210,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -232,7 +225,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -252,7 +244,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<RuleSet>(response, default);
             }
         }
@@ -268,7 +259,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<RuleSet>>(response, default);
             }
         }
@@ -284,7 +274,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -300,7 +289,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -316,7 +304,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -336,7 +323,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<Dictionary<ObjectType, string>>(response, default);
             }
         }
@@ -352,7 +338,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<ObjectType>>(response, default);
             }
         }
@@ -368,7 +353,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<Dictionary<string, Type>>(response, default);
             }
         }
@@ -384,7 +368,6 @@ namespace RuleAPI
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<Dictionary<string, Type>>(response, default);
             }
         }

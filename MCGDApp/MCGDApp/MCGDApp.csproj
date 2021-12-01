@@ -116,6 +116,10 @@
       <Project>{e5119cd6-c4a9-4834-b857-29d412c01f86}</Project>
       <Name>ModelCheckPackage</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\VoxelService\VoxelService\VoxelService.csproj">
+      <Project>{61939a6e-ad16-4fd9-ba8c-7af101d952a9}</Project>
+      <Name>VoxelService</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

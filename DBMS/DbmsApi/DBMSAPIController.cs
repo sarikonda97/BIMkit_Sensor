@@ -24,7 +24,7 @@ namespace DbmsApi
 
         public TokenData Token { get; private set; }
 
-        public double TIMEOUT = 30.0;
+        public double TIMEOUT = 5.0;
 
         #endregion
 
@@ -105,7 +105,7 @@ namespace DbmsApi
             catch (TimeoutException)
             {
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.RequestTimeout, ReasonPhrase = "Server timed out." };
-            }
+                }
             catch (HttpRequestException e)
             {
                 if (e.GetBaseException().GetType() == typeof(SocketException))
@@ -171,7 +171,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<TokenData>(response, default);
             }
         }
@@ -190,7 +189,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -213,7 +211,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<ModelMetadata>>(response, default);
             }
         }
@@ -233,7 +230,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<Model>(response, default);
             }
         }
@@ -253,7 +249,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -273,7 +268,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -293,7 +287,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -316,7 +309,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<CatalogObjectMetadata>>(response, default);
             }
         }
@@ -336,7 +328,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<MongoCatalogObject>(response, default);
             }
         }
@@ -356,7 +347,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<CatalogObject>(response, default);
             }
         }
@@ -376,7 +366,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -396,7 +385,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -416,7 +404,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
 
@@ -437,7 +424,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -461,7 +447,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<Material>(response, default);
             }
         }
@@ -481,7 +466,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<Material>>(response, default);
             }
         }
@@ -501,7 +485,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -521,7 +504,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -541,7 +523,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -564,7 +545,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<string>>(response, default);
             }
         }
@@ -583,7 +563,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<UserData>(response, default);
             }
         }
@@ -603,7 +582,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<UserData>(response, default);
             }
         }
@@ -624,7 +602,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -644,7 +621,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -667,7 +643,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<ModelMetadata>>(response, default);
             }
         }
@@ -687,7 +662,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<ModelPermission>(response, default);
             }
         }
@@ -708,7 +682,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -731,7 +704,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<UserData>>(response, default);
             }
         }
@@ -751,7 +723,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<ModelMetadata>>(response, default);
             }
         }
@@ -771,7 +742,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -795,7 +765,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<ObjectType>(response, default);
             }
         }
@@ -815,7 +784,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<List<ObjectType>>(response, default);
             }
         }
@@ -835,7 +803,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -855,7 +822,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
@@ -875,7 +841,6 @@ namespace DbmsApi
             }
             else
             {
-                response.ReasonPhrase = await response.Content.ReadAsAsync<string>();
                 return new APIResponse<string>(response, default);
             }
         }
