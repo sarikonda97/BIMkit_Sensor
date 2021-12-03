@@ -62,7 +62,7 @@ namespace RMS.Controllers
                     rule.Owner = user.PublicName;
                     string ruleId = db.Create(rule);
                     db.AddRuleToUser(user.Username, ruleId);
-                    return Request.CreateResponseRMS(HttpStatusCode.Created, ruleId);
+                    return Request.CreateResponseRMS(HttpStatusCode.OK, ruleId);
                 }
                 catch
                 {

@@ -271,18 +271,18 @@ namespace ModelConverter
         {
             try
             {
-                return new JavaScriptSerializer().Deserialize<Dictionary<string, string>>(File.ReadAllText(ifcTypeconverterFile));
+             return   DBMSReadWrite.JSONReadFromFile<Dictionary<string, string>>(ifcTypeconverterFile);
             }
             catch (FileNotFoundException)
             {
-                File.WriteAllText(ifcTypeconverterFile, new JavaScriptSerializer().Serialize(new Dictionary<string, string>()));
-                return new JavaScriptSerializer().Deserialize<Dictionary<string, string>>(File.ReadAllText(ifcTypeconverterFile));
+                DBMSReadWrite.JSONWriteToFile(ifcTypeconverterFile, new Dictionary<string, string>());
+                return DBMSReadWrite.JSONReadFromFile<Dictionary<string, string>>(ifcTypeconverterFile);
             }
         }
 
         public static void SaveTypeConvertDictionary()
         {
-            File.WriteAllText(ifcTypeconverterFile, new JavaScriptSerializer().Serialize(IfcTypeConverter));
+            DBMSReadWrite.JSONWriteToFile(ifcTypeconverterFile, IfcTypeConverter);
         }
 
         // Method for exporting a list of IfcObjects to a IfcModel

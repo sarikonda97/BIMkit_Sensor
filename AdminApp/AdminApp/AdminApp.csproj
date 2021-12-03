@@ -146,5 +146,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ModelConverter\ModelConverter\ModelConverter.csproj">
+      <Project>{79A520BA-1EF8-4CBE-B45A-205CC70C7AA2}</Project>
+      <Name>ModelConverter</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

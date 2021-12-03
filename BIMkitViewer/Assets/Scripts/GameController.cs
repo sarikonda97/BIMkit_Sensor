@@ -333,6 +333,7 @@ public class GameController : MonoBehaviour
         RaycastHit hitData;
         if (Physics.Raycast(ray, out hitData, 1000))
         {
+            Debug.Log("Hit");
             ModelObjectScript mos;
             VoxelScript vos;
             if (ViewingGameObject != null)

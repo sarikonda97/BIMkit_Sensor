@@ -257,7 +257,7 @@ namespace MCGDApp
             // Save the models:
             newModel.Name = "Generated Model";
             APIResponse<string> response3 = await DBMSController.CreateModel(newModel);
-            if (response3.Code != System.Net.HttpStatusCode.Created)
+            if (response3.Code != System.Net.HttpStatusCode.OK)
             {
                 MessageBox.Show(response3.ReasonPhrase);
                 return;

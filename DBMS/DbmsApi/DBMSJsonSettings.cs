@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
+using System.Web.Script.Serialization;
 
 namespace DbmsApi
 {
@@ -91,6 +92,18 @@ namespace DbmsApi
         public static CatalogObject ReadCatalogObjectFromString(string data)
         {
             return JsonConvert.DeserializeObject<CatalogObject>(data, DBMSJsonSettings.JsonSerializerSettings);
+        }
+
+        public static void JSONWriteToFile(string path, object data)
+        {
+            File.WriteAllText(path, JsonConvert.SerializeObject(data, DBMSJsonSettings.JsonSerializerSettings));
+            //File.WriteAllText(path, new JavaScriptSerializer().Serialize(data));
+        }
+
+        public static T JSONReadFromFile<T>(string path)
+        {
+            return JsonConvert.DeserializeObject<T>(File.ReadAllText(path), DBMSJsonSettings.JsonSerializerSettings);
+            //return new JavaScriptSerializer() { MaxJsonLength = int.MaxValue }.Deserialize<T>(File.ReadAllText(path));
         }
     }
 }

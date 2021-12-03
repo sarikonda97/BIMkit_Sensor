@@ -20,11 +20,13 @@ namespace DbmsApi
         // Basic web client
         private static HttpClientHandler handler;
         private static HttpClient client;
-        private static List<MediaTypeFormatter> mediaTypeFormatters = new List<MediaTypeFormatter>() { new JsonMediaTypeFormatter() { SerializerSettings = DBMSJsonSettings.JsonSerializerSettings } };
+        private static List<MediaTypeFormatter> mediaTypeFormatters = new List<MediaTypeFormatter>() {
+            new JsonMediaTypeFormatter() { SerializerSettings = DBMSJsonSettings.JsonSerializerSettings }
+        };
 
         public TokenData Token { get; private set; }
 
-        public double TIMEOUT = 5.0;
+        public double TIMEOUT = 60.0;
 
         #endregion
 
@@ -241,6 +243,7 @@ namespace DbmsApi
         /// <returns><see cref="APIResponse"/> containing the new models Id</returns>
         public async Task<APIResponse<string>> CreateModel(Model model)
         {
+
             HttpResponseMessage response = await TryCatchFunctionAsync(client.PostAsJsonAsync("models", model));
 
             if (response.IsSuccessStatusCode)

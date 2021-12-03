@@ -53,6 +53,8 @@ namespace AdminApp
                 this.groupBoxMaterial.Enabled = User.IsAdmin;
                 this.groupBoxUsers.Enabled = User.IsAdmin;
                 this.groupBoxAllModels.Enabled = User.IsAdmin;
+                this.groupBoxModelDataset.Enabled = User.IsAdmin;
+                this.groupBoxCatalogDataset.Enabled = User.IsAdmin;
             }
         }
 
@@ -86,8 +88,8 @@ namespace AdminApp
             this.dataGridViewMaterialProps.Rows.Clear();
             this.dataGridViewUsers.Rows.Clear();
             this.dataGridViewUserProperties.Rows.Clear();
-            this.dataGridViewModelProperties.Rows.Clear();
-            this.dataGridViewModels.Rows.Clear();
+            this.dataGridViewUserModelProperties.Rows.Clear();
+            this.dataGridViewUserModels.Rows.Clear();
         }
 
         private async Task RefreshAsync()
@@ -158,7 +160,7 @@ namespace AdminApp
         {
             foreach (Property property in properties)
             {
-                this.dataGridViewModels.Rows.Add(property.Name, property.GetValueString());
+                view.Rows.Add(property.Name, property.GetValueString());
             }
         }
 
@@ -168,7 +170,7 @@ namespace AdminApp
 
         private async Task DisplayAvailableModels()
         {
-            this.dataGridViewModels.Rows.Clear();
+            this.dataGridViewUserModels.Rows.Clear();
             ModelMetadatas = new Dictionary<string, ModelMetadata>();
             APIResponse<List<ModelMetadata>> response = await Controller.GetAvailableModels();
             if (response.Code == System.Net.HttpStatusCode.OK)
@@ -176,7 +178,7 @@ namespace AdminApp
                 foreach (ModelMetadata data in response.Data)
                 {
                     ModelMetadatas.Add(data.ModelId, data);
-                    this.dataGridViewModels.Rows.Add(data.Name, data.ModelId, data.Owner, data.ObjectCount);
+                    this.dataGridViewUserModels.Rows.Add(data.Name, data.ModelId, data.Owner, data.ObjectCount);
                 }
             }
             else
@@ -200,12 +202,12 @@ namespace AdminApp
             }
 
             APIResponse<string> response = await Controller.CreateModel(modelToAdd);
-            if (response.Code == System.Net.HttpStatusCode.Created)
+            if (response.Code == System.Net.HttpStatusCode.OK)
             {
                 await DisplayAvailableModels();
 
                 // Highlight and show the model info
-                this.DisplayProperties(this.dataGridViewModelProperties, ModelMetadatas[response.Data].Properties);
+                this.DisplayProperties(this.dataGridViewUserModelProperties, ModelMetadatas[response.Data].Properties);
             }
             else
             {
@@ -215,12 +217,12 @@ namespace AdminApp
 
         private async void buttonEditModel_Click(object sender, EventArgs e)
         {
-            if (this.dataGridViewModels.SelectedRows.Count != 1)
+            if (this.dataGridViewUserModels.SelectedRows.Count != 1)
             {
                 return;
             }
 
-            string modelId = this.dataGridViewModels.SelectedRows[0].Cells[1].Value as string;
+            string modelId = this.dataGridViewUserModels.SelectedRows[0].Cells[1].Value as string;
             Model modelToEdit = PromptForModel();
             if (modelToEdit == null)
             {
@@ -233,7 +235,7 @@ namespace AdminApp
                 await DisplayAvailableModels();
 
                 // Highlight and show the model info
-                this.DisplayProperties(this.dataGridViewModelProperties, ModelMetadatas[modelToEdit.Id].Properties);
+                this.DisplayProperties(this.dataGridViewUserModelProperties, ModelMetadatas[modelToEdit.Id].Properties);
             }
             else
             {
@@ -243,12 +245,12 @@ namespace AdminApp
 
         private async void buttonShareModel_Click(object sender, EventArgs e)
         {
-            if (this.dataGridViewModels.SelectedRows.Count != 1)
+            if (this.dataGridViewUserModels.SelectedRows.Count != 1)
             {
                 return;
             }
 
-            string modelId = this.dataGridViewModels.SelectedRows[0].Cells[1].Value as string;
+            string modelId = this.dataGridViewUserModels.SelectedRows[0].Cells[1].Value as string;
             APIResponse<ModelPermission> response = await Controller.GetModelPermissions(modelId);
             if (response.Code != System.Net.HttpStatusCode.OK)
             {
@@ -272,7 +274,7 @@ namespace AdminApp
 
         private async void buttonDownloadModel_Click(object sender, EventArgs e)
         {
-            if (this.dataGridViewModels.SelectedRows.Count != 1)
+            if (this.dataGridViewUserModels.SelectedRows.Count != 1)
             {
                 return;
             }
@@ -283,7 +285,7 @@ namespace AdminApp
                 return;
             }
 
-            string modelId = this.dataGridViewModels.SelectedRows[0].Cells[1].Value as string;
+            string modelId = this.dataGridViewUserModels.SelectedRows[0].Cells[1].Value as string;
             APIResponse<Model> response = await Controller.GetModel(new ItemRequest(modelId, lodf.LOD));
             if (response.Code != System.Net.HttpStatusCode.OK)
             {
@@ -304,12 +306,12 @@ namespace AdminApp
 
         private async void buttonDeleteModel_Click(object sender, EventArgs e)
         {
-            if (this.dataGridViewModels.SelectedRows.Count != 1)
+            if (this.dataGridViewUserModels.SelectedRows.Count != 1)
             {
                 return;
             }
 
-            string modelId = this.dataGridViewModels.SelectedRows[0].Cells[1].Value as string;
+            string modelId = this.dataGridViewUserModels.SelectedRows[0].Cells[1].Value as string;
 
             APIResponse<string> response = await Controller.DeleteModel(modelId);
             if (response.Code != System.Net.HttpStatusCode.OK)
@@ -336,13 +338,13 @@ namespace AdminApp
 
         private void dataGridViewModels_SelectionChanged(object sender, EventArgs e)
         {
-            if (this.dataGridViewModels.SelectedRows.Count != 1)
+            if (this.dataGridViewUserModels.SelectedRows.Count != 1)
             {
                 return;
             }
 
-            string modelId = this.dataGridViewModels.SelectedRows[0].Cells[1].Value as string;
-            this.DisplayProperties(this.dataGridViewModelProperties, ModelMetadatas[modelId].Properties);
+            string modelId = this.dataGridViewUserModels.SelectedRows[0].Cells[1].Value as string;
+            this.DisplayProperties(this.dataGridViewUserModelProperties, ModelMetadatas[modelId].Properties);
         }
 
         #endregion
@@ -352,6 +354,7 @@ namespace AdminApp
         private async Task DisplayAvailableCatalogObjects()
         {
             this.dataGridViewCatalogObjects.Rows.Clear();
+            this.dataGridViewDatasetCatalog.Rows.Clear();
             CatalogMetadatas = new Dictionary<string, CatalogObjectMetadata>();
             APIResponse<List<CatalogObjectMetadata>> response = await Controller.GetAvailableCatalogObjects();
             if (response.Code == System.Net.HttpStatusCode.OK)
@@ -360,6 +363,7 @@ namespace AdminApp
                 {
                     CatalogMetadatas.Add(data.CatalogObjectId, data);
                     this.dataGridViewCatalogObjects.Rows.Add(data.Name, data.CatalogObjectId, data.Type);
+                    this.dataGridViewDatasetCatalog.Rows.Add(data.Name, data.CatalogObjectId, data.Type);
                 }
             }
             else
@@ -398,7 +402,7 @@ namespace AdminApp
             };
 
             APIResponse<string> response = await Controller.CreateCatalogObject(mongoCO);
-            if (response.Code == System.Net.HttpStatusCode.Created)
+            if (response.Code == System.Net.HttpStatusCode.OK)
             {
                 await DisplayAvailableCatalogObjects();
 
@@ -572,7 +576,7 @@ namespace AdminApp
                 Properties = new DbmsApi.API.Properties()
             };
             APIResponse<string> response = await Controller.CreateMaterial(newMat);
-            if (response.Code == System.Net.HttpStatusCode.Created)
+            if (response.Code == System.Net.HttpStatusCode.OK)
             {
                 await DisplayMaterials();
 
@@ -776,6 +780,7 @@ namespace AdminApp
         private async Task DisplayAllModels()
         {
             this.dataGridViewAllModels.Rows.Clear();
+            this.dataGridViewDatasetModel.Rows.Clear();
             AllModels = new Dictionary<string, ModelMetadata>();
             APIResponse<List<ModelMetadata>> response = await Controller.GetAllModels();
             if (response.Code == System.Net.HttpStatusCode.OK)
@@ -784,6 +789,7 @@ namespace AdminApp
                 {
                     AllModels.Add(data.ModelId, data);
                     this.dataGridViewAllModels.Rows.Add(data.Name, data.ModelId, data.Owner, data.ObjectCount);
+                    this.dataGridViewDatasetModel.Rows.Add(data.Name, data.ModelId, data.Owner, data.ObjectCount);
                 }
             }
             else
@@ -897,17 +903,133 @@ namespace AdminApp
 
         private void buttonAddType_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("INCOMPLETE");
         }
 
         private void buttonEditType_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("INCOMPLETE");
         }
 
         private void buttonDeleteType_Click(object sender, EventArgs e)
         {
+            MessageBox.Show("INCOMPLETE");
+        }
 
+        #endregion
+
+        #region Dataset Adding:
+
+        public static int BULK_UPLOAD_LIMIT = 10;
+
+        private async void buttonBulkAddModel_Click(object sender, EventArgs e)
+        {
+            // Promt for the file:
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            if (fbd.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            // Should state what format the dataset is from:
+            GetModelsFrom3DFRONTDataset(fbd.SelectedPath);
+
+            await DisplayAllModels();
+        }
+
+        public async void GetModelsFrom3DFRONTDataset(string path)
+        {
+            // Assume that the Folder names in the Main folder are labeled
+            string[] files = Directory.GetFiles(path, "*.json");
+
+            int counter = 0;
+            foreach (string file in files)
+            {
+                Model modelToAdd = ModelConverter.DatasetConverter3DFRONT.Convert3DFRONTModel(file, 1.0, false, true);
+
+                APIResponse<string> response = await Controller.CreateModel(modelToAdd);
+                if (response.Code != System.Net.HttpStatusCode.OK)
+                {
+                    MessageBox.Show(response.ReasonPhrase);
+                }
+
+                counter++;
+                if (counter == BULK_UPLOAD_LIMIT)
+                {
+                    break;
+                }
+            }
+        }
+
+        private async void buttonBulkDeleteModel_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("INCOMPLETE");
+        }
+
+        private async void buttonBulkAddCatalog_Click(object sender, EventArgs e)
+        {
+            // Promt for the file:
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            if (fbd.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            // Should state what format the dataset is from:
+            GetObjectsFrom3DFRONTDataset(fbd.SelectedPath);
+
+            await DisplayAvailableCatalogObjects();
+        }
+
+        public enum Datasets { _3DFRONT, OBJ }
+
+        public async void GetObjectsFrom3DFRONTDataset(string path)
+        {
+            // Import the Types from model_info.json:
+            List<ModelConverter.Type> typeList = DBMSReadWrite.JSONReadFromFile<List<ModelConverter.Type>>(path + "\\model_info.json");
+
+            // Assume that the Folder names in the Main folder are labeled
+            string[] dirs = Directory.GetDirectories(path);
+            int counter = 0;
+            foreach (string dir in dirs)
+            {
+                CatalogObject newObj = ModelConverter.DatasetConverter3DFRONT.Convert3DFRONTCatalogObject(dir, 1.0, false, true);
+                if (CatalogMetadatas.Values.Any(v => v.Name == newObj.Name))
+                {
+                    continue;
+                }
+
+                ModelConverter.Type type = typeList.First(t => t.model_id == newObj.CatalogID);
+                newObj.TypeId = type.category + "_" + type.supercategory;
+
+                MongoCatalogObject mongoCO = new MongoCatalogObject()
+                {
+                    Id = newObj.CatalogID,
+                    MeshReps = new List<MeshRep>() { new MeshRep() { Components = newObj.Components } },
+                    Name = newObj.Name,
+                    Properties = newObj.Properties,
+                    TypeId = newObj.TypeId
+                };
+
+                mongoCO.Properties.Add("Dataset", Datasets._3DFRONT.ToString());
+
+                APIResponse<string> response = await Controller.CreateCatalogObject(mongoCO);
+                if (response.Code != System.Net.HttpStatusCode.OK)
+                {
+                    MessageBox.Show(response.ReasonPhrase);
+                }
+
+                counter++;
+                if (counter == BULK_UPLOAD_LIMIT)
+                {
+                    break;
+                }
+            }
+        }
+
+        private async void buttonBulkDeleteCatalog_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("INCOMPLETE");
         }
 
         #endregion

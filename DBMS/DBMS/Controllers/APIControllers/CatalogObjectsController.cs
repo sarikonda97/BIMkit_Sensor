@@ -115,6 +115,11 @@ namespace DBMS.Controllers.APIControllers
                 return Request.CreateResponseDBMS(HttpStatusCode.BadRequest, "Missing CatalogObject");
             }
 
+            // Make sure the ID is unique and not white space
+            //if (string.IsNullOrWhiteSpace(catalogObject.Id) || db.RetrieveAvailableCatalogObjectIDs().Contains(catalogObject.Id))
+            //{
+            //    catalogObject.Id = null;
+            //}
             catalogObject.Id = null;
 
             catalogObject.MeshReps = catalogObject.MeshReps.OrderBy(o => o.LevelOfDetail).ToList();
@@ -122,7 +127,7 @@ namespace DBMS.Controllers.APIControllers
             catalogObject.MeshReps = catalogObject.MeshReps.OrderBy(o => o.LevelOfDetail).ToList();
 
             string coId = db.CreateCatalogObject(catalogObject);
-            return Request.CreateResponseDBMS(HttpStatusCode.Created, coId);
+            return Request.CreateResponseDBMS(HttpStatusCode.OK, coId);
         }
 
         private MeshRep CreateBoundingBox(MeshRep mesh)

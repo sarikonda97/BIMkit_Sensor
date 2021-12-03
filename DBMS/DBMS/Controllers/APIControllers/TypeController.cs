@@ -65,7 +65,7 @@ namespace DBMS.Controllers.APIControllers
             }
 
             string typeId = db.CreateType(type);
-            return Request.CreateResponseDBMS(HttpStatusCode.Created, typeId);
+            return Request.CreateResponseDBMS(HttpStatusCode.OK, typeId);
         }
 
         public HttpResponseMessage Put([FromBody] ObjectType type)

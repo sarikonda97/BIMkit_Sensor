@@ -376,6 +376,11 @@ namespace DBMS.Controllers.DBControllers
             return catalogObjectCollection.AsQueryable().ToList().Select(co => new CatalogObjectMetadata(co)).ToList();
         }
 
+        public List<string> RetrieveAvailableCatalogObjectIDs()
+        {
+            return catalogObjectCollection.AsQueryable().ToList().Select(co => new CatalogObjectMetadata(co)).Select(o=>o.CatalogObjectId).ToList();
+        }
+
         #endregion
 
         #region Materials

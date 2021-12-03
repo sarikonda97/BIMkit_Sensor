@@ -94,7 +94,7 @@ namespace RMS.Controllers
                     };
                     string ruleSetId = db.Create(newRuleSet);
                     db.AddRuleSetToUser(user.Username, ruleSetId);
-                    return Request.CreateResponseRMS(HttpStatusCode.Created, ruleset.Id);
+                    return Request.CreateResponseRMS(HttpStatusCode.OK, ruleset.Id);
                 }
                 catch
                 {

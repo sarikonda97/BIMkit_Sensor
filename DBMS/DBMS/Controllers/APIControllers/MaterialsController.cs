@@ -63,7 +63,7 @@ namespace DBMS.Controllers.APIControllers
 
             mat.Id = null;
             string matId = db.CreateMaterial(mat);
-            return Request.CreateResponseDBMS(HttpStatusCode.Created, matId);
+            return Request.CreateResponseDBMS(HttpStatusCode.OK, matId);
         }
 
         public HttpResponseMessage Put([FromBody] Material mat)

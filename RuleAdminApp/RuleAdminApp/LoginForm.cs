@@ -54,7 +54,7 @@ namespace RuleAdminApp
                 response = await RuleAPIController.LoginAsync(this.User.Username);
             }
 
-            if (response.Code == System.Net.HttpStatusCode.OK || response.Code == System.Net.HttpStatusCode.Created)
+            if (response.Code == System.Net.HttpStatusCode.OK || response.Code == System.Net.HttpStatusCode.OK)
             {
                 this.User = response.Data;
                 this.DialogResult = DialogResult.OK;

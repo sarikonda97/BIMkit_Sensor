@@ -71,7 +71,7 @@ namespace GenerativeDesignService.Controllers
                 // Save the models:
                 newModel.Name = "Generated Model";
                 APIResponse<string> response3 = await DBMSAPIController.CreateModel(newModel);
-                if (response3.Code != System.Net.HttpStatusCode.Created)
+                if (response3.Code != System.Net.HttpStatusCode.OK)
                 {
                     return Request.CreateResponse(response3.Code, response3.ReasonPhrase);
                 }

@@ -35,7 +35,7 @@ namespace RMS.Controllers
             }
 
             RuleUser createdUser = db.AddUser(newUser.Username, newUser.PublicName);
-            return Request.CreateResponseRMS(HttpStatusCode.Created, createdUser);
+            return Request.CreateResponseRMS(HttpStatusCode.OK, createdUser);
         }
 
         // Update User info

@@ -71,7 +71,7 @@ namespace DBMS.Controllers
             }
 
             db.AddUser(newUserData, false);
-            return Request.CreateResponseDBMS(HttpStatusCode.Created, db.RetrieveUserData(newUserData.Username));
+            return Request.CreateResponseDBMS(HttpStatusCode.OK, db.RetrieveUserData(newUserData.Username));
         }
 
         public HttpResponseMessage Put([FromBody] UserData userData)

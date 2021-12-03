@@ -2,12 +2,14 @@
 using DBMS.Filters;
 using DbmsApi.API;
 using DbmsApi.Mongo;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using FromBodyAttribute = System.Web.Http.FromBodyAttribute;
 
 namespace DBMS.Controllers.APIControllers
 {
@@ -28,6 +30,10 @@ namespace DBMS.Controllers.APIControllers
             return Request.CreateResponseDBMS(HttpStatusCode.OK, db.RetrieveAvailableModels(user.Username));
         }
 
+        [System.Web.Http.HttpGet]
+        [DisableRequestSizeLimit,
+        RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue,
+        ValueLengthLimit = int.MaxValue)]
         public HttpResponseMessage Get(string id, string lod)
         {
             User user = db.GetUserFromToken(ActionContext.Request.Headers.Authorization.Parameter);
@@ -67,21 +73,41 @@ namespace DBMS.Controllers.APIControllers
                 Relations = model.Relations,
             };
 
+            // Swap out reference to Catalog Objects with the real objects
             foreach (CatalogObjectReference catalogRef in model.CatalogObjects)
             {
                 MongoCatalogObject mongoCO = db.GetCatalogObject(catalogRef.CatalogId);
-                ModelCatalogObject catalogObject = new ModelCatalogObject()
+                ModelCatalogObject catalogObject;
+                if (mongoCO == null)
                 {
-                    Id = catalogRef.Id,
-                    CatalogId = catalogRef.CatalogId,
-                    Location = catalogRef.Location,
-                    Orientation = catalogRef.Orientation,
-                    Tags = catalogRef.Tags,
-                    Components = (mongoCO.MeshReps.Any(c => c.LevelOfDetail == levelOfDetail) ? mongoCO.MeshReps.First(c => c.LevelOfDetail == levelOfDetail) : mongoCO.MeshReps.FirstOrDefault()).Components,
-                    Name = mongoCO.Name,
-                    Properties = mongoCO.Properties,
-                    TypeId = mongoCO.TypeId
-                };
+                    catalogObject = new ModelCatalogObject()
+                    {
+                        Id = catalogRef.Id,
+                        CatalogId = catalogRef.CatalogId,
+                        Location = catalogRef.Location,
+                        Orientation = catalogRef.Orientation,
+                        Tags = catalogRef.Tags,
+                        Components = new List<Component>(),
+                        Name = "N/A",
+                        Properties = new Properties(),
+                        TypeId = "N/A"
+                    };
+                }
+                else
+                {
+                    catalogObject = new ModelCatalogObject()
+                    {
+                        Id = catalogRef.Id,
+                        CatalogId = catalogRef.CatalogId,
+                        Location = catalogRef.Location,
+                        Orientation = catalogRef.Orientation,
+                        Tags = catalogRef.Tags,
+                        Components = (mongoCO.MeshReps.Any(c => c.LevelOfDetail == levelOfDetail) ? mongoCO.MeshReps.First(c => c.LevelOfDetail == levelOfDetail) : mongoCO.MeshReps.FirstOrDefault()).Components,
+                        Name = mongoCO.Name,
+                        Properties = mongoCO.Properties,
+                        TypeId = mongoCO.TypeId
+                    };
+                }
 
                 fullModel.ModelObjects.Add(catalogObject);
             }
@@ -89,6 +115,10 @@ namespace DBMS.Controllers.APIControllers
             return Request.CreateResponseDBMS(HttpStatusCode.OK, fullModel);
         }
 
+        [System.Web.Http.HttpPost]
+        [DisableRequestSizeLimit,
+        RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue,
+        ValueLengthLimit = int.MaxValue)]
         public HttpResponseMessage Post([FromBody] Model model)
         {
             User user = db.GetUserFromToken(ActionContext.Request.Headers.Authorization.Parameter);
@@ -104,13 +134,36 @@ namespace DBMS.Controllers.APIControllers
 
             MongoModel fullModel = new MongoModel(model, user.PublicName);
             fullModel.Id = null;
+
+            // Need to do a quick check that the catalog Ids are valid. If not then they are deleted:
+            List<CatalogObjectMetadata> coMetas = db.RetrieveAvailableCatalogObjects();
+            foreach (CatalogObjectReference coRef in fullModel.CatalogObjects)
+            {
+                if (coMetas.Select(com => com.CatalogObjectId).Contains(coRef.CatalogId))
+                {
+                    continue;
+                }
+                if (coMetas.Select(com => com.Name).Contains(coRef.CatalogId))
+                {
+                    coRef.CatalogId = coMetas.First(i => i.Name == coRef.CatalogId).CatalogObjectId;
+                    continue;
+                }
+                coRef.CatalogId = null;
+            }
+
+            fullModel.CatalogObjects = fullModel.CatalogObjects.Where(coref => coref.CatalogId != null).ToList();
+
             string id = db.CreateModel(fullModel);
             db.AddOwnedModel(user.Username, id);
 
             // Return the id of the new model
-            return Request.CreateResponseDBMS(HttpStatusCode.Created, id);
+            return Request.CreateResponseDBMS(HttpStatusCode.OK, id);
         }
 
+        [System.Web.Http.HttpPut]
+        [DisableRequestSizeLimit,
+        RequestFormLimits(MultipartBodyLengthLimit = int.MaxValue,
+        ValueLengthLimit = int.MaxValue)]
         public HttpResponseMessage Put([FromBody] Model model)
         {
             User user = db.GetUserFromToken(ActionContext.Request.Headers.Authorization.Parameter);
