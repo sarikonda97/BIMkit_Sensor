@@ -67,7 +67,7 @@ namespace DBMS.Controllers.DBControllers
             }
         }
 
-        #region USER
+        #region UserControl
 
         public User CheckUser(string username, string password)
         {
@@ -231,12 +231,12 @@ namespace DBMS.Controllers.DBControllers
 
         public List<UserData> RetrieveAllUserData()
         {
-            return userCollection.AsQueryable().ToList().Select(u => new UserData(u)).ToList();
+            return userCollection.Find(u=>true).ToList().Select(u => new UserData(u)).ToList();
         }
 
         public List<string> RetrieveAllUserNames()
         {
-            return userCollection.AsQueryable().ToList().Select(u => u.Username).ToList();
+            return userCollection.Find(u => true).ToList().Select(u => u.Username).ToList();
         }
 
         public UserData RetrieveUserData(string username)
@@ -373,12 +373,12 @@ namespace DBMS.Controllers.DBControllers
 
         public List<CatalogObjectMetadata> RetrieveAvailableCatalogObjects()
         {
-            return catalogObjectCollection.AsQueryable().ToList().Select(co => new CatalogObjectMetadata(co)).ToList();
+            return catalogObjectCollection.Find(co => true).ToList().Select(co => new CatalogObjectMetadata(co)).ToList();
         }
 
         public List<string> RetrieveAvailableCatalogObjectIDs()
         {
-            return catalogObjectCollection.AsQueryable().ToList().Select(co => new CatalogObjectMetadata(co)).Select(o=>o.CatalogObjectId).ToList();
+            return catalogObjectCollection.Find(co => true).ToList().Select(c => c.Id).ToList();
         }
 
         #endregion

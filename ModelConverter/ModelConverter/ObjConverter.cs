@@ -32,7 +32,14 @@ namespace ModelConverter
                 for (int i = 0; i < face.Count; i++)
                 {
                     Vertex vertex = objectLoadResult.Vertices[face[i].VertexIndex - 1];
-                    vertices.Add(new Vector3D(vertex.X, vertex.Y, vertex.Z));
+                    if (flipYZ)
+                    {
+                        vertices.Add(new Vector3D(vertex.X, vertex.Z, vertex.Y));
+                    }
+                    else
+                    {
+                        vertices.Add(new Vector3D(vertex.X, vertex.Y, vertex.Z));
+                    }
                 }
                 return vertices;
             }).ToList();
@@ -72,31 +79,7 @@ namespace ModelConverter
             component.Triangles = trianglesTuples;
             component.Vertices = finalVertices.Select(v => v.Copy()).ToList();
 
-            // Next bit is for making the local center of all objects the origin:
-            if (component.Vertices.Count > 0)
-            {
-                // Find the center of the whole object:
-                List<Vector3D> allVects = component.Vertices.Select(v => v.Copy()).ToList();
-                double minX = allVects.Min(v => v.x);
-                double minY = allVects.Min(v => v.y);
-                double minZ = allVects.Min(v => v.z);
-                double maxX = allVects.Max(v => v.x);
-                double maxY = allVects.Max(v => v.y);
-                double maxZ = allVects.Max(v => v.z);
-                Vector3D objCenter = new Vector3D((minX + maxX) / 2.0, (minY + maxY) / 2.0, (minZ + maxZ) / 2.0);
-                List<Vector3D> newVerts = new List<Vector3D>();
-                foreach (Vector3D oldVect in component.Vertices)
-                {
-                    Vector3D oldVertTranslated = Vector3D.Subract(oldVect, objCenter);
-                    oldVertTranslated = Vector3D.Scale(oldVertTranslated, scale);
-                    if (flipYZ)
-                    {
-                        oldVertTranslated = new Vector3D(oldVertTranslated.x, oldVertTranslated.z, oldVertTranslated.y);
-                    }
-                    newVerts.Add(oldVertTranslated);
-                }
-                component.Vertices = newVerts;
-            }
+            ConverterGeneral.CenterObject(new List<Component>() { component }, scale, new Vector4D(0, 0, 0, 1));
 
             CatalogObject modelSpecificObject = new CatalogObject()
             {
@@ -104,6 +87,7 @@ namespace ModelConverter
                 CatalogID = null,
                 Components = new List<Component>() { component },
                 Properties = new DbmsApi.API.Properties(),
+                TypeId = "N/A"
             };
 
             return modelSpecificObject;

@@ -80,16 +80,18 @@ namespace AdminApp
             AllModels = new Dictionary<string, ModelMetadata>();
 
             this.dataGridViewCurrentUserProperties.Rows.Clear();
-            this.dataGridViewAllModels.Rows.Clear();
-            this.dataGridViewAllModelProp.Rows.Clear();
+            this.dataGridViewUserModels.Rows.Clear();
+            this.dataGridViewUserModelProperties.Rows.Clear();
             this.dataGridViewCatalogObjects.Rows.Clear();
             this.dataGridViewCatalogPorperties.Rows.Clear();
             this.dataGridViewMaterial.Rows.Clear();
             this.dataGridViewMaterialProps.Rows.Clear();
             this.dataGridViewUsers.Rows.Clear();
             this.dataGridViewUserProperties.Rows.Clear();
-            this.dataGridViewUserModelProperties.Rows.Clear();
-            this.dataGridViewUserModels.Rows.Clear();
+            this.dataGridViewAllModels.Rows.Clear();
+            this.dataGridViewAllModelProp.Rows.Clear();
+            this.dataGridViewDatasetCatalog.Rows.Clear();
+            this.dataGridViewDatasetModel.Rows.Clear();
         }
 
         private async Task RefreshAsync()
@@ -158,6 +160,7 @@ namespace AdminApp
 
         private void DisplayProperties(DataGridView view, DbmsApi.API.Properties properties)
         {
+            view.Rows.Clear();
             foreach (Property property in properties)
             {
                 view.Rows.Add(property.Name, property.GetValueString());
@@ -493,7 +496,7 @@ namespace AdminApp
             {
                 MessageBox.Show(response.ReasonPhrase);
             }
-            
+
         }
 
         private async void buttonDeleteCatalogObject_Click(object sender, EventArgs e)
@@ -733,8 +736,8 @@ namespace AdminApp
                     }
                 }
 
-                await DisplayAllUsers();
-                await DisplayAvailableModels();
+                DisplayAllUsers();
+                DisplayAvailableModels();
             }
         }
 
@@ -758,8 +761,8 @@ namespace AdminApp
                 MessageBox.Show(response.ReasonPhrase);
             }
 
-            await DisplayAllUsers();
-            await DisplayAvailableModels();
+            DisplayAllUsers();
+            DisplayAvailableModels();
         }
 
         private void dataGridViewUserProperties_SelectionChanged(object sender, EventArgs e)
@@ -920,7 +923,7 @@ namespace AdminApp
 
         #region Dataset Adding:
 
-        public static int BULK_UPLOAD_LIMIT = 10;
+        public static int BULK_UPLOAD_LIMIT = 5;
 
         private async void buttonBulkAddModel_Click(object sender, EventArgs e)
         {
@@ -933,8 +936,6 @@ namespace AdminApp
 
             // Should state what format the dataset is from:
             GetModelsFrom3DFRONTDataset(fbd.SelectedPath);
-
-            await DisplayAllModels();
         }
 
         public async void GetModelsFrom3DFRONTDataset(string path)
@@ -945,7 +946,20 @@ namespace AdminApp
             int counter = 0;
             foreach (string file in files)
             {
-                Model modelToAdd = ModelConverter.DatasetConverter3DFRONT.Convert3DFRONTModel(file, 1.0, false, true);
+                Model modelToAdd;
+                try
+                {
+                    modelToAdd = ModelConverter.DatasetConverter3DFRONT.Convert3DFRONTModel(file, 1.0, true, true);
+                }
+                catch
+                {
+                    MessageBox.Show("Error with file:\n" + file);
+                    continue;
+                }
+                if (ModelMetadatas.Values.Any(v => v.Name == modelToAdd.Name))
+                {
+                    continue;
+                }
 
                 APIResponse<string> response = await Controller.CreateModel(modelToAdd);
                 if (response.Code != System.Net.HttpStatusCode.OK)
@@ -959,6 +973,8 @@ namespace AdminApp
                     break;
                 }
             }
+
+            await DisplayAllModels();
         }
 
         private async void buttonBulkDeleteModel_Click(object sender, EventArgs e)
@@ -977,8 +993,6 @@ namespace AdminApp
 
             // Should state what format the dataset is from:
             GetObjectsFrom3DFRONTDataset(fbd.SelectedPath);
-
-            await DisplayAvailableCatalogObjects();
         }
 
         public enum Datasets { _3DFRONT, OBJ }
@@ -993,7 +1007,16 @@ namespace AdminApp
             int counter = 0;
             foreach (string dir in dirs)
             {
-                CatalogObject newObj = ModelConverter.DatasetConverter3DFRONT.Convert3DFRONTCatalogObject(dir, 1.0, false, true);
+                CatalogObject newObj;
+                try
+                {
+                    newObj = ModelConverter.DatasetConverter3DFRONT.Convert3DFRONTCatalogObject(dir, 1.0, false, true);
+                }
+                catch
+                {
+                    MessageBox.Show("Error with file:\n" + dir);
+                    continue;
+                }
                 if (CatalogMetadatas.Values.Any(v => v.Name == newObj.Name))
                 {
                     continue;
@@ -1025,6 +1048,8 @@ namespace AdminApp
                     break;
                 }
             }
+
+            await DisplayAvailableCatalogObjects();
         }
 
         private async void buttonBulkDeleteCatalog_Click(object sender, EventArgs e)

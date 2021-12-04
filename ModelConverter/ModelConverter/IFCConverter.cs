@@ -146,43 +146,7 @@ namespace ModelConverter
             List<ModelObject> objectList = objectDict.Values.ToList();
             foreach (var obj in objectList)
             {
-                if (obj.Components.Count == 0)
-                {
-                    continue;
-                }
-
-                // Find the center of the whole object:
-                List<Vector3D> allVects = obj.Components.SelectMany(vl => vl.Vertices.Select(v => v.Copy())).ToList();
-                double minX = allVects.Min(v => v.x);
-                double minY = allVects.Min(v => v.y);
-                double minZ = allVects.Min(v => v.z);
-                double maxX = allVects.Max(v => v.x);
-                double maxY = allVects.Max(v => v.y);
-                double maxZ = allVects.Max(v => v.z);
-                Vector3D objCenter = new Vector3D((minX + maxX) / 2.0, (minY + maxY) / 2.0, (minZ + maxZ) / 2.0);
-
-                // Move all verticies to the center and the reverse orinetation (so they face forward):
-                Vector4D ObjOrientation = obj.Orientation;
-                Matrix4 objTranslation = Utils.GetTranslationMatrixFromLocationOrientation(objCenter, ObjOrientation);
-                Matrix4 objTranslationInverse = objTranslation.GetInverse(out bool invertable);
-                if (invertable)
-                {
-                    foreach (Component component in obj.Components)
-                    {
-                        List<Vector3D> newVerts = new List<Vector3D>();
-                        foreach (Vector3D oldVect in component.Vertices)
-                        {
-                            Vector4D oldVertVect = oldVect.Get4D(1.0);
-                            Vector3D oldVertTranslated = Matrix4.Multiply(objTranslationInverse, oldVertVect);
-                            oldVertTranslated.Scale(scale);
-                            newVerts.Add(oldVertTranslated);
-                        }
-                        component.Vertices = newVerts;
-                    }
-                }
-                objCenter.Scale(scale);
-                //obj.Location = ConverterGeneral.VectorConverterTuple(objCenter);
-                obj.Location = objCenter;
+                obj.Location = ConverterGeneral.CenterObject(obj.Components, scale, obj.Orientation);
             }
 
             Model finalModel = new Model()

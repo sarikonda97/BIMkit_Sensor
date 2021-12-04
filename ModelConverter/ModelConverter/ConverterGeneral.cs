@@ -1,4 +1,5 @@
-﻿using MathPackage;
+﻿using DbmsApi.API;
+using MathPackage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,5 +118,83 @@ namespace ModelConverter
         {
             return new Tuple<double, double, double, double>(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
         }
+
+        public static Vector3D CenterObject(List<Component> components, double scale, Vector4D orientation)
+        {
+            List<Vector3D> allVects = components.SelectMany(vl => vl.Vertices.Select(v => v.Copy())).ToList();
+            if (allVects.Count == 0)
+            {
+                return new Vector3D();
+            }
+
+            // Find the center of the whole object:
+            double minX = allVects.Min(v => v.x);
+            double minY = allVects.Min(v => v.y);
+            double minZ = allVects.Min(v => v.z);
+            double maxX = allVects.Max(v => v.x);
+            double maxY = allVects.Max(v => v.y);
+            double maxZ = allVects.Max(v => v.z);
+            Vector3D objCenter = new Vector3D((minX + maxX) / 2.0, (minY + maxY) / 2.0, (minZ + maxZ) / 2.0);
+
+            // Move all verticies to the center and the reverse orinetation (so they face forward):
+            Matrix4 objTranslation = Utils.GetTranslationMatrixFromLocationOrientation(objCenter, orientation);
+            Matrix4 objTranslationInverse = objTranslation.GetInverse(out bool invertable);
+            if (invertable)
+            {
+                foreach (Component component in components)
+                {
+                    List<Vector3D> newVerts = new List<Vector3D>();
+                    foreach (Vector3D oldVect in component.Vertices)
+                    {
+                        Vector4D oldVertVect = oldVect.Get4D(1.0);
+                        Vector3D oldVertTranslated = Matrix4.Multiply(objTranslationInverse, oldVertVect);
+                        oldVertTranslated.Scale(scale);
+                        newVerts.Add(oldVertTranslated);
+                    }
+                    component.Vertices = newVerts;
+                }
+            }
+
+            objCenter.Scale(scale);
+            return objCenter;
+        }
+        //public static Vector3D CenterObject2(List<Component> components, double scale, bool flipYZ)
+        //{
+        //    // Next bit is for making the local center of all objects the origin:
+        //    List<Vector3D> allObjVerts = components.SelectMany(c => c.Vertices).ToList();
+        //    if (allObjVerts.Count < 0)
+        //    {
+        //        return new Vector3D();
+        //    }
+
+        //    // Find the center of the whole object:
+        //    List<Vector3D> allVects = allObjVerts.Select(v => v.Copy()).ToList();
+        //    double minX = allVects.Min(v => v.x);
+        //    double minY = allVects.Min(v => v.y);
+        //    double minZ = allVects.Min(v => v.z);
+        //    double maxX = allVects.Max(v => v.x);
+        //    double maxY = allVects.Max(v => v.y);
+        //    double maxZ = allVects.Max(v => v.z);
+        //    Vector3D objCenter = new Vector3D((minX + maxX) / 2.0, (minY + maxY) / 2.0, (minZ + maxZ) / 2.0);
+
+        //    foreach (Component component in components)
+        //    {
+        //        List<Vector3D> newVerts = new List<Vector3D>();
+        //        foreach (Vector3D oldVect in component.Vertices)
+        //        {
+        //            Vector3D oldVertTranslated = Vector3D.Subract(oldVect, objCenter);
+        //            oldVertTranslated = Vector3D.Scale(oldVertTranslated, scale);
+        //            if (flipYZ)
+        //            {
+        //                oldVertTranslated = new Vector3D(oldVertTranslated.x, oldVertTranslated.z, oldVertTranslated.y);
+        //            }
+        //            newVerts.Add(oldVertTranslated);
+        //        }
+        //        component.Vertices = newVerts;
+        //    }
+
+        //    return objCenter;
+        //}
+
     }
 }

@@ -26,7 +26,7 @@ namespace DbmsApi
 
         public TokenData Token { get; private set; }
 
-        public double TIMEOUT = 60.0;
+        public double TIMEOUT = 30.0;
 
         #endregion
 
