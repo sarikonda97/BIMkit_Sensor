@@ -11,6 +11,7 @@ namespace DbmsApi.Mongo
         public string TypeId;
 
         public Properties Properties;
+        public List<KeyValuePair<string, string>> Tags = new List<KeyValuePair<string, string>>();
         public List<MeshRep> MeshReps = new List<MeshRep>();
     }
 

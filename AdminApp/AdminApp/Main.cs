@@ -950,6 +950,7 @@ namespace AdminApp
                 try
                 {
                     modelToAdd = ModelConverter.DatasetConverter3DFRONT.Convert3DFRONTModel(file, 1.0, true, true);
+                    modelToAdd.Tags.Add(new KeyValuePair<string, string>("Dataset", "3DFRONT"));
                 }
                 catch
                 {

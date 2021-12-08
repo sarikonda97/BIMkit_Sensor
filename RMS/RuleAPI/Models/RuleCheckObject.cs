@@ -27,7 +27,7 @@ namespace RuleAPI.Models
 
         public List<Vector3D> GlobalVerticies = new List<Vector3D>();
         public List<Vector3D> LocalVerticies = new List<Vector3D>();
-        public List<int> Triangles = new List<int>();
+        public List<int[]> Triangles = new List<int[]>();
 
         [JsonConstructor]
         private RuleCheckObject() { }
@@ -44,10 +44,11 @@ namespace RuleAPI.Models
             Properties = modelObject.Properties;
 
             LocalVerticies = new List<Vector3D>();
-            Triangles = new List<int>();
+            Triangles = new List<int[]>();
             foreach (Component component in modelObject.Components)
             {
-                Triangles.AddRange(component.Triangles.SelectMany(t => new List<int>() { t[0] + LocalVerticies.Count, t[1] + LocalVerticies.Count, t[2] + LocalVerticies.Count }));
+                Triangles.AddRange(component.Triangles.Select(t => new int[] { t[0] + LocalVerticies.Count, t[1] + LocalVerticies.Count, t[2] + LocalVerticies.Count }));
+                //Triangles.AddRange(component.Triangles.SelectMany(t => new List<int>() { t[0] + LocalVerticies.Count, t[1] + LocalVerticies.Count, t[2] + LocalVerticies.Count }));
                 LocalVerticies.AddRange(component.Vertices.Select(v => v.Copy()));
             }
             Vector3D realCenter, realDimentions;

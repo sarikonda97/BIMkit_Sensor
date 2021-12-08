@@ -12,6 +12,7 @@ namespace DbmsApi.API
         public string Id; // This is the ID within the model, not the catalogID
         public Vector3D Location;
         public Vector4D Orientation;
+        public Properties Properties;
         public List<KeyValuePair<string, string>> Tags = new List<KeyValuePair<string, string>>();
     }
 
@@ -20,7 +21,6 @@ namespace DbmsApi.API
         public string Name;
         public string TypeId;
 
-        public Properties Properties;
         public List<Component> Components = new List<Component>();
     }
 

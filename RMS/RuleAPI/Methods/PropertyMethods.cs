@@ -35,9 +35,9 @@ namespace RuleAPI.Methods
             double minLen = double.MaxValue;
             for (int i = 0; i < obj.Triangles.Count; i += 3)
             {
-                Vector3D v0 = obj.GlobalVerticies[obj.Triangles[i]];
-                Vector3D v1 = obj.GlobalVerticies[obj.Triangles[i + 1]];
-                Vector3D v2 = obj.GlobalVerticies[obj.Triangles[i + 2]];
+                Vector3D v0 = obj.GlobalVerticies[obj.Triangles[i][0]];
+                Vector3D v1 = obj.GlobalVerticies[obj.Triangles[i][1]];
+                Vector3D v2 = obj.GlobalVerticies[obj.Triangles[i][2]];
 
                 double d01 = Vector3D.Distance(v0, v1);
                 double d02 = Vector3D.Distance(v0, v2);
@@ -51,9 +51,9 @@ namespace RuleAPI.Methods
             double maxLen = double.MinValue;
             for (int i = 0; i < obj.Triangles.Count; i += 3)
             {
-                Vector3D v0 = obj.GlobalVerticies[obj.Triangles[i]];
-                Vector3D v1 = obj.GlobalVerticies[obj.Triangles[i + 1]];
-                Vector3D v2 = obj.GlobalVerticies[obj.Triangles[i + 2]];
+                Vector3D v0 = obj.GlobalVerticies[obj.Triangles[i][0]];
+                Vector3D v1 = obj.GlobalVerticies[obj.Triangles[i][1]];
+                Vector3D v2 = obj.GlobalVerticies[obj.Triangles[i][2]];
 
                 double d01 = Vector3D.Distance(v0, v1);
                 double d02 = Vector3D.Distance(v0, v2);
@@ -67,9 +67,9 @@ namespace RuleAPI.Methods
             double totalLen = 0;
             for (int i = 0; i < obj.Triangles.Count; i += 3)
             {
-                Vector3D v0 = obj.GlobalVerticies[obj.Triangles[i]];
-                Vector3D v1 = obj.GlobalVerticies[obj.Triangles[i + 1]];
-                Vector3D v2 = obj.GlobalVerticies[obj.Triangles[i + 2]];
+                Vector3D v0 = obj.GlobalVerticies[obj.Triangles[i][0]];
+                Vector3D v1 = obj.GlobalVerticies[obj.Triangles[i][1]];
+                Vector3D v2 = obj.GlobalVerticies[obj.Triangles[i][2]];
 
                 double d01 = Vector3D.Distance(v0, v1);
                 double d02 = Vector3D.Distance(v0, v2);

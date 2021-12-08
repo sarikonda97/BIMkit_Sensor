@@ -129,9 +129,9 @@ namespace MathPackage
             return new Mesh(newVects, m.TriangleList);
         }
 
-        public static List<int> CreateTrianglesForExtrudedSolid(List<Vector3D> polyLinePoints)
+        public static List<int[]> CreateTrianglesForExtrudedSolid(List<Vector3D> polyLinePoints)
         {
-            List<int> triangleNums = new List<int>();
+            List<int[]> triangleNums = new List<int[]>();
             if (polyLinePoints.Count == 0)
             {
                 return triangleNums;
@@ -152,22 +152,24 @@ namespace MathPackage
 
                 if (i % 2 == 0)
                 {
-                    triangleNums.Add(i + mainPointCount);
-                    triangleNums.Add(index1 + mainPointCount);
-                    triangleNums.Add(index2 + mainPointCount);
+                    triangleNums.Add(new int[] { i + mainPointCount, index1 + mainPointCount, index2 + mainPointCount });
+                    //triangleNums.Add(i + mainPointCount);
+                    //triangleNums.Add(index1 + mainPointCount);
+                    //triangleNums.Add(index2 + mainPointCount);
                 }
                 else
                 {
-                    triangleNums.Add(i + mainPointCount);
-                    triangleNums.Add(index2 + mainPointCount);
-                    triangleNums.Add(index1 + mainPointCount);
+                    triangleNums.Add(new int[] { i + mainPointCount, index2 + mainPointCount, index1 + mainPointCount });
+                    //triangleNums.Add(i + mainPointCount);
+                    //triangleNums.Add(index2 + mainPointCount);
+                    //triangleNums.Add(index1 + mainPointCount);
                 }
             }
             //Top trianlges:
-            List<int> topTriangles = Utils.EarClippingVariant(polyLinePoints, FaceSide.FRONT);       // TODO: CHECK IF FRONT IS CORRECT
-            foreach (int tri in topTriangles)
+            List<int[]> topTriangles = Utils.EarClippingVariant(polyLinePoints, FaceSide.FRONT);       // TODO: CHECK IF FRONT IS CORRECT
+            foreach (int[] tri in topTriangles)
             {
-                triangleNums.Add(tri + mainPointCountTriple);
+                triangleNums.Add(new int[] { tri[0] + mainPointCountTriple, tri[1] + mainPointCountTriple, tri[2] + mainPointCountTriple });
             }
 
             return triangleNums;
@@ -205,9 +207,9 @@ namespace MathPackage
             return new Vector4D(axisNorm.x * S, axisNorm.y * S, axisNorm.z * S, C);
         }
 
-        public static List<int> EarClippingVariant(List<Vector3D> points, FaceSide faceSide)
+        public static List<int[]> EarClippingVariant(List<Vector3D> points, FaceSide faceSide)
         {
-            List<int> triangleList = new List<int>();
+            List<int[]> triangleList = new List<int[]>();
 
             List<Tuple<int, Vector3D>> remainingPoints = new List<Tuple<int, Vector3D>>();
             for (int i = 0; i < points.Count; i++)
@@ -321,15 +323,17 @@ namespace MathPackage
                     {
                         if (faceSide == FaceSide.FRONT)
                         {
-                            triangleList.Add(remainingPoints[index1].Item1);
-                            triangleList.Add(remainingPoints[index3].Item1);
-                            triangleList.Add(remainingPoints[index2].Item1);
+                            triangleList.Add(new int[] { remainingPoints[index1].Item1 , remainingPoints[index3].Item1, remainingPoints[index2].Item1 });
+                            //triangleList.Add(remainingPoints[index1].Item1);
+                            //triangleList.Add(remainingPoints[index3].Item1);
+                            //triangleList.Add(remainingPoints[index2].Item1);
                         }
                         if (faceSide == FaceSide.BACK)
                         {
-                            triangleList.Add(remainingPoints[index1].Item1);
-                            triangleList.Add(remainingPoints[index2].Item1);
-                            triangleList.Add(remainingPoints[index3].Item1);
+                            triangleList.Add(new int[] { remainingPoints[index1].Item1, remainingPoints[index2].Item1, remainingPoints[index3].Item1 });
+                            //triangleList.Add(remainingPoints[index1].Item1);
+                            //triangleList.Add(remainingPoints[index2].Item1);
+                            //triangleList.Add(remainingPoints[index3].Item1);
                         }
                         remainingPoints.RemoveAt(index2);
                         removedEar = true;
@@ -345,15 +349,17 @@ namespace MathPackage
 
             if (faceSide == FaceSide.FRONT || faceSide == FaceSide.BOTH)
             {
-                triangleList.Add(remainingPoints[0].Item1);
-                triangleList.Add(remainingPoints[2].Item1);
-                triangleList.Add(remainingPoints[1].Item1);
+                triangleList.Add(new int[] { remainingPoints[0].Item1, remainingPoints[2].Item1, remainingPoints[1].Item1 });
+                //triangleList.Add(remainingPoints[0].Item1);
+                //triangleList.Add(remainingPoints[2].Item1);
+                //triangleList.Add(remainingPoints[1].Item1);
             }
             if (faceSide == FaceSide.BACK || faceSide == FaceSide.BOTH)
             {
-                triangleList.Add(remainingPoints[0].Item1);
-                triangleList.Add(remainingPoints[1].Item1);
-                triangleList.Add(remainingPoints[2].Item1);
+                triangleList.Add(new int[] { remainingPoints[0].Item1, remainingPoints[1].Item1, remainingPoints[2].Item1 });
+                //triangleList.Add(remainingPoints[0].Item1);
+                //triangleList.Add(remainingPoints[1].Item1);
+                //triangleList.Add(remainingPoints[2].Item1);
             }
 
             return triangleList;
@@ -491,8 +497,8 @@ namespace MathPackage
             verticies.Add(new Vector3D(v2.x, v2.y, mean));
             verticies.Add(new Vector3D(v3.x, v3.y, mean));
 
-            List<int> triangles = new List<int>();
-            triangles.AddRange(new int[] { 0, 1, 2 });
+            List<int[]> triangles = new List<int[]>();
+            triangles.Add(new int[] { 0, 1, 2 });
 
             return new Mesh(verticies, triangles);
         }
@@ -517,7 +523,7 @@ namespace MathPackage
                 verticies.Add(new Vector3D(point.x, point.y, top));
             }
 
-            List<int> triangles = CreateTrianglesForExtrudedSolid(vects);
+            List<int[]> triangles = CreateTrianglesForExtrudedSolid(vects);
 
             return new Mesh(verticies, triangles);
         }
@@ -536,21 +542,21 @@ namespace MathPackage
                 new Vector3D(location.x-dimentions.x / 2.0, location.y+dimentions.y / 2.0, location.z+dimentions.z / 2.0)
             };
 
-            List<int> tList = new List<int>();
-            tList.AddRange(new List<int> { 0, 1, 2 });
-            tList.AddRange(new List<int> { 0, 2, 3 });
-            tList.AddRange(new List<int> { 4, 7, 6 });
-            tList.AddRange(new List<int> { 4, 6, 5 });
-            tList.AddRange(new List<int> { 0, 4, 1 });
-            tList.AddRange(new List<int> { 1, 4, 5 });
-            tList.AddRange(new List<int> { 1, 5, 2 });
-            tList.AddRange(new List<int> { 2, 5, 6 });
-            tList.AddRange(new List<int> { 2, 6, 3 });
-            tList.AddRange(new List<int> { 3, 6, 7 });
-            tList.AddRange(new List<int> { 3, 7, 0 });
-            tList.AddRange(new List<int> { 0, 7, 4 });
+            List<int[]> tList = new List<int[]>();
+            tList.Add(new int[] { 0, 1, 2 });
+            tList.Add(new int[] { 0, 2, 3 });
+            tList.Add(new int[] { 4, 7, 6 });
+            tList.Add(new int[] { 4, 6, 5 });
+            tList.Add(new int[] { 0, 4, 1 });
+            tList.Add(new int[] { 1, 4, 5 });
+            tList.Add(new int[] { 1, 5, 2 });
+            tList.Add(new int[] { 2, 5, 6 });
+            tList.Add(new int[] { 2, 6, 3 });
+            tList.Add(new int[] { 3, 6, 7 });
+            tList.Add(new int[] { 3, 7, 0 });
+            tList.Add(new int[] { 0, 7, 4 });
 
-            List<int> triangles = new List<int>();
+            List<int[]> triangles = new List<int[]>();
             if (faceSide == FaceSide.FRONT || faceSide == FaceSide.BOTH)
             {
                 triangles.AddRange(tList);
@@ -569,15 +575,15 @@ namespace MathPackage
             double minDist = double.MaxValue;
             for (int i = 0; i < m1.TriangleList.Count; i += 3)
             {
-                Vector3D v0 = m1.VertexList[m1.TriangleList[i]];
-                Vector3D v1 = m1.VertexList[m1.TriangleList[i + 1]];
-                Vector3D v2 = m1.VertexList[m1.TriangleList[i + 2]];
+                Vector3D v0 = m1.VertexList[m1.TriangleList[i][0]];
+                Vector3D v1 = m1.VertexList[m1.TriangleList[i][1]];
+                Vector3D v2 = m1.VertexList[m1.TriangleList[i][2]];
 
                 for (int j = 0; j < m2.TriangleList.Count; j += 3)
                 {
-                    Vector3D u0 = m2.VertexList[m2.TriangleList[j]];
-                    Vector3D u1 = m2.VertexList[m2.TriangleList[j + 1]];
-                    Vector3D u2 = m2.VertexList[m2.TriangleList[j + 2]];
+                    Vector3D u0 = m2.VertexList[m2.TriangleList[j][0]];
+                    Vector3D u1 = m2.VertexList[m2.TriangleList[j][1]];
+                    Vector3D u2 = m2.VertexList[m2.TriangleList[j][2]];
 
                     // Get the min distance of each triangle pair:
                     DistTriangle3Triangle3 distTriangle3Triangle3 = new DistTriangle3Triangle3(
@@ -602,9 +608,9 @@ namespace MathPackage
             double minDist = double.MaxValue;
             for (int i = 0; i < m.TriangleList.Count; i += 3)
             {
-                Vector3D v0 = m.VertexList[m.TriangleList[i]];
-                Vector3D v1 = m.VertexList[m.TriangleList[i + 1]];
-                Vector3D v2 = m.VertexList[m.TriangleList[i + 2]];
+                Vector3D v0 = m.VertexList[m.TriangleList[i][0]];
+                Vector3D v1 = m.VertexList[m.TriangleList[i][1]];
+                Vector3D v2 = m.VertexList[m.TriangleList[i][2]];
 
                 // Get the min distance of each triangle pair:
                 DistPoint3Triangle3 distTriangle3Triangle3 = new DistPoint3Triangle3(
@@ -637,15 +643,15 @@ namespace MathPackage
 
             for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
             {
-                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i]];
-                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i + 1]];
-                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i + 2]];
+                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
+                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
+                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
 
                 for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
                 {
-                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j]];
-                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j + 1]];
-                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j + 2]];
+                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
+                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
+                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
 
                     IntrTriangle3Triangle3 intrTriangle3Triangle3 = new IntrTriangle3Triangle3(
                                                                                     new Triangle3d(
@@ -837,9 +843,9 @@ namespace MathPackage
         {
             for (int j = 0; j < m.TriangleList.Count; j += 3)
             {
-                Vector3D u0 = m.VertexList[m.TriangleList[j]];
-                Vector3D u1 = m.VertexList[m.TriangleList[j + 1]];
-                Vector3D u2 = m.VertexList[m.TriangleList[j + 2]];
+                Vector3D u0 = m.VertexList[m.TriangleList[j][0]];
+                Vector3D u1 = m.VertexList[m.TriangleList[j][1]];
+                Vector3D u2 = m.VertexList[m.TriangleList[j][2]];
 
                 bool testResult = RayIntersectsTriangle(rayOrigin, rayVector, u0, u1, u2);
                 if (testResult)
@@ -855,17 +861,17 @@ namespace MathPackage
         {
             for (int i = 0; i < m1.TriangleList.Count; i += 3)
             {
-                Vector3D v0 = m1.VertexList[m1.TriangleList[i]];
-                Vector3D v1 = m1.VertexList[m1.TriangleList[i + 1]];
-                Vector3D v2 = m1.VertexList[m1.TriangleList[i + 2]];
+                Vector3D v0 = m1.VertexList[m1.TriangleList[i][0]];
+                Vector3D v1 = m1.VertexList[m1.TriangleList[i][1]];
+                Vector3D v2 = m1.VertexList[m1.TriangleList[i][2]];
 
                 Vector3D vM = Vector3D.Average(new Vector3D[] { v0, v1, v2 });
 
                 for (int j = 0; j < m2.TriangleList.Count; j += 3)
                 {
-                    Vector3D u0 = m2.VertexList[m2.TriangleList[j]];
-                    Vector3D u1 = m2.VertexList[m2.TriangleList[j + 1]];
-                    Vector3D u2 = m2.VertexList[m2.TriangleList[j + 2]];
+                    Vector3D u0 = m2.VertexList[m2.TriangleList[j][0]];
+                    Vector3D u1 = m2.VertexList[m2.TriangleList[j][1]];
+                    Vector3D u2 = m2.VertexList[m2.TriangleList[j][2]];
 
                     Vector3D uM = Vector3D.Average(new Vector3D[] { u0, u1, u2 });
 
@@ -893,17 +899,17 @@ namespace MathPackage
             Vector3D negDirection = direction.Neg();
             for (int i = 0; i < m1.TriangleList.Count; i += 3)
             {
-                Vector3D v0 = m1.VertexList[m1.TriangleList[i]];
-                Vector3D v1 = m1.VertexList[m1.TriangleList[i + 1]];
-                Vector3D v2 = m1.VertexList[m1.TriangleList[i + 2]];
+                Vector3D v0 = m1.VertexList[m1.TriangleList[i][0]];
+                Vector3D v1 = m1.VertexList[m1.TriangleList[i][1]];
+                Vector3D v2 = m1.VertexList[m1.TriangleList[i][2]];
 
                 Vector3D vM = Vector3D.Average(new Vector3D[] { v0, v1, v2 });
 
                 for (int j = 0; j < m2.TriangleList.Count; j += 3)
                 {
-                    Vector3D u0 = m2.VertexList[m2.TriangleList[j]];
-                    Vector3D u1 = m2.VertexList[m2.TriangleList[j + 1]];
-                    Vector3D u2 = m2.VertexList[m2.TriangleList[j + 2]];
+                    Vector3D u0 = m2.VertexList[m2.TriangleList[j][0]];
+                    Vector3D u1 = m2.VertexList[m2.TriangleList[j][1]];
+                    Vector3D u2 = m2.VertexList[m2.TriangleList[j][2]];
 
                     Vector3D uM = Vector3D.Average(new Vector3D[] { u0, u1, u2 });
 

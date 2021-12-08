@@ -11,9 +11,9 @@ namespace DbmsApi.API
     public class Model : MongoDocument
     {
         public string Name;
-        public Properties Properties;
         public List<ModelObject> ModelObjects = new List<ModelObject>();
         public List<Relation> Relations = new List<Relation>();
+        public Properties Properties;
         public List<KeyValuePair<string, string>> Tags = new List<KeyValuePair<string, string>>();
 
         public Model() { }

@@ -103,7 +103,7 @@ namespace RuleAPI.Models
                     List<int[]> triangles = new List<int[]>();
                     for (int i = 0; i < rco.Triangles.Count; i += 3)
                     {
-                        triangles.Add(new int[3] { rco.Triangles[i], rco.Triangles[i + 1], rco.Triangles[i + 2] });
+                        triangles.Add(new int[3] { rco.Triangles[i][0], rco.Triangles[i][1], rco.Triangles[i][2] });
                     }
                     ModelObject newModelObject = new ModelObject()
                     {

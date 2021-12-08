@@ -12,6 +12,7 @@ namespace DbmsApi.API
         public string Name;
         public string TypeId;
         public Properties Properties;
+        public List<KeyValuePair<string, string>> Tags = new List<KeyValuePair<string, string>>();
         public List<Component> Components = new List<Component>();
     }
 }

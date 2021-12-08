@@ -1,6 +1,7 @@
 ﻿using DbmsApi.Mongo;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace DbmsApi.API
 {
@@ -12,6 +13,7 @@ namespace DbmsApi.API
         public string Name;
         public string Type;
         public Properties Properties;
+        public List<KeyValuePair<string, string>> Tags = new List<KeyValuePair<string, string>>();
 
         [JsonConstructor]
         [BsonConstructor]
@@ -23,6 +25,7 @@ namespace DbmsApi.API
             Name = catalogObject.Name;
             Properties = catalogObject.Properties;
             Type = catalogObject.TypeId;
+            Tags = catalogObject.Tags;
         }
 
         public override string ToString()

@@ -11,5 +11,6 @@ namespace DbmsApi.API
         public string ObjectId1; // This is the ID within the model, not the catalogID
         public string ObjectId2; // This is the ID within the model, not the catalogID
         public Properties Properties;
+        public List<KeyValuePair<string, string>> Tags = new List<KeyValuePair<string, string>>();
     }
 }

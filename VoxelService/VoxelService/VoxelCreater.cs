@@ -69,7 +69,7 @@ namespace VoxelService
                     Matrix4 translationMatrix = Utils.GetTranslationMatrixFromLocationOrientation(mo.Location, mo.Orientation);
                     foreach (Component c in mo.Components)
                     {
-                        Mesh mocMesh = new Mesh(Utils.TranslateVerticies(translationMatrix, c.Vertices), c.Triangles.SelectMany(t => t.ToList()).ToList());
+                        Mesh mocMesh = new Mesh(Utils.TranslateVerticies(translationMatrix, c.Vertices), c.Triangles);
                         if (Utils.MeshOverlap(voxelBox, mocMesh, 1.0))
                         {
                             possible.Overlap = true;

@@ -639,9 +639,9 @@ namespace MathPackage
     public class Mesh
     {
         public List<Vector3D> VertexList { get; set; }
-        public List<int> TriangleList { get; set; }
+        public List<int[]> TriangleList { get; set; }
 
-        public Mesh(List<Vector3D> vertexList, List<int> triangleList)
+        public Mesh(List<Vector3D> vertexList, List<int[]> triangleList)
         {
             VertexList = vertexList;
             TriangleList = triangleList;
@@ -650,7 +650,7 @@ namespace MathPackage
         public Mesh()
         {
             VertexList = new List<Vector3D>();
-            TriangleList = new List<int>();
+            TriangleList = new List<int[]>();
         }
     }
 }

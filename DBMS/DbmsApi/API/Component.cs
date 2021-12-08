@@ -13,5 +13,6 @@ namespace DbmsApi.API
         public List<Vector3D> Vertices = new List<Vector3D>();
         public List<int[]> Triangles = new List<int[]>();
         public Properties Properties;
+        public List<KeyValuePair<string, string>> Tags = new List<KeyValuePair<string, string>>();
     }
 }

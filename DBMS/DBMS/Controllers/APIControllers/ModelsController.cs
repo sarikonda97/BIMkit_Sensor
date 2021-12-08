@@ -2,6 +2,7 @@
 using DBMS.Filters;
 using DbmsApi.API;
 using DbmsApi.Mongo;
+using MathPackage;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -80,6 +81,12 @@ namespace DBMS.Controllers.APIControllers
                 ModelCatalogObject catalogObject;
                 if (mongoCO == null)
                 {
+                    Mesh mesh = Utils.CreateBoundingBox(new Vector3D(), new Vector3D(0.1, 0.1, 0.1), FaceSide.FRONT);
+                    Component component = new Component()
+                    {
+                        Triangles = mesh.TriangleList,
+                        Vertices = mesh.VertexList
+                    };
                     catalogObject = new ModelCatalogObject()
                     {
                         Id = catalogRef.Id,
@@ -87,8 +94,8 @@ namespace DBMS.Controllers.APIControllers
                         Location = catalogRef.Location,
                         Orientation = catalogRef.Orientation,
                         Tags = catalogRef.Tags,
-                        Components = new List<Component>(),
-                        Name = "N/A",
+                        Components = new List<Component>() { component },
+                        Name = "Missing Catalog Item: " + catalogRef.CatalogId,
                         Properties = new Properties(),
                         TypeId = "N/A"
                     };
@@ -111,6 +118,8 @@ namespace DBMS.Controllers.APIControllers
 
                 fullModel.ModelObjects.Add(catalogObject);
             }
+
+            fullModel.ModelObjects = fullModel.ModelObjects.OrderBy(mo => mo.Name).ToList();
 
             return Request.CreateResponseDBMS(HttpStatusCode.OK, fullModel);
         }
@@ -148,7 +157,7 @@ namespace DBMS.Controllers.APIControllers
                     coRef.CatalogId = coMetas.First(i => i.Name == coRef.CatalogId).CatalogObjectId;
                     continue;
                 }
-                coRef.CatalogId = null;
+                coRef.CatalogId = "2CD82E60B06FEF732F20C72B";
             }
 
             fullModel.CatalogObjects = fullModel.CatalogObjects.Where(coref => coref.CatalogId != null).ToList();
