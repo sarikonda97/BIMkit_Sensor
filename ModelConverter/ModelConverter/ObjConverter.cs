@@ -25,67 +25,77 @@ namespace ModelConverter
 
         public static CatalogObject ConvertObjFile(LoadResult objectLoadResult, string objectName, double scale, bool flipTriangles, bool flipYZ)
         {
-            //  Get faces
-            List<List<Vector3D>> faces = objectLoadResult.Groups.SelectMany(grp => grp.Faces).Select(face =>
+            List<Component> components = new List<Component>();
+            foreach (var group in objectLoadResult.Groups)
             {
-                List<Vector3D> vertices = new List<Vector3D>();
-                for (int i = 0; i < face.Count; i++)
+                //  Get faces
+                List<List<Vector3D>> faces = group.Faces.Select(face =>
                 {
-                    Vertex vertex = objectLoadResult.Vertices[face[i].VertexIndex - 1];
-                    if (flipYZ)
+                    List<Vector3D> vertices = new List<Vector3D>();
+                    for (int i = 0; i < face.Count; i++)
                     {
-                        vertices.Add(new Vector3D(vertex.X, vertex.Z, vertex.Y));
+                        Vertex vertex = objectLoadResult.Vertices[face[i].VertexIndex - 1];
+                        if (flipYZ)
+                        {
+                            vertices.Add(new Vector3D(vertex.X, vertex.Z, vertex.Y));
+                        }
+                        else
+                        {
+                            vertices.Add(new Vector3D(vertex.X, vertex.Y, vertex.Z));
+                        }
+                    }
+                    return vertices;
+                }).ToList();
+
+                // Attempt to tesellate the faces
+                List<int> triangles = new List<int>();
+                List<Vector3D> finalVertices = new List<Vector3D>();
+                foreach (List<Vector3D> face in faces)
+                {
+                    List<int> tempTriangleInts = new List<int>();
+                    if (face.Count >= 3)
+                    {
+                        tempTriangleInts = EarClippingVariant(face, FaceSide.FRONT);
+                    }
+
+                    foreach (int intVal in tempTriangleInts)
+                    {
+                        triangles.Add(intVal + finalVertices.Count);
+                    }
+                    finalVertices.AddRange(face);
+                }
+
+                List<int[]> trianglesTuples = new List<int[]>();
+                for (int index = 0; index < triangles.Count; index += 3)
+                {
+                    if (flipTriangles)
+                    {
+                        trianglesTuples.Add(new int[3] { triangles[index], triangles[index + 2], triangles[index + 1] });
                     }
                     else
                     {
-                        vertices.Add(new Vector3D(vertex.X, vertex.Y, vertex.Z));
+                        trianglesTuples.Add(new int[3] { triangles[index], triangles[index + 1], triangles[index + 2] });
                     }
                 }
-                return vertices;
-            }).ToList();
 
-            // Attempt to tesellate the faces
-            List<int> triangles = new List<int>();
-            List<Vector3D> finalVertices = new List<Vector3D>();
-            foreach (List<Vector3D> face in faces)
-            {
-                List<int> tempTriangleInts = new List<int>();
-                if (face.Count >= 3)
+                Component component = new Component()
                 {
-                    tempTriangleInts = EarClippingVariant(face, FaceSide.FRONT);
-                }
-
-                foreach (int intVal in tempTriangleInts)
-                {
-                    triangles.Add(intVal + finalVertices.Count);
-                }
-                finalVertices.AddRange(face);
+                    Triangles = trianglesTuples,
+                    Vertices = finalVertices.Select(v => v.Copy()).ToList(),
+                    MaterialId = group.Material != null ? group.Material.Name : "Default",
+                    Properties = new DbmsApi.API.Properties(),
+                    Tags = new List<KeyValuePair<string, string>>()
+                };
+                components.Add(component);
             }
 
-            List<int[]> trianglesTuples = new List<int[]>();
-            for (int index = 0; index < triangles.Count; index += 3)
-            {
-                if (flipTriangles)
-                {
-                    trianglesTuples.Add(new int[3] { triangles[index], triangles[index + 2], triangles[index + 1] });
-                }
-                else
-                {
-                    trianglesTuples.Add(new int[3] { triangles[index], triangles[index + 1], triangles[index + 2] });
-                }
-            }
-
-            Component component = new Component();
-            component.Triangles = trianglesTuples;
-            component.Vertices = finalVertices.Select(v => v.Copy()).ToList();
-
-            ConverterGeneral.CenterObject(new List<Component>() { component }, scale, new Vector4D(0, 0, 0, 1));
+            ConverterGeneral.CenterObject(components, scale, new Vector4D(0, 0, 0, 1));
 
             CatalogObject modelSpecificObject = new CatalogObject()
             {
                 Name = objectName,
                 CatalogID = null,
-                Components = new List<Component>() { component },
+                Components = components,
                 Properties = new DbmsApi.API.Properties(),
                 TypeId = "N/A"
             };

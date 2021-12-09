@@ -54,7 +54,7 @@ namespace DBMS.Controllers.APIControllers
                 return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Not Logged in or Session has ended");
             }
 
-            LevelOfDetail levelOfDetail = LevelOfDetail.LOD100;
+            LevelOfDetail levelOfDetail;
             try
             {
                 levelOfDetail = (LevelOfDetail)Enum.Parse(typeof(LevelOfDetail), lod);

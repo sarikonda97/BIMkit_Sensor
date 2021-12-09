@@ -68,7 +68,7 @@ namespace AdminApp
             this.buttonEditCatalogObject = new System.Windows.Forms.Button();
             this.buttonAddCatalogObject = new System.Windows.Forms.Button();
             this.groupBoxMaterial = new System.Windows.Forms.GroupBox();
-            this.dataGridViewMaterialProps = new System.Windows.Forms.DataGridView();
+            this.dataGridViewMaterialProperties = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewMaterial = new System.Windows.Forms.DataGridView();
@@ -102,7 +102,7 @@ namespace AdminApp
             this.tabPageUsersAdmin = new System.Windows.Forms.TabPage();
             this.tabPageModelAdmin = new System.Windows.Forms.TabPage();
             this.groupBoxAllModels = new System.Windows.Forms.GroupBox();
-            this.dataGridViewAllModelProp = new System.Windows.Forms.DataGridView();
+            this.dataGridViewAllModelProperties = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn17 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn18 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewAllModels = new System.Windows.Forms.DataGridView();
@@ -113,16 +113,7 @@ namespace AdminApp
             this.buttonDeleteAllModel = new System.Windows.Forms.Button();
             this.buttonEditAllModel = new System.Windows.Forms.Button();
             this.buttonAddAllModel = new System.Windows.Forms.Button();
-            this.buttonRefresh = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.groupBoxModelDataset = new System.Windows.Forms.GroupBox();
-            this.dataGridViewDatasetModel = new System.Windows.Forms.DataGridView();
-            this.dataGridViewTextBoxColumn23 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn24 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn25 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn26 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.buttonBulkDeleteModel = new System.Windows.Forms.Button();
-            this.buttonBulkAddModel = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBoxCatalogDataset = new System.Windows.Forms.GroupBox();
             this.dataGridViewDatasetCatalog = new System.Windows.Forms.DataGridView();
@@ -131,6 +122,17 @@ namespace AdminApp
             this.dataGridViewTextBoxColumn29 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.buttonBulkDeleteCatalog = new System.Windows.Forms.Button();
             this.buttonBulkAddCatalog = new System.Windows.Forms.Button();
+            this.groupBoxModelDataset = new System.Windows.Forms.GroupBox();
+            this.dataGridViewDatasetModel = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn23 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn24 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn25 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn26 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.buttonBulkDeleteModel = new System.Windows.Forms.Button();
+            this.buttonBulkAddModel = new System.Windows.Forms.Button();
+            this.buttonRefresh = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.numericUpDownUploadLimit = new System.Windows.Forms.NumericUpDown();
             this.groupBoxUser.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCurrentUserProperties)).BeginInit();
             this.groupBoxModel.SuspendLayout();
@@ -140,7 +142,7 @@ namespace AdminApp
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCatalogPorperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCatalogObjects)).BeginInit();
             this.groupBoxMaterial.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMaterialProps)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMaterialProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMaterial)).BeginInit();
             this.groupBoxUsers.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewUserProperties)).BeginInit();
@@ -158,14 +160,16 @@ namespace AdminApp
             this.tabPageUsersAdmin.SuspendLayout();
             this.tabPageModelAdmin.SuspendLayout();
             this.groupBoxAllModels.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAllModelProp)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAllModelProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAllModels)).BeginInit();
             this.tabPage1.SuspendLayout();
-            this.groupBoxModelDataset.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewDatasetModel)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBoxCatalogDataset.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewDatasetCatalog)).BeginInit();
+            this.groupBoxModelDataset.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewDatasetModel)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownUploadLimit)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonLogout
@@ -615,7 +619,7 @@ namespace AdminApp
             this.groupBoxMaterial.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxMaterial.Controls.Add(this.dataGridViewMaterialProps);
+            this.groupBoxMaterial.Controls.Add(this.dataGridViewMaterialProperties);
             this.groupBoxMaterial.Controls.Add(this.dataGridViewMaterial);
             this.groupBoxMaterial.Controls.Add(this.buttonDeleteMaterial);
             this.groupBoxMaterial.Controls.Add(this.buttonEditMaterial);
@@ -629,22 +633,22 @@ namespace AdminApp
             // 
             // dataGridViewMaterialProps
             // 
-            this.dataGridViewMaterialProps.AllowUserToAddRows = false;
-            this.dataGridViewMaterialProps.AllowUserToDeleteRows = false;
-            this.dataGridViewMaterialProps.AllowUserToResizeColumns = false;
-            this.dataGridViewMaterialProps.AllowUserToResizeRows = false;
-            this.dataGridViewMaterialProps.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.dataGridViewMaterialProperties.AllowUserToAddRows = false;
+            this.dataGridViewMaterialProperties.AllowUserToDeleteRows = false;
+            this.dataGridViewMaterialProperties.AllowUserToResizeColumns = false;
+            this.dataGridViewMaterialProperties.AllowUserToResizeRows = false;
+            this.dataGridViewMaterialProperties.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewMaterialProps.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewMaterialProps.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewMaterialProperties.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewMaterialProperties.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn9,
             this.dataGridViewTextBoxColumn10});
-            this.dataGridViewMaterialProps.Location = new System.Drawing.Point(6, 183);
-            this.dataGridViewMaterialProps.Name = "dataGridViewMaterialProps";
-            this.dataGridViewMaterialProps.ReadOnly = true;
-            this.dataGridViewMaterialProps.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewMaterialProps.Size = new System.Drawing.Size(605, 86);
-            this.dataGridViewMaterialProps.TabIndex = 12;
+            this.dataGridViewMaterialProperties.Location = new System.Drawing.Point(6, 183);
+            this.dataGridViewMaterialProperties.Name = "dataGridViewMaterialProps";
+            this.dataGridViewMaterialProperties.ReadOnly = true;
+            this.dataGridViewMaterialProperties.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridViewMaterialProperties.Size = new System.Drawing.Size(605, 86);
+            this.dataGridViewMaterialProperties.TabIndex = 12;
             // 
             // dataGridViewTextBoxColumn9
             // 
@@ -1029,7 +1033,7 @@ namespace AdminApp
             this.groupBoxAllModels.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxAllModels.Controls.Add(this.dataGridViewAllModelProp);
+            this.groupBoxAllModels.Controls.Add(this.dataGridViewAllModelProperties);
             this.groupBoxAllModels.Controls.Add(this.dataGridViewAllModels);
             this.groupBoxAllModels.Controls.Add(this.buttonDeleteAllModel);
             this.groupBoxAllModels.Controls.Add(this.buttonEditAllModel);
@@ -1043,22 +1047,22 @@ namespace AdminApp
             // 
             // dataGridViewAllModelProp
             // 
-            this.dataGridViewAllModelProp.AllowUserToAddRows = false;
-            this.dataGridViewAllModelProp.AllowUserToDeleteRows = false;
-            this.dataGridViewAllModelProp.AllowUserToResizeColumns = false;
-            this.dataGridViewAllModelProp.AllowUserToResizeRows = false;
-            this.dataGridViewAllModelProp.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.dataGridViewAllModelProperties.AllowUserToAddRows = false;
+            this.dataGridViewAllModelProperties.AllowUserToDeleteRows = false;
+            this.dataGridViewAllModelProperties.AllowUserToResizeColumns = false;
+            this.dataGridViewAllModelProperties.AllowUserToResizeRows = false;
+            this.dataGridViewAllModelProperties.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewAllModelProp.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewAllModelProp.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewAllModelProperties.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewAllModelProperties.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn17,
             this.dataGridViewTextBoxColumn18});
-            this.dataGridViewAllModelProp.Location = new System.Drawing.Point(6, 376);
-            this.dataGridViewAllModelProp.Name = "dataGridViewAllModelProp";
-            this.dataGridViewAllModelProp.ReadOnly = true;
-            this.dataGridViewAllModelProp.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewAllModelProp.Size = new System.Drawing.Size(605, 130);
-            this.dataGridViewAllModelProp.TabIndex = 12;
+            this.dataGridViewAllModelProperties.Location = new System.Drawing.Point(6, 376);
+            this.dataGridViewAllModelProperties.Name = "dataGridViewAllModelProp";
+            this.dataGridViewAllModelProperties.ReadOnly = true;
+            this.dataGridViewAllModelProperties.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridViewAllModelProperties.Size = new System.Drawing.Size(605, 130);
+            this.dataGridViewAllModelProperties.TabIndex = 12;
             // 
             // dataGridViewTextBoxColumn17
             // 
@@ -1164,17 +1168,6 @@ namespace AdminApp
             this.buttonAddAllModel.UseVisualStyleBackColor = true;
             this.buttonAddAllModel.Click += new System.EventHandler(this.buttonAddModel_Click);
             // 
-            // buttonRefresh
-            // 
-            this.buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRefresh.Location = new System.Drawing.Point(546, 5);
-            this.buttonRefresh.Name = "buttonRefresh";
-            this.buttonRefresh.Size = new System.Drawing.Size(103, 23);
-            this.buttonRefresh.TabIndex = 17;
-            this.buttonRefresh.Text = "Refresh";
-            this.buttonRefresh.UseVisualStyleBackColor = true;
-            this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
-            // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.tableLayoutPanel1);
@@ -1186,6 +1179,105 @@ namespace AdminApp
             this.tabPage1.Text = "Datasets (Admin)";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.groupBoxCatalogDataset, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.groupBoxModelDataset, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 2);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 6);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 3;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(617, 512);
+            this.tableLayoutPanel1.TabIndex = 11;
+            // 
+            // groupBoxCatalogDataset
+            // 
+            this.groupBoxCatalogDataset.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxCatalogDataset.Controls.Add(this.dataGridViewDatasetCatalog);
+            this.groupBoxCatalogDataset.Controls.Add(this.buttonBulkDeleteCatalog);
+            this.groupBoxCatalogDataset.Controls.Add(this.buttonBulkAddCatalog);
+            this.groupBoxCatalogDataset.Location = new System.Drawing.Point(3, 239);
+            this.groupBoxCatalogDataset.Name = "groupBoxCatalogDataset";
+            this.groupBoxCatalogDataset.Size = new System.Drawing.Size(611, 230);
+            this.groupBoxCatalogDataset.TabIndex = 17;
+            this.groupBoxCatalogDataset.TabStop = false;
+            this.groupBoxCatalogDataset.Text = "Catalog Dataset";
+            // 
+            // dataGridViewDatasetCatalog
+            // 
+            this.dataGridViewDatasetCatalog.AllowUserToAddRows = false;
+            this.dataGridViewDatasetCatalog.AllowUserToDeleteRows = false;
+            this.dataGridViewDatasetCatalog.AllowUserToResizeColumns = false;
+            this.dataGridViewDatasetCatalog.AllowUserToResizeRows = false;
+            this.dataGridViewDatasetCatalog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridViewDatasetCatalog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewDatasetCatalog.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn27,
+            this.dataGridViewTextBoxColumn28,
+            this.dataGridViewTextBoxColumn29});
+            this.dataGridViewDatasetCatalog.Location = new System.Drawing.Point(6, 19);
+            this.dataGridViewDatasetCatalog.Name = "dataGridViewDatasetCatalog";
+            this.dataGridViewDatasetCatalog.ReadOnly = true;
+            this.dataGridViewDatasetCatalog.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridViewDatasetCatalog.Size = new System.Drawing.Size(518, 205);
+            this.dataGridViewDatasetCatalog.TabIndex = 10;
+            // 
+            // dataGridViewTextBoxColumn27
+            // 
+            this.dataGridViewTextBoxColumn27.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.dataGridViewTextBoxColumn27.HeaderText = "Name";
+            this.dataGridViewTextBoxColumn27.Name = "dataGridViewTextBoxColumn27";
+            this.dataGridViewTextBoxColumn27.ReadOnly = true;
+            this.dataGridViewTextBoxColumn27.Width = 60;
+            // 
+            // dataGridViewTextBoxColumn28
+            // 
+            this.dataGridViewTextBoxColumn28.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.dataGridViewTextBoxColumn28.HeaderText = "ID";
+            this.dataGridViewTextBoxColumn28.Name = "dataGridViewTextBoxColumn28";
+            this.dataGridViewTextBoxColumn28.ReadOnly = true;
+            this.dataGridViewTextBoxColumn28.Width = 43;
+            // 
+            // dataGridViewTextBoxColumn29
+            // 
+            this.dataGridViewTextBoxColumn29.HeaderText = "Type";
+            this.dataGridViewTextBoxColumn29.Name = "dataGridViewTextBoxColumn29";
+            this.dataGridViewTextBoxColumn29.ReadOnly = true;
+            // 
+            // buttonBulkDeleteCatalog
+            // 
+            this.buttonBulkDeleteCatalog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonBulkDeleteCatalog.Location = new System.Drawing.Point(530, 201);
+            this.buttonBulkDeleteCatalog.Name = "buttonBulkDeleteCatalog";
+            this.buttonBulkDeleteCatalog.Size = new System.Drawing.Size(75, 23);
+            this.buttonBulkDeleteCatalog.TabIndex = 9;
+            this.buttonBulkDeleteCatalog.Text = "Delete";
+            this.buttonBulkDeleteCatalog.UseVisualStyleBackColor = true;
+            this.buttonBulkDeleteCatalog.Click += new System.EventHandler(this.buttonBulkDeleteCatalog_Click);
+            // 
+            // buttonBulkAddCatalog
+            // 
+            this.buttonBulkAddCatalog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonBulkAddCatalog.Location = new System.Drawing.Point(530, 19);
+            this.buttonBulkAddCatalog.Name = "buttonBulkAddCatalog";
+            this.buttonBulkAddCatalog.Size = new System.Drawing.Size(75, 23);
+            this.buttonBulkAddCatalog.TabIndex = 7;
+            this.buttonBulkAddCatalog.Text = "Add";
+            this.buttonBulkAddCatalog.UseVisualStyleBackColor = true;
+            this.buttonBulkAddCatalog.Click += new System.EventHandler(this.buttonBulkAddCatalog_Click);
+            // 
             // groupBoxModelDataset
             // 
             this.groupBoxModelDataset.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1196,7 +1288,7 @@ namespace AdminApp
             this.groupBoxModelDataset.Controls.Add(this.buttonBulkAddModel);
             this.groupBoxModelDataset.Location = new System.Drawing.Point(3, 3);
             this.groupBoxModelDataset.Name = "groupBoxModelDataset";
-            this.groupBoxModelDataset.Size = new System.Drawing.Size(611, 250);
+            this.groupBoxModelDataset.Size = new System.Drawing.Size(611, 230);
             this.groupBoxModelDataset.TabIndex = 16;
             this.groupBoxModelDataset.TabStop = false;
             this.groupBoxModelDataset.Text = "Model Dataset";
@@ -1220,7 +1312,7 @@ namespace AdminApp
             this.dataGridViewDatasetModel.Name = "dataGridViewDatasetModel";
             this.dataGridViewDatasetModel.ReadOnly = true;
             this.dataGridViewDatasetModel.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewDatasetModel.Size = new System.Drawing.Size(518, 225);
+            this.dataGridViewDatasetModel.Size = new System.Drawing.Size(518, 205);
             this.dataGridViewDatasetModel.TabIndex = 10;
             // 
             // dataGridViewTextBoxColumn23
@@ -1258,7 +1350,7 @@ namespace AdminApp
             // buttonBulkDeleteModel
             // 
             this.buttonBulkDeleteModel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBulkDeleteModel.Location = new System.Drawing.Point(530, 221);
+            this.buttonBulkDeleteModel.Location = new System.Drawing.Point(530, 201);
             this.buttonBulkDeleteModel.Name = "buttonBulkDeleteModel";
             this.buttonBulkDeleteModel.Size = new System.Drawing.Size(75, 23);
             this.buttonBulkDeleteModel.TabIndex = 9;
@@ -1277,102 +1369,44 @@ namespace AdminApp
             this.buttonBulkAddModel.UseVisualStyleBackColor = true;
             this.buttonBulkAddModel.Click += new System.EventHandler(this.buttonBulkAddModel_Click);
             // 
-            // tableLayoutPanel1
+            // buttonRefresh
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonRefresh.Location = new System.Drawing.Point(546, 5);
+            this.buttonRefresh.Name = "buttonRefresh";
+            this.buttonRefresh.Size = new System.Drawing.Size(103, 23);
+            this.buttonRefresh.TabIndex = 17;
+            this.buttonRefresh.Text = "Refresh";
+            this.buttonRefresh.UseVisualStyleBackColor = true;
+            this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Controls.Add(this.groupBoxCatalogDataset, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.groupBoxModelDataset, 0, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 6);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(617, 512);
-            this.tableLayoutPanel1.TabIndex = 11;
+            this.groupBox1.Controls.Add(this.numericUpDownUploadLimit);
+            this.groupBox1.Location = new System.Drawing.Point(3, 475);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(611, 34);
+            this.groupBox1.TabIndex = 18;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Upload Limit";
             // 
-            // groupBoxCatalogDataset
+            // numericUpDownUploadLimit
             // 
-            this.groupBoxCatalogDataset.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.numericUpDownUploadLimit.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxCatalogDataset.Controls.Add(this.dataGridViewDatasetCatalog);
-            this.groupBoxCatalogDataset.Controls.Add(this.buttonBulkDeleteCatalog);
-            this.groupBoxCatalogDataset.Controls.Add(this.buttonBulkAddCatalog);
-            this.groupBoxCatalogDataset.Location = new System.Drawing.Point(3, 259);
-            this.groupBoxCatalogDataset.Name = "groupBoxCatalogDataset";
-            this.groupBoxCatalogDataset.Size = new System.Drawing.Size(611, 250);
-            this.groupBoxCatalogDataset.TabIndex = 17;
-            this.groupBoxCatalogDataset.TabStop = false;
-            this.groupBoxCatalogDataset.Text = "Catalog Dataset";
-            // 
-            // dataGridViewDatasetCatalog
-            // 
-            this.dataGridViewDatasetCatalog.AllowUserToAddRows = false;
-            this.dataGridViewDatasetCatalog.AllowUserToDeleteRows = false;
-            this.dataGridViewDatasetCatalog.AllowUserToResizeColumns = false;
-            this.dataGridViewDatasetCatalog.AllowUserToResizeRows = false;
-            this.dataGridViewDatasetCatalog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewDatasetCatalog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewDatasetCatalog.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn27,
-            this.dataGridViewTextBoxColumn28,
-            this.dataGridViewTextBoxColumn29});
-            this.dataGridViewDatasetCatalog.Location = new System.Drawing.Point(6, 19);
-            this.dataGridViewDatasetCatalog.Name = "dataGridViewDatasetCatalog";
-            this.dataGridViewDatasetCatalog.ReadOnly = true;
-            this.dataGridViewDatasetCatalog.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewDatasetCatalog.Size = new System.Drawing.Size(518, 225);
-            this.dataGridViewDatasetCatalog.TabIndex = 10;
-            // 
-            // dataGridViewTextBoxColumn27
-            // 
-            this.dataGridViewTextBoxColumn27.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.dataGridViewTextBoxColumn27.HeaderText = "Name";
-            this.dataGridViewTextBoxColumn27.Name = "dataGridViewTextBoxColumn27";
-            this.dataGridViewTextBoxColumn27.ReadOnly = true;
-            this.dataGridViewTextBoxColumn27.Width = 60;
-            // 
-            // dataGridViewTextBoxColumn28
-            // 
-            this.dataGridViewTextBoxColumn28.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.dataGridViewTextBoxColumn28.HeaderText = "ID";
-            this.dataGridViewTextBoxColumn28.Name = "dataGridViewTextBoxColumn28";
-            this.dataGridViewTextBoxColumn28.ReadOnly = true;
-            this.dataGridViewTextBoxColumn28.Width = 43;
-            // 
-            // dataGridViewTextBoxColumn29
-            // 
-            this.dataGridViewTextBoxColumn29.HeaderText = "Type";
-            this.dataGridViewTextBoxColumn29.Name = "dataGridViewTextBoxColumn29";
-            this.dataGridViewTextBoxColumn29.ReadOnly = true;
-            // 
-            // buttonBulkDeleteCatalog
-            // 
-            this.buttonBulkDeleteCatalog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBulkDeleteCatalog.Location = new System.Drawing.Point(530, 221);
-            this.buttonBulkDeleteCatalog.Name = "buttonBulkDeleteCatalog";
-            this.buttonBulkDeleteCatalog.Size = new System.Drawing.Size(75, 23);
-            this.buttonBulkDeleteCatalog.TabIndex = 9;
-            this.buttonBulkDeleteCatalog.Text = "Delete";
-            this.buttonBulkDeleteCatalog.UseVisualStyleBackColor = true;
-            this.buttonBulkDeleteCatalog.Click += new System.EventHandler(this.buttonBulkDeleteCatalog_Click);
-            // 
-            // buttonBulkAddCatalog
-            // 
-            this.buttonBulkAddCatalog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBulkAddCatalog.Location = new System.Drawing.Point(530, 19);
-            this.buttonBulkAddCatalog.Name = "buttonBulkAddCatalog";
-            this.buttonBulkAddCatalog.Size = new System.Drawing.Size(75, 23);
-            this.buttonBulkAddCatalog.TabIndex = 7;
-            this.buttonBulkAddCatalog.Text = "Add";
-            this.buttonBulkAddCatalog.UseVisualStyleBackColor = true;
-            this.buttonBulkAddCatalog.Click += new System.EventHandler(this.buttonBulkAddCatalog_Click);
+            this.numericUpDownUploadLimit.Location = new System.Drawing.Point(75, 10);
+            this.numericUpDownUploadLimit.Name = "numericUpDownUploadLimit";
+            this.numericUpDownUploadLimit.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDownUploadLimit.TabIndex = 0;
+            this.numericUpDownUploadLimit.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownUploadLimit.ValueChanged += new System.EventHandler(this.numericUpDownUploadLimit_ValueChanged);
             // 
             // Main
             // 
@@ -1397,7 +1431,7 @@ namespace AdminApp
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCatalogPorperties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCatalogObjects)).EndInit();
             this.groupBoxMaterial.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMaterialProps)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMaterialProperties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMaterial)).EndInit();
             this.groupBoxUsers.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewUserProperties)).EndInit();
@@ -1415,14 +1449,16 @@ namespace AdminApp
             this.tabPageUsersAdmin.ResumeLayout(false);
             this.tabPageModelAdmin.ResumeLayout(false);
             this.groupBoxAllModels.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAllModelProp)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAllModelProperties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAllModels)).EndInit();
             this.tabPage1.ResumeLayout(false);
-            this.groupBoxModelDataset.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewDatasetModel)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.groupBoxCatalogDataset.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewDatasetCatalog)).EndInit();
+            this.groupBoxModelDataset.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewDatasetModel)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownUploadLimit)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1459,7 +1495,7 @@ namespace AdminApp
         private System.Windows.Forms.Button buttonEditCatalogObject;
         private System.Windows.Forms.Button buttonAddCatalogObject;
         private System.Windows.Forms.GroupBox groupBoxMaterial;
-        private System.Windows.Forms.DataGridView dataGridViewMaterialProps;
+        private System.Windows.Forms.DataGridView dataGridViewMaterialProperties;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
         private System.Windows.Forms.DataGridView dataGridViewMaterial;
@@ -1491,7 +1527,7 @@ namespace AdminApp
         private System.Windows.Forms.TabPage tabPageUsersAdmin;
         private System.Windows.Forms.TabPage tabPageModelAdmin;
         private System.Windows.Forms.GroupBox groupBoxAllModels;
-        private System.Windows.Forms.DataGridView dataGridViewAllModelProp;
+        private System.Windows.Forms.DataGridView dataGridViewAllModelProperties;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn17;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn18;
         private System.Windows.Forms.DataGridView dataGridViewAllModels;
@@ -1531,6 +1567,8 @@ namespace AdminApp
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn26;
         private System.Windows.Forms.Button buttonBulkDeleteModel;
         private System.Windows.Forms.Button buttonBulkAddModel;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.NumericUpDown numericUpDownUploadLimit;
     }
 }
 

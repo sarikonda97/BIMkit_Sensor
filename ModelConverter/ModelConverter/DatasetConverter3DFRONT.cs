@@ -39,7 +39,7 @@ namespace ModelConverter
             {
                 if (modelObjects.TryGetValue(mo.Id, out ModelObject existingMO))
                 {
-                    int i = 0;
+                    int i = 0; // Something weird here...
                 }
                 else
                 {

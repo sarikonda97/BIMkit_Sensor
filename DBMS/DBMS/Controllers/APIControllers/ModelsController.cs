@@ -154,10 +154,20 @@ namespace DBMS.Controllers.APIControllers
                 }
                 if (coMetas.Select(com => com.Name).Contains(coRef.CatalogId))
                 {
+                    // In this case we know if came from the 3DFront dataset so do some one time fixes:
                     coRef.CatalogId = coMetas.First(i => i.Name == coRef.CatalogId).CatalogObjectId;
+                    
+                    MongoCatalogObject mongoCO = db.GetCatalogObject(coRef.CatalogId);
+                    MeshRep meshRep = mongoCO.MeshReps.First(m => m.LevelOfDetail == LevelOfDetail.LOD100);
+                    List<Vector3D> vects = meshRep.Components.SelectMany(co => co.Vertices).ToList();
+                    double top = vects.Max(v => v.z);
+                    double bottom = vects.Min(v => v.z);
+                    coRef.Location = new Vector3D(coRef.Location.x, coRef.Location.y , coRef.Location.z + (top - bottom) / 2.0);
+
                     continue;
                 }
-                coRef.CatalogId = "2CD82E60B06FEF732F20C72B";
+
+                coRef.CatalogId = null;
             }
 
             fullModel.CatalogObjects = fullModel.CatalogObjects.Where(coref => coref.CatalogId != null).ToList();

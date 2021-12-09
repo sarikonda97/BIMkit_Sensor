@@ -256,6 +256,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataetConverterCoohom.cs" />
     <Compile Include="Dataset3DFRONTClasses.cs" />
     <Compile Include="DatasetConverter3DFRONT.cs" />
     <Compile Include="ConverterGeneral.cs" />

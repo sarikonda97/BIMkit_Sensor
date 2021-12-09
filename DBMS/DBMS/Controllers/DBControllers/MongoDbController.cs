@@ -145,7 +145,11 @@ namespace DBMS.Controllers.DBControllers
             User user = GetUser(auth.Username);
 
             ICryptoService cs = new PBKDF2();
-            userCollection.UpdateOne(u => u.Username == user.Username, Builders<User>.Update.Set((u) => u.PassHash, cs.Compute(auth.Password)).Set((u) => u.Salt, cs.Salt));
+            userCollection.UpdateOne(u => u.Username == user.Username,
+                Builders<User>.Update
+                    .Set((u) => u.PassHash, cs.Compute(auth.Password))
+                    .Set((u) => u.Salt, cs.Salt)
+                );
         }
 
         public TokenData LoginUser(AuthModel userdata)
@@ -288,10 +292,19 @@ namespace DBMS.Controllers.DBControllers
             return availableModels.Select(m => new ModelMetadata(m, GetModelPermissions(m.Id).Owner)).ToList();
         }
 
-        public List<ModelMetadata> RetrieveAvailableModels()
+        public List<ModelMetadata> RetrieveAllModels()
         {
             List<MongoModel> availableModels = modelCollection.Find(m => true).ToList();
-            return availableModels.Select(m => new ModelMetadata(m, GetModelPermissions(m.Id).Owner)).ToList();
+            List<ModelMetadata> modelMetadatas = new List<ModelMetadata>();
+            foreach (var m in availableModels)
+            {
+                ModelPermission modelPermission = GetModelPermissions(m.Id);
+                if (modelPermission != null)
+                {
+                    modelMetadatas.Add(new ModelMetadata(m, modelPermission.Owner));
+                }
+            }
+            return modelMetadatas;
         }
 
         public void SetModelPermissions(string modelId, List<string> UsersWithAccess)
@@ -305,29 +318,26 @@ namespace DBMS.Controllers.DBControllers
             userCollection.UpdateMany(u => UsersWithAccess.Contains(u.Username) && !u.AccessibleModels.Contains(modelId), Builders<User>.Update.Push(u => u.AccessibleModels, modelId));
         }
 
-        public void SetModelOwner(string modelId, string newOwnerId)
+        public void SetModelOwner(string modelId, string newOwnerUsername)
         {
-            newOwnerId = newOwnerId.ToLower();
+            newOwnerUsername = newOwnerUsername.ToLower();
 
             // Remove ownership from the old owner
             userCollection.FindOneAndUpdate(u => u.OwnedModels.Contains(modelId), Builders<User>.Update.Pull(u => u.OwnedModels, modelId));
 
             // Add ownership to the new owner
-            userCollection.FindOneAndUpdate(u => u.Username == newOwnerId, Builders<User>.Update.Push(u => u.OwnedModels, modelId));
+            userCollection.FindOneAndUpdate(u => u.Username == newOwnerUsername, Builders<User>.Update.Push(u => u.OwnedModels, modelId));
         }
 
         public ModelPermission GetModelPermissions(string modelId)
         {
-            MongoModel model = GetModel(modelId);
-            if (model == null)
-            {
-                return null;
-            }
             List<string> usersWithAccess = userCollection.Find(u => u.AccessibleModels.Contains(modelId)).ToList().Select(u => u.Username).ToList();
             User owner = userCollection.Find(u => u.OwnedModels.Contains(modelId)).Limit(1).FirstOrDefault();
             if (owner == null)
             {
-                return null;
+                // If for some reason noone owns it then make it the admins
+                owner = GetUser("admin");
+                SetModelOwner(modelId, owner.Username);
             }
             return new ModelPermission
             {

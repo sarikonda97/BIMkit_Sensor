@@ -85,11 +85,11 @@ namespace AdminApp
             this.dataGridViewCatalogObjects.Rows.Clear();
             this.dataGridViewCatalogPorperties.Rows.Clear();
             this.dataGridViewMaterial.Rows.Clear();
-            this.dataGridViewMaterialProps.Rows.Clear();
+            this.dataGridViewMaterialProperties.Rows.Clear();
             this.dataGridViewUsers.Rows.Clear();
             this.dataGridViewUserProperties.Rows.Clear();
             this.dataGridViewAllModels.Rows.Clear();
-            this.dataGridViewAllModelProp.Rows.Clear();
+            this.dataGridViewAllModelProperties.Rows.Clear();
             this.dataGridViewDatasetCatalog.Rows.Clear();
             this.dataGridViewDatasetModel.Rows.Clear();
         }
@@ -584,7 +584,7 @@ namespace AdminApp
                 await DisplayMaterials();
 
                 // Highlight and show the model info
-                this.DisplayProperties(this.dataGridViewMaterialProps, Materials[response.Data].Properties);
+                this.DisplayProperties(this.dataGridViewMaterialProperties, Materials[response.Data].Properties);
             }
             else
             {
@@ -618,7 +618,7 @@ namespace AdminApp
                 await DisplayMaterials();
 
                 // Highlight and show the model info
-                this.DisplayProperties(this.dataGridViewMaterialProps, Materials[response.Data].Properties);
+                this.DisplayProperties(this.dataGridViewMaterialProperties, Materials[response.Data].Properties);
             }
             else
             {
@@ -652,7 +652,7 @@ namespace AdminApp
             }
 
             string matlId = this.dataGridViewMaterial.SelectedRows[0].Cells[1].Value as string;
-            this.DisplayProperties(this.dataGridViewMaterial, Materials[matlId].Properties);
+            this.DisplayProperties(this.dataGridViewMaterialProperties, Materials[matlId].Properties);
         }
 
         #endregion
@@ -773,7 +773,7 @@ namespace AdminApp
             }
 
             string userId = this.dataGridViewUsers.SelectedRows[0].Cells[1].Value as string;
-            this.DisplayProperties(this.dataGridViewUsers, AllUsers[userId].Properties);
+            this.DisplayProperties(this.dataGridViewUserProperties, AllUsers[userId].Properties);
         }
 
         #endregion
@@ -855,7 +855,7 @@ namespace AdminApp
             }
 
             string modelId = this.dataGridViewAllModels.SelectedRows[0].Cells[1].Value as string;
-            this.DisplayProperties(this.dataGridViewAllModels, AllModels[modelId].Properties);
+            this.DisplayProperties(this.dataGridViewAllModelProperties, AllModels[modelId].Properties);
         }
 
         #endregion
@@ -923,7 +923,7 @@ namespace AdminApp
 
         #region Dataset Adding:
 
-        public static int BULK_UPLOAD_LIMIT = 5;
+        public static int BULK_UPLOAD_LIMIT = 10;
 
         private async void buttonBulkAddModel_Click(object sender, EventArgs e)
         {
@@ -946,6 +946,11 @@ namespace AdminApp
             int counter = 0;
             foreach (string file in files)
             {
+                string modelName = Path.GetFileNameWithoutExtension(file);
+                if (ModelMetadatas.Values.Any(v => v.Name == modelName))
+                {
+                    continue;
+                }
                 Model modelToAdd;
                 try
                 {
@@ -1008,6 +1013,11 @@ namespace AdminApp
             int counter = 0;
             foreach (string dir in dirs)
             {
+                string objName = Path.GetFileNameWithoutExtension(dir);
+                if (CatalogMetadatas.Values.Any(v => v.Name == objName))
+                {
+                    continue;
+                }
                 CatalogObject newObj;
                 try
                 {
@@ -1058,6 +1068,11 @@ namespace AdminApp
             MessageBox.Show("INCOMPLETE");
         }
 
-        #endregion
+        private void numericUpDownUploadLimit_ValueChanged(object sender, EventArgs e)
+        {
+            BULK_UPLOAD_LIMIT = Convert.ToInt32(this.numericUpDownUploadLimit.Value);
+        }
     }
+
+    #endregion
 }

@@ -28,7 +28,7 @@ namespace DBMS.Controllers.APIControllers
                 return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Must be admin to access full model list");
             }
 
-            return Request.CreateResponseDBMS(HttpStatusCode.OK, db.RetrieveAvailableModels());
+            return Request.CreateResponseDBMS(HttpStatusCode.OK, db.RetrieveAllModels());
         }
 
         public HttpResponseMessage Get(string id)
