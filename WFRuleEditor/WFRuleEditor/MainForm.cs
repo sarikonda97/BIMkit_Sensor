@@ -1,14 +1,20 @@
-﻿using RuleAPI.Models;
+﻿using DbmsApi;
+using DbmsApi.API;
+using RuleAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BIMRuleEditor
 {
     public partial class MainForm : Form
     {
+        private DBMSAPIController Controller;
+        private string dbmsurl = "https://localhost:44322//api/";
+
         private List<RuleSet> ruleSets = new List<RuleSet>();
         private RuleSet currentRuleset;
         private Rule currentRule;
@@ -23,6 +29,27 @@ namespace BIMRuleEditor
                 this.comboBoxErrorLevel.Items.Add(errorLevel);
             }
 
+            Controller = new DBMSAPIController(dbmsurl);
+            GetTypes();
+            GetUserLocalRules();
+            RedisplayRulesets();
+        }
+
+        private async Task GetTypes()
+        {
+            APIResponse<List<ObjectType>> response3 = await Controller.GetTypes();
+            if (response3.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response3.ReasonPhrase);
+                return;
+            }
+            ObjectTypeTree.BuildTypeTree(response3.Data);
+        }
+
+        #region Display Updates
+
+        private void GetUserLocalRules()
+        {
             foreach (string fileName in Directory.GetFiles(Application.UserAppDataPath))
             {
                 try
@@ -34,10 +61,7 @@ namespace BIMRuleEditor
                     MessageBox.Show("Existing rules are outdated");
                 }
             }
-            RedisplayRulesets();
         }
-
-        #region Display Updates
 
         private void RedisplayRulesets()
         {
@@ -218,6 +242,8 @@ namespace BIMRuleEditor
             TreeNode newTreeNode = new TreeNode(rs.Name);
             newTreeNode.Tag = rs;
             this.treeViewRulesets.Nodes.Add(newTreeNode);
+
+            currentRuleset = rs;
         }
 
         private void buttonAddRule_Click(object sender, EventArgs e)
@@ -252,6 +278,8 @@ namespace BIMRuleEditor
                     break;
                 }
             }
+
+            currentRule = newRule;
         }
 
         private void buttonDeleteRule_Click(object sender, EventArgs e)
@@ -415,6 +443,10 @@ namespace BIMRuleEditor
 
         private void buttonAddObjSearch_Click(object sender, EventArgs e)
         {
+            if (currentRule == null)
+            {
+                return;
+            }
             int newIndex = currentRule.ExistentialClauses.Count;
             string newEcName = "Object" + newIndex;
             ExistencialClauseForm osf = new ExistencialClauseForm(newEcName, currentRule.ExistentialClauses.Keys.Where(k => k != newEcName).ToList());
@@ -435,6 +467,10 @@ namespace BIMRuleEditor
 
         private void buttonEditObjSearch_Click(object sender, EventArgs e)
         {
+            if (currentRule == null)
+            {
+                return;
+            }
             if (this.treeViewObjSearch.SelectedNode == null)
             {
                 MessageBox.Show("No Object Search selected.");
@@ -477,6 +513,10 @@ namespace BIMRuleEditor
 
         private void buttonDeleteObjSearch_Click(object sender, EventArgs e)
         {
+            if (currentRule == null)
+            {
+                return;
+            }
             if (this.treeViewObjSearch.SelectedNode == null)
             {
                 MessageBox.Show("No Object Search selected.");
@@ -522,6 +562,10 @@ namespace BIMRuleEditor
 
         private void buttonAddLogicalExpressions_Click(object sender, EventArgs e)
         {
+            if (currentRule == null)
+            {
+                return;
+            }
             if (this.treeViewLogicalExpressions.SelectedNode == null)
             {
                 MessageBox.Show("No LogicalExpression selected.");
@@ -590,6 +634,10 @@ namespace BIMRuleEditor
 
         private void buttonEditLogicalExpressions_Click(object sender, EventArgs e)
         {
+            if (currentRule == null)
+            {
+                return;
+            }
             if (this.treeViewLogicalExpressions.SelectedNode == null)
             {
                 MessageBox.Show("No item selected.");
@@ -686,6 +734,10 @@ namespace BIMRuleEditor
 
         private void buttonDeleteLogicalExpressions_Click(object sender, EventArgs e)
         {
+            if (currentRule == null)
+            {
+                return;
+            }
             if (this.treeViewLogicalExpressions.SelectedNode == null)
             {
                 MessageBox.Show("No item selected.");
@@ -745,9 +797,9 @@ namespace BIMRuleEditor
 
         #region Save data
 
-        private void ButtonSaveAndExit_Click(object sender, EventArgs e)
+        private void ButtonSave_Click(object sender, EventArgs e)
         {
-            // Should save locally when closing
+            // Save locally
             string path = Path.GetDirectoryName(userAppData);
             string name = Path.GetFileNameWithoutExtension(userAppData);
             string extn = Path.GetExtension(userAppData);
@@ -757,7 +809,6 @@ namespace BIMRuleEditor
                 RuleReadWrite.WriteRuleSet(rs, path + "\\" + name + "(" + index + ")" + extn);
                 index++;
             }
-            this.Close();
         }
 
         #endregion

@@ -33,9 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DbmsApi">
-      <HintPath>..\..\DBMS\DbmsApi\bin\Debug\DbmsApi.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -54,6 +51,12 @@
     </Compile>
     <Compile Include="AdminUserEditForm.Designer.cs">
       <DependentUpon>AdminUserEditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DatasetTypeSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DatasetTypeSelectForm.Designer.cs">
+      <DependentUpon>DatasetTypeSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MaterialForm.cs">
       <SubType>Form</SubType>
@@ -87,11 +90,23 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestBoxObjectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestBoxObjectForm.Designer.cs">
+      <DependentUpon>TestBoxObjectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="TypeChangeForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="TypeChangeForm.Designer.cs">
       <DependentUpon>TypeChangeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TypeEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TypeEditForm.Designer.cs">
+      <DependentUpon>TypeEditForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UpdateUserDataForm.cs">
       <SubType>Form</SubType>
@@ -101,6 +116,9 @@
     </Compile>
     <EmbeddedResource Include="AdminUserEditForm.resx">
       <DependentUpon>AdminUserEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DatasetTypeSelectForm.resx">
+      <DependentUpon>DatasetTypeSelectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LevelOfDetailForm.resx">
       <DependentUpon>LevelOfDetailForm.cs</DependentUpon>
@@ -126,8 +144,14 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="TestBoxObjectForm.resx">
+      <DependentUpon>TestBoxObjectForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TypeChangeForm.resx">
       <DependentUpon>TypeChangeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TypeEditForm.resx">
+      <DependentUpon>TypeEditForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UpdateUserDataForm.resx">
       <DependentUpon>UpdateUserDataForm.cs</DependentUpon>
@@ -147,6 +171,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DBMS\DbmsApi\DbmsApi.csproj">
+      <Project>{79b59851-64ee-4388-a904-0921cf334e2f}</Project>
+      <Name>DbmsApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MathPackage\MathPackage\MathPackage.csproj">
+      <Project>{0c409f93-c5db-4b60-86f3-473453bfe014}</Project>
+      <Name>MathPackage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ModelConverter\ModelConverter\ModelConverter.csproj">
       <Project>{79A520BA-1EF8-4CBE-B45A-205CC70C7AA2}</Project>
       <Name>ModelConverter</Name>

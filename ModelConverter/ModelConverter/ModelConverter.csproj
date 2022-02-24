@@ -256,10 +256,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataetConverterCoohom.cs" />
+    <Compile Include="DatasetConverterCoohom.cs" />
     <Compile Include="Dataset3DFRONTClasses.cs" />
     <Compile Include="DatasetConverter3DFRONT.cs" />
     <Compile Include="ConverterGeneral.cs" />
+    <Compile Include="DatasetCoohomClasses.cs" />
+    <Compile Include="GbXMLConverter.cs" />
     <Compile Include="IfcConverter.cs" />
     <Compile Include="ObjConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

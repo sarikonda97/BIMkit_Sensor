@@ -314,7 +314,6 @@ namespace RuleAPI
 
         public async Task<APIResponse<Dictionary<ObjectType, string>>> GetVOMethodsAsync()
         {
-            // Perform POST request
             HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("method/vo"));
 
             if (response.IsSuccessStatusCode)
@@ -329,7 +328,6 @@ namespace RuleAPI
 
         public async Task<APIResponse<List<ObjectType>>> GetTypesList()
         {
-            // Perform POST request
             HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("method/type"));
 
             if (response.IsSuccessStatusCode)
@@ -344,7 +342,6 @@ namespace RuleAPI
 
         public async Task<APIResponse<Dictionary<string, Type>>> GetPropertyMethodsAsync()
         {
-            // Perform POST request
             HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("method/property"));
 
             if (response.IsSuccessStatusCode)
@@ -359,7 +356,6 @@ namespace RuleAPI
 
         public async Task<APIResponse<Dictionary<string, Type>>> GetRelationMethodsAsync()
         {
-            // Perform POST request
             HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("method/relation"));
 
             if (response.IsSuccessStatusCode)

@@ -1,6 +1,8 @@
 ﻿using DbmsApi;
 using DbmsApi.API;
 using DbmsApi.Mongo;
+using MathPackage;
+using ModelConverter;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -305,6 +307,71 @@ namespace AdminApp
             }
 
             DBMSReadWrite.WriteModel(response.Data, sfd.FileName);
+        }
+
+        private async void buttonExportModel_Click(object sender, EventArgs e)
+        {
+            if (this.dataGridViewUserModels.SelectedRows.Count != 1)
+            {
+                return;
+            }
+            string modelId = this.dataGridViewUserModels.SelectedRows[0].Cells[1].Value as string;
+
+            LevelOfDetailForm lodf = new LevelOfDetailForm();
+            if (lodf.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            DatasetTypeSelectForm dtsf = new DatasetTypeSelectForm();
+            if (dtsf.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            string extension = string.Empty;
+            string fileData = string.Empty;
+            if (dtsf.SelectedDataset == ConverterGeneral.Datasets.GBXML)
+            {
+                fileData = await GetModelAsGBXML(lodf.LOD, modelId);
+                extension = ".xml";
+            }
+
+            if (string.IsNullOrWhiteSpace(fileData))
+            {
+                MessageBox.Show("Could Not Convert File");
+                return;
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "BIMkit File (*.bpm)|*.bpm|All files (*.*)|*.*";
+            sfd.FileName = modelId + extension;
+            if (sfd.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            File.WriteAllText(sfd.FileName, fileData);
+        }
+
+        private async Task<string> GetModelAsGBXML(LevelOfDetail lod, string modelId)
+        {
+            APIResponse<Model> response = await Controller.GetModel(new ItemRequest(modelId, lod));
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return string.Empty;
+            }
+
+            Model model = response.Data;
+
+
+
+
+
+
+
+            return string.Empty;
         }
 
         private async void buttonDeleteModel_Click(object sender, EventArgs e)
@@ -904,19 +971,64 @@ namespace AdminApp
             tnRoot.ExpandAll();
         }
 
-        private void buttonAddType_Click(object sender, EventArgs e)
+        private async void buttonAddType_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("INCOMPLETE");
+            // Get the new Type
+            TypeEditForm tef = new TypeEditForm(ObjectTypeTree.GetAllTypes());
+            if (tef.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            APIResponse<string> response = await Controller.CreateType(tef.Type);
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return;
+            }
+
+            RefreshAsync();
         }
 
-        private void buttonEditType_Click(object sender, EventArgs e)
+        private async void buttonEditType_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("INCOMPLETE");
+            // Get the Type
+            ObjectType selectedType = (ObjectType) this.treeViewTypes.SelectedNode.Tag;
+
+            TypeEditForm tef = new TypeEditForm(selectedType, ObjectTypeTree.GetAllTypes());
+            if (tef.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            APIResponse<string> response = await Controller.UpdateType(tef.Type);
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return;
+            }
+
+            RefreshAsync();
         }
 
-        private void buttonDeleteType_Click(object sender, EventArgs e)
+        private async void buttonDeleteType_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("INCOMPLETE");
+            // Get the Type
+            ObjectType selectedType = (ObjectType)this.treeViewTypes.SelectedNode.Tag;
+
+            if (MessageBox.Show("Are you sure?", "Deleting: " + selectedType.Name, MessageBoxButtons.YesNo) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            APIResponse<string> response = await Controller.DeleteType(selectedType.Name);
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return;
+            }
+
+            RefreshAsync();
         }
 
         #endregion
@@ -927,6 +1039,12 @@ namespace AdminApp
 
         private async void buttonBulkAddModel_Click(object sender, EventArgs e)
         {
+            DatasetTypeSelectForm datasetTypeSelect = new DatasetTypeSelectForm();
+            if (datasetTypeSelect.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
             // Promt for the file:
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             if (fbd.ShowDialog() != DialogResult.OK)
@@ -934,8 +1052,14 @@ namespace AdminApp
                 return;
             }
 
-            // Should state what format the dataset is from:
-            GetModelsFrom3DFRONTDataset(fbd.SelectedPath);
+            if (datasetTypeSelect.SelectedDataset == ConverterGeneral.Datasets._3DFRONT)
+            {
+                GetModelsFrom3DFRONTDataset(fbd.SelectedPath);
+            }
+            if (datasetTypeSelect.SelectedDataset == ConverterGeneral.Datasets.COOHOM)
+            {
+                GetModelsFromCoohomDataset(fbd.SelectedPath);
+            }
         }
 
         public async void GetModelsFrom3DFRONTDataset(string path)
@@ -955,13 +1079,48 @@ namespace AdminApp
                 try
                 {
                     modelToAdd = ModelConverter.DatasetConverter3DFRONT.Convert3DFRONTModel(file, 1.0, true, true);
-                    modelToAdd.Tags.Add(new KeyValuePair<string, string>("Dataset", "3DFRONT"));
                 }
                 catch
                 {
                     MessageBox.Show("Error with file:\n" + file);
                     continue;
                 }
+                if (ModelMetadatas.Values.Any(v => v.Name == modelToAdd.Name))
+                {
+                    continue;
+                }
+
+                APIResponse<string> response = await Controller.CreateModel(modelToAdd);
+                if (response.Code != System.Net.HttpStatusCode.OK)
+                {
+                    MessageBox.Show(response.ReasonPhrase);
+                }
+
+                counter++;
+                if (counter == BULK_UPLOAD_LIMIT)
+                {
+                    break;
+                }
+            }
+
+            await DisplayAllModels();
+        }
+
+        public async void GetModelsFromCoohomDataset(string path)
+        {
+            // Assume that the Folder names in the Main folder are labeled
+            string[] files = Directory.GetDirectories(path);
+
+            int counter = 0;
+            foreach (string file in files)
+            {
+                string modelName = Path.GetFileNameWithoutExtension(file);
+                if (ModelMetadatas.Values.Any(v => v.Name == modelName))
+                {
+                    continue;
+                }
+                Model modelToAdd;
+                modelToAdd = DatasetConverterCoohom.ConvertCoohomModel(file, Utils.MM_TO_METER, true, false);
                 if (ModelMetadatas.Values.Any(v => v.Name == modelToAdd.Name))
                 {
                     continue;
@@ -990,6 +1149,12 @@ namespace AdminApp
 
         private async void buttonBulkAddCatalog_Click(object sender, EventArgs e)
         {
+            DatasetTypeSelectForm datasetTypeSelect = new DatasetTypeSelectForm();
+            if (datasetTypeSelect.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
             // Promt for the file:
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             if (fbd.ShowDialog() != DialogResult.OK)
@@ -998,15 +1163,20 @@ namespace AdminApp
             }
 
             // Should state what format the dataset is from:
-            GetObjectsFrom3DFRONTDataset(fbd.SelectedPath);
+            if (datasetTypeSelect.SelectedDataset == ConverterGeneral.Datasets._3DFRONT)
+            {
+                GetObjectsFrom3DFRONTDataset(fbd.SelectedPath);
+            }
+            if (datasetTypeSelect.SelectedDataset == ConverterGeneral.Datasets.COOHOM)
+            {
+                GetObjectsFromCoohomDataset(fbd.SelectedPath);
+            }
         }
-
-        public enum Datasets { _3DFRONT, OBJ }
 
         public async void GetObjectsFrom3DFRONTDataset(string path)
         {
             // Import the Types from model_info.json:
-            List<ModelConverter.Type> typeList = DBMSReadWrite.JSONReadFromFile<List<ModelConverter.Type>>(path + "\\model_info.json");
+            List<Dataset3DFRONTClasses.Type> typeList = DBMSReadWrite.JSONReadFromFile<List<Dataset3DFRONTClasses.Type>>(path + "\\model_info.json");
 
             // Assume that the Folder names in the Main folder are labeled
             string[] dirs = Directory.GetDirectories(path);
@@ -1021,7 +1191,7 @@ namespace AdminApp
                 CatalogObject newObj;
                 try
                 {
-                    newObj = ModelConverter.DatasetConverter3DFRONT.Convert3DFRONTCatalogObject(dir, 1.0, false, true);
+                    newObj = DatasetConverter3DFRONT.Convert3DFRONTCatalogObject(dir, 1.0, false, true);
                 }
                 catch
                 {
@@ -1033,19 +1203,71 @@ namespace AdminApp
                     continue;
                 }
 
-                ModelConverter.Type type = typeList.First(t => t.model_id == newObj.CatalogID);
+                Dataset3DFRONTClasses.Type type = typeList.First(t => t.model_id == newObj.CatalogID);
                 newObj.TypeId = type.category + "_" + type.supercategory;
 
                 MongoCatalogObject mongoCO = new MongoCatalogObject()
                 {
                     Id = newObj.CatalogID,
-                    MeshReps = new List<MeshRep>() { new MeshRep() { Components = newObj.Components } },
+                    MeshReps = new List<MeshRep>() { new MeshRep() { Components = newObj.Components ,LevelOfDetail = LevelOfDetail.LOD500} },
                     Name = newObj.Name,
                     Properties = newObj.Properties,
-                    TypeId = newObj.TypeId
+                    TypeId = newObj.TypeId,
+                    Tags = newObj.Tags
                 };
 
-                mongoCO.Properties.Add("Dataset", Datasets._3DFRONT.ToString());
+                APIResponse<string> response = await Controller.CreateCatalogObject(mongoCO);
+                if (response.Code != System.Net.HttpStatusCode.OK)
+                {
+                    MessageBox.Show(response.ReasonPhrase);
+                }
+
+                counter++;
+                if (counter == BULK_UPLOAD_LIMIT)
+                {
+                    break;
+                }
+            }
+
+            await DisplayAvailableCatalogObjects();
+        }
+
+        public async void GetObjectsFromCoohomDataset(string path)
+        {
+            // Assume that the Folder names in the Main folder are labeled
+            string[] dirs = Directory.GetDirectories(path);
+            int counter = 0;
+            foreach (string dir in dirs)
+            {
+                string objName = Path.GetFileNameWithoutExtension(dir);
+                if (CatalogMetadatas.Values.Any(v => v.Name == objName))
+                {
+                    continue;
+                }
+                CatalogObject newObj;
+                try
+                {
+                    newObj = DatasetConverterCoohom.ConvertCoohomCatalogObject(dir, Utils.MM_TO_METER, false, false);
+                }
+                catch
+                {
+                    MessageBox.Show("Error with file:\n" + dir);
+                    continue;
+                }
+                if (CatalogMetadatas.Values.Any(v => v.Name == newObj.Name))
+                {
+                    continue;
+                }
+
+                MongoCatalogObject mongoCO = new MongoCatalogObject()
+                {
+                    Id = newObj.CatalogID,
+                    MeshReps = new List<MeshRep>() { new MeshRep() { Components = newObj.Components, LevelOfDetail = LevelOfDetail.LOD500 } },
+                    Name = newObj.Name,
+                    Properties = newObj.Properties,
+                    TypeId = newObj.TypeId,
+                    Tags = newObj.Tags
+                };
 
                 APIResponse<string> response = await Controller.CreateCatalogObject(mongoCO);
                 if (response.Code != System.Net.HttpStatusCode.OK)
@@ -1072,7 +1294,29 @@ namespace AdminApp
         {
             BULK_UPLOAD_LIMIT = Convert.ToInt32(this.numericUpDownUploadLimit.Value);
         }
-    }
 
-    #endregion
+        #endregion
+
+        private async void buttonTestItemAdd_Click(object sender, EventArgs e)
+        {
+            TestBoxObjectForm tbof = new TestBoxObjectForm(ObjectTypeTree.GetAllTypes());
+            if (tbof.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            APIResponse<string> response = await Controller.CreateCatalogObject(tbof.MongoCatalogObject);
+            if (response.Code == System.Net.HttpStatusCode.OK)
+            {
+                await DisplayAvailableCatalogObjects();
+
+                // Highlight and show the model info
+                this.DisplayProperties(this.dataGridViewCatalogPorperties, CatalogMetadatas[response.Data].Properties);
+            }
+            else
+            {
+                MessageBox.Show(response.ReasonPhrase);
+            }
+        }
+    }
 }

@@ -91,6 +91,7 @@ namespace DBMS.Controllers.APIControllers
                 return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Cannot edit Root");
             }
 
+            ObjectTypeTree.BuildTypeTree(db.GetAllAvailableTypes());
             if (!db.UpdateType(type, true))
             {
                 return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Creates Type Loop");
@@ -117,6 +118,7 @@ namespace DBMS.Controllers.APIControllers
                 return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Cannot edit Root");
             }
 
+            ObjectTypeTree.BuildTypeTree(db.GetAllAvailableTypes());
             db.DeleteType(id);
             return Request.CreateResponseDBMS(HttpStatusCode.OK, "Delete Successful");
         }

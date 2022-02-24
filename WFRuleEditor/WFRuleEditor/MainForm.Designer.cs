@@ -35,14 +35,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxTitle = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.groupBoxRulesets = new System.Windows.Forms.GroupBox();
-            this.buttonMoveRule = new System.Windows.Forms.Button();
-            this.buttonAddRuleSet = new System.Windows.Forms.Button();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonImportRuleset = new System.Windows.Forms.Button();
-            this.buttonDeleteRule = new System.Windows.Forms.Button();
-            this.buttonExportRulesets = new System.Windows.Forms.Button();
-            this.treeViewRulesets = new System.Windows.Forms.TreeView();
             this.buttonAddObjSearch = new System.Windows.Forms.Button();
             this.buttonEditObjSearch = new System.Windows.Forms.Button();
             this.buttonDeleteObjSearch = new System.Windows.Forms.Button();
@@ -54,11 +46,19 @@
             this.buttonAddLogicalExpressions = new System.Windows.Forms.Button();
             this.buttonEditLogicalExpressions = new System.Windows.Forms.Button();
             this.richTextBoxRuleString = new System.Windows.Forms.RichTextBox();
-            this.buttonSaveAndExit = new System.Windows.Forms.Button();
+            this.buttonSave = new System.Windows.Forms.Button();
+            this.treeViewRulesets = new System.Windows.Forms.TreeView();
+            this.buttonExportRulesets = new System.Windows.Forms.Button();
+            this.buttonDeleteRule = new System.Windows.Forms.Button();
+            this.buttonImportRuleset = new System.Windows.Forms.Button();
+            this.buttonAdd = new System.Windows.Forms.Button();
+            this.buttonAddRuleSet = new System.Windows.Forms.Button();
+            this.buttonMoveRule = new System.Windows.Forms.Button();
+            this.groupBoxRulesets = new System.Windows.Forms.GroupBox();
             this.groupBoxGeneral.SuspendLayout();
-            this.groupBoxRulesets.SuspendLayout();
             this.groupBoxObjSearch.SuspendLayout();
             this.groupBoxLogicalExpressions.SuspendLayout();
+            this.groupBoxRulesets.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBoxGeneral
@@ -135,109 +135,6 @@
             this.label1.Size = new System.Drawing.Size(38, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "Name:";
-            // 
-            // groupBoxRulesets
-            // 
-            this.groupBoxRulesets.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBoxRulesets.Controls.Add(this.buttonMoveRule);
-            this.groupBoxRulesets.Controls.Add(this.buttonAddRuleSet);
-            this.groupBoxRulesets.Controls.Add(this.buttonAdd);
-            this.groupBoxRulesets.Controls.Add(this.buttonImportRuleset);
-            this.groupBoxRulesets.Controls.Add(this.buttonDeleteRule);
-            this.groupBoxRulesets.Controls.Add(this.buttonExportRulesets);
-            this.groupBoxRulesets.Controls.Add(this.treeViewRulesets);
-            this.groupBoxRulesets.Location = new System.Drawing.Point(12, 12);
-            this.groupBoxRulesets.Name = "groupBoxRulesets";
-            this.groupBoxRulesets.Size = new System.Drawing.Size(254, 479);
-            this.groupBoxRulesets.TabIndex = 2;
-            this.groupBoxRulesets.TabStop = false;
-            this.groupBoxRulesets.Text = "Rulesets";
-            // 
-            // buttonMoveRule
-            // 
-            this.buttonMoveRule.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonMoveRule.Location = new System.Drawing.Point(6, 305);
-            this.buttonMoveRule.Name = "buttonMoveRule";
-            this.buttonMoveRule.Size = new System.Drawing.Size(242, 23);
-            this.buttonMoveRule.TabIndex = 6;
-            this.buttonMoveRule.Text = "Move Selected Rule(s)";
-            this.buttonMoveRule.UseVisualStyleBackColor = true;
-            this.buttonMoveRule.Click += new System.EventHandler(this.ButtonMoveRule_Click);
-            // 
-            // buttonAddRuleSet
-            // 
-            this.buttonAddRuleSet.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonAddRuleSet.Location = new System.Drawing.Point(6, 334);
-            this.buttonAddRuleSet.Name = "buttonAddRuleSet";
-            this.buttonAddRuleSet.Size = new System.Drawing.Size(242, 23);
-            this.buttonAddRuleSet.TabIndex = 5;
-            this.buttonAddRuleSet.Text = "Add Ruleset";
-            this.buttonAddRuleSet.UseVisualStyleBackColor = true;
-            this.buttonAddRuleSet.Click += new System.EventHandler(this.buttonAddRuleSet_Click);
-            // 
-            // buttonAdd
-            // 
-            this.buttonAdd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonAdd.Location = new System.Drawing.Point(6, 363);
-            this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(242, 23);
-            this.buttonAdd.TabIndex = 4;
-            this.buttonAdd.Text = "Add Rule";
-            this.buttonAdd.UseVisualStyleBackColor = true;
-            this.buttonAdd.Click += new System.EventHandler(this.buttonAddRule_Click);
-            // 
-            // buttonImportRuleset
-            // 
-            this.buttonImportRuleset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonImportRuleset.Location = new System.Drawing.Point(6, 421);
-            this.buttonImportRuleset.Name = "buttonImportRuleset";
-            this.buttonImportRuleset.Size = new System.Drawing.Size(242, 23);
-            this.buttonImportRuleset.TabIndex = 3;
-            this.buttonImportRuleset.Text = "Import";
-            this.buttonImportRuleset.UseVisualStyleBackColor = true;
-            this.buttonImportRuleset.Click += new System.EventHandler(this.buttonImportRuleset_Click);
-            // 
-            // buttonDeleteRule
-            // 
-            this.buttonDeleteRule.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonDeleteRule.Location = new System.Drawing.Point(6, 392);
-            this.buttonDeleteRule.Name = "buttonDeleteRule";
-            this.buttonDeleteRule.Size = new System.Drawing.Size(242, 23);
-            this.buttonDeleteRule.TabIndex = 2;
-            this.buttonDeleteRule.Text = "Delete Selected";
-            this.buttonDeleteRule.UseVisualStyleBackColor = true;
-            this.buttonDeleteRule.Click += new System.EventHandler(this.buttonDeleteRule_Click);
-            // 
-            // buttonExportRulesets
-            // 
-            this.buttonExportRulesets.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonExportRulesets.Location = new System.Drawing.Point(6, 450);
-            this.buttonExportRulesets.Name = "buttonExportRulesets";
-            this.buttonExportRulesets.Size = new System.Drawing.Size(242, 23);
-            this.buttonExportRulesets.TabIndex = 1;
-            this.buttonExportRulesets.Text = "Export";
-            this.buttonExportRulesets.UseVisualStyleBackColor = true;
-            this.buttonExportRulesets.Click += new System.EventHandler(this.buttonExportRulesets_Click);
-            // 
-            // treeViewRulesets
-            // 
-            this.treeViewRulesets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeViewRulesets.CheckBoxes = true;
-            this.treeViewRulesets.Location = new System.Drawing.Point(6, 19);
-            this.treeViewRulesets.Name = "treeViewRulesets";
-            this.treeViewRulesets.Size = new System.Drawing.Size(242, 280);
-            this.treeViewRulesets.TabIndex = 0;
-            this.treeViewRulesets.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeViewRulesets_NodeMouseClick);
-            this.treeViewRulesets.KeyUp += new System.Windows.Forms.KeyEventHandler(this.treeViewRulesets_KeyUp);
             // 
             // buttonAddObjSearch
             // 
@@ -367,23 +264,126 @@
             this.richTextBoxRuleString.TabIndex = 10;
             this.richTextBoxRuleString.Text = "";
             // 
-            // buttonSaveAndExit
+            // buttonSave
             // 
-            this.buttonSaveAndExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSaveAndExit.Location = new System.Drawing.Point(893, 462);
-            this.buttonSaveAndExit.Name = "buttonSaveAndExit";
-            this.buttonSaveAndExit.Size = new System.Drawing.Size(81, 29);
-            this.buttonSaveAndExit.TabIndex = 11;
-            this.buttonSaveAndExit.Text = "Save and Exit";
-            this.buttonSaveAndExit.UseVisualStyleBackColor = true;
-            this.buttonSaveAndExit.Click += new System.EventHandler(this.ButtonSaveAndExit_Click);
+            this.buttonSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonSave.Location = new System.Drawing.Point(893, 462);
+            this.buttonSave.Name = "buttonSave";
+            this.buttonSave.Size = new System.Drawing.Size(81, 29);
+            this.buttonSave.TabIndex = 11;
+            this.buttonSave.Text = "Save";
+            this.buttonSave.UseVisualStyleBackColor = true;
+            this.buttonSave.Click += new System.EventHandler(this.ButtonSave_Click);
+            // 
+            // treeViewRulesets
+            // 
+            this.treeViewRulesets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.treeViewRulesets.CheckBoxes = true;
+            this.treeViewRulesets.Location = new System.Drawing.Point(6, 19);
+            this.treeViewRulesets.Name = "treeViewRulesets";
+            this.treeViewRulesets.Size = new System.Drawing.Size(242, 280);
+            this.treeViewRulesets.TabIndex = 0;
+            this.treeViewRulesets.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeViewRulesets_NodeMouseClick);
+            this.treeViewRulesets.KeyUp += new System.Windows.Forms.KeyEventHandler(this.treeViewRulesets_KeyUp);
+            // 
+            // buttonExportRulesets
+            // 
+            this.buttonExportRulesets.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonExportRulesets.Location = new System.Drawing.Point(6, 450);
+            this.buttonExportRulesets.Name = "buttonExportRulesets";
+            this.buttonExportRulesets.Size = new System.Drawing.Size(242, 23);
+            this.buttonExportRulesets.TabIndex = 1;
+            this.buttonExportRulesets.Text = "Export";
+            this.buttonExportRulesets.UseVisualStyleBackColor = true;
+            this.buttonExportRulesets.Click += new System.EventHandler(this.buttonExportRulesets_Click);
+            // 
+            // buttonDeleteRule
+            // 
+            this.buttonDeleteRule.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonDeleteRule.Location = new System.Drawing.Point(6, 392);
+            this.buttonDeleteRule.Name = "buttonDeleteRule";
+            this.buttonDeleteRule.Size = new System.Drawing.Size(242, 23);
+            this.buttonDeleteRule.TabIndex = 2;
+            this.buttonDeleteRule.Text = "Delete Selected";
+            this.buttonDeleteRule.UseVisualStyleBackColor = true;
+            this.buttonDeleteRule.Click += new System.EventHandler(this.buttonDeleteRule_Click);
+            // 
+            // buttonImportRuleset
+            // 
+            this.buttonImportRuleset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonImportRuleset.Location = new System.Drawing.Point(6, 421);
+            this.buttonImportRuleset.Name = "buttonImportRuleset";
+            this.buttonImportRuleset.Size = new System.Drawing.Size(242, 23);
+            this.buttonImportRuleset.TabIndex = 3;
+            this.buttonImportRuleset.Text = "Import";
+            this.buttonImportRuleset.UseVisualStyleBackColor = true;
+            this.buttonImportRuleset.Click += new System.EventHandler(this.buttonImportRuleset_Click);
+            // 
+            // buttonAdd
+            // 
+            this.buttonAdd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonAdd.Location = new System.Drawing.Point(6, 363);
+            this.buttonAdd.Name = "buttonAdd";
+            this.buttonAdd.Size = new System.Drawing.Size(242, 23);
+            this.buttonAdd.TabIndex = 4;
+            this.buttonAdd.Text = "Add Rule";
+            this.buttonAdd.UseVisualStyleBackColor = true;
+            this.buttonAdd.Click += new System.EventHandler(this.buttonAddRule_Click);
+            // 
+            // buttonAddRuleSet
+            // 
+            this.buttonAddRuleSet.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonAddRuleSet.Location = new System.Drawing.Point(6, 334);
+            this.buttonAddRuleSet.Name = "buttonAddRuleSet";
+            this.buttonAddRuleSet.Size = new System.Drawing.Size(242, 23);
+            this.buttonAddRuleSet.TabIndex = 5;
+            this.buttonAddRuleSet.Text = "Add Ruleset";
+            this.buttonAddRuleSet.UseVisualStyleBackColor = true;
+            this.buttonAddRuleSet.Click += new System.EventHandler(this.buttonAddRuleSet_Click);
+            // 
+            // buttonMoveRule
+            // 
+            this.buttonMoveRule.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonMoveRule.Location = new System.Drawing.Point(6, 305);
+            this.buttonMoveRule.Name = "buttonMoveRule";
+            this.buttonMoveRule.Size = new System.Drawing.Size(242, 23);
+            this.buttonMoveRule.TabIndex = 6;
+            this.buttonMoveRule.Text = "Move Selected Rule(s)";
+            this.buttonMoveRule.UseVisualStyleBackColor = true;
+            this.buttonMoveRule.Click += new System.EventHandler(this.ButtonMoveRule_Click);
+            // 
+            // groupBoxRulesets
+            // 
+            this.groupBoxRulesets.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBoxRulesets.Controls.Add(this.buttonMoveRule);
+            this.groupBoxRulesets.Controls.Add(this.buttonAddRuleSet);
+            this.groupBoxRulesets.Controls.Add(this.buttonAdd);
+            this.groupBoxRulesets.Controls.Add(this.buttonImportRuleset);
+            this.groupBoxRulesets.Controls.Add(this.buttonDeleteRule);
+            this.groupBoxRulesets.Controls.Add(this.buttonExportRulesets);
+            this.groupBoxRulesets.Controls.Add(this.treeViewRulesets);
+            this.groupBoxRulesets.Location = new System.Drawing.Point(12, 12);
+            this.groupBoxRulesets.Name = "groupBoxRulesets";
+            this.groupBoxRulesets.Size = new System.Drawing.Size(254, 479);
+            this.groupBoxRulesets.TabIndex = 2;
+            this.groupBoxRulesets.TabStop = false;
+            this.groupBoxRulesets.Text = "Rulesets";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(986, 503);
-            this.Controls.Add(this.buttonSaveAndExit);
+            this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.richTextBoxRuleString);
             this.Controls.Add(this.groupBoxLogicalExpressions);
             this.Controls.Add(this.groupBoxObjSearch);
@@ -394,9 +394,9 @@
             this.Text = "Rule Editor";
             this.groupBoxGeneral.ResumeLayout(false);
             this.groupBoxGeneral.PerformLayout();
-            this.groupBoxRulesets.ResumeLayout(false);
             this.groupBoxObjSearch.ResumeLayout(false);
             this.groupBoxLogicalExpressions.ResumeLayout(false);
+            this.groupBoxRulesets.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -410,11 +410,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBoxTitle;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.GroupBox groupBoxRulesets;
-        private System.Windows.Forms.Button buttonImportRuleset;
-        private System.Windows.Forms.Button buttonDeleteRule;
-        private System.Windows.Forms.Button buttonExportRulesets;
-        private System.Windows.Forms.TreeView treeViewRulesets;
         private System.Windows.Forms.Button buttonAddObjSearch;
         private System.Windows.Forms.Button buttonEditObjSearch;
         private System.Windows.Forms.Button buttonDeleteObjSearch;
@@ -426,10 +421,15 @@
         private System.Windows.Forms.Button buttonAddLogicalExpressions;
         private System.Windows.Forms.Button buttonEditLogicalExpressions;
         private System.Windows.Forms.RichTextBox richTextBoxRuleString;
+        private System.Windows.Forms.Button buttonSave;
+        private System.Windows.Forms.TreeView treeViewRulesets;
+        private System.Windows.Forms.Button buttonExportRulesets;
+        private System.Windows.Forms.Button buttonDeleteRule;
+        private System.Windows.Forms.Button buttonImportRuleset;
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonAddRuleSet;
         private System.Windows.Forms.Button buttonMoveRule;
-        private System.Windows.Forms.Button buttonSaveAndExit;
+        private System.Windows.Forms.GroupBox groupBoxRulesets;
     }
 }
 

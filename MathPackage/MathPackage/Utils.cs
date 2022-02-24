@@ -198,6 +198,47 @@ namespace MathPackage
             return new Matrix4(c1.Get4D(location.x), c2.Get4D(location.y), c3.Get4D(location.z), new Vector4D(0, 0, 0, 1)).GetTranspose();
         }
 
+        public static void GetLocationAndOrientationFromTranslationMatrix(Matrix4 matrix, out Vector3D location, out Vector4D orientation)
+        {
+            location = new Vector3D(matrix.GetCell(0, 3), matrix.GetCell(1, 3), matrix.GetCell(2, 3));
+            orientation = new Vector4D();
+
+            // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+            double tr = matrix.GetCell(0, 0) + matrix.GetCell(1, 1) + matrix.GetCell(2, 2);
+            if (tr > 0)
+            {
+                double S = Math.Sqrt(tr + 1.0) * 2.0; // S=4*qw 
+                orientation.w = 0.25 * S;
+                orientation.x = (matrix.GetCell(2, 1) - matrix.GetCell(1, 2)) / S;
+                orientation.y = (matrix.GetCell(0, 2) - matrix.GetCell(2, 0)) / S;
+                orientation.z = (matrix.GetCell(1, 0) - matrix.GetCell(0, 1)) / S;
+            }
+            else if ((matrix.GetCell(0, 0) > matrix.GetCell(1, 1)) & (matrix.GetCell(0, 0) > matrix.GetCell(2, 2)))
+            {
+                double S = Math.Sqrt(1.0 + matrix.GetCell(0, 0) - matrix.GetCell(1, 1) - matrix.GetCell(2, 2)) * 2.0; // S=4*qx 
+                orientation.w = (matrix.GetCell(2, 1) - matrix.GetCell(1, 2)) / S;
+                orientation.x = 0.25 * S;
+                orientation.y = (matrix.GetCell(0, 1) + matrix.GetCell(1, 0)) / S;
+                orientation.z = (matrix.GetCell(0, 2) + matrix.GetCell(2, 0)) / S;
+            }
+            else if (matrix.GetCell(1, 1) > matrix.GetCell(2, 2))
+            {
+                double S = Math.Sqrt(1.0 + matrix.GetCell(1, 1) - matrix.GetCell(0, 0) - matrix.GetCell(2, 2)) * 2.0; // S=4*qy
+                orientation.w = (matrix.GetCell(0, 2) - matrix.GetCell(2, 0)) / S;
+                orientation.x = (matrix.GetCell(0, 1) + matrix.GetCell(1, 0)) / S;
+                orientation.y = 0.25 * S;
+                orientation.z = (matrix.GetCell(1, 2) + matrix.GetCell(2, 1)) / S;
+            }
+            else
+            {
+                double S = Math.Sqrt(1.0 + matrix.GetCell(2, 2) - matrix.GetCell(0, 0) - matrix.GetCell(1, 1)) * 2.0; // S=4*qz
+                orientation.w = (matrix.GetCell(1, 0) - matrix.GetCell(0, 1)) / S;
+                orientation.x = (matrix.GetCell(0, 2) + matrix.GetCell(2, 0)) / S;
+                orientation.y = (matrix.GetCell(1, 2) + matrix.GetCell(2, 1)) / S;
+                orientation.z = 0.25 * S;
+            }
+        }
+
         public static Vector4D GetQuaterion(Vector3D axis, double rotationRad)
         {
             // https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Using_quaternion_as_rotations

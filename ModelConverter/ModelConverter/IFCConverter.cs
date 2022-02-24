@@ -48,7 +48,7 @@ namespace ModelConverter
         // Method for getting list of objects from a IfcModel (Should be a xbim file type if using in Unity)
         public static Model GetObjectsFromIFC(string modelPath, double scale, bool flipTriangles)
         {
-            var model = IfcStore.Open(modelPath);
+            var modelIfc = IfcStore.Open(modelPath);
             bool createContext = false;
             if (Path.GetExtension(modelPath) == ".xbim")
             {
@@ -58,8 +58,10 @@ namespace ModelConverter
             {
                 createContext = true;
             }
-            XbimSchemaVersion version = model.SchemaVersion;
-            return GetObjectsFromIFC(model, createContext, version, scale, flipTriangles);
+            XbimSchemaVersion version = modelIfc.SchemaVersion;
+            Model model = GetObjectsFromIFC(modelIfc, createContext, version, scale, flipTriangles);
+            model.Tags.Add(new KeyValuePair<string, string>("Dataset", ConverterGeneral.Datasets.IFC.ToString()));
+            return model;
         }
 
         // Method for getting list of objects from a IfcModel

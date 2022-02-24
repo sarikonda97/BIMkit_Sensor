@@ -93,6 +93,14 @@ namespace BIMRuleEditor
             {
                 this.comboBoxOperString.Items.Add(OperatorString);
             }
+
+            //this.comboBoxBoolProp.SelectedIndex = 0;
+            //this.comboBoxOperBool.SelectedIndex = 0;
+            //this.comboBoxBoolValue.SelectedIndex = 0;
+            //this.comboBoxOperNum.SelectedIndex = 0;
+            //this.comboBoxNumUnit.SelectedIndex = 0;
+            //this.comboBoxStringProp.SelectedIndex = 0;
+            //this.comboBoxOperString.SelectedIndex = 0;
         }
 
         private void DisplayPropertyCheck()
@@ -203,7 +211,7 @@ namespace BIMRuleEditor
 
         private void textBoxNumValue_TextChanged(object sender, EventArgs e)
         {
-            if (int.TryParse(this.textBoxNumValue.Text, out int num))
+            if (double.TryParse(this.textBoxNumValue.Text, out double num))
             {
                 this.PropertyCheckNum.SetNewValue(Convert.ToDouble(this.textBoxNumValue.Text));
                 this.textBoxNumValue.BackColor = Color.White;

@@ -42,6 +42,7 @@ namespace AdminApp
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxUsername = new System.Windows.Forms.TextBox();
             this.groupBoxModel = new System.Windows.Forms.GroupBox();
+            this.buttonExportModel = new System.Windows.Forms.Button();
             this.buttonDownloadModel = new System.Windows.Forms.Button();
             this.buttonShareModel = new System.Windows.Forms.Button();
             this.dataGridViewUserModelProperties = new System.Windows.Forms.DataGridView();
@@ -130,9 +131,10 @@ namespace AdminApp
             this.dataGridViewTextBoxColumn26 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.buttonBulkDeleteModel = new System.Windows.Forms.Button();
             this.buttonBulkAddModel = new System.Windows.Forms.Button();
-            this.buttonRefresh = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.numericUpDownUploadLimit = new System.Windows.Forms.NumericUpDown();
+            this.buttonRefresh = new System.Windows.Forms.Button();
+            this.buttonTestItemAdd = new System.Windows.Forms.Button();
             this.groupBoxUser.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCurrentUserProperties)).BeginInit();
             this.groupBoxModel.SuspendLayout();
@@ -314,6 +316,7 @@ namespace AdminApp
             this.groupBoxModel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxModel.Controls.Add(this.buttonExportModel);
             this.groupBoxModel.Controls.Add(this.buttonDownloadModel);
             this.groupBoxModel.Controls.Add(this.buttonShareModel);
             this.groupBoxModel.Controls.Add(this.dataGridViewUserModelProperties);
@@ -327,6 +330,17 @@ namespace AdminApp
             this.groupBoxModel.TabIndex = 2;
             this.groupBoxModel.TabStop = false;
             this.groupBoxModel.Text = "Building Models";
+            // 
+            // buttonExportModel
+            // 
+            this.buttonExportModel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonExportModel.Location = new System.Drawing.Point(536, 135);
+            this.buttonExportModel.Name = "buttonExportModel";
+            this.buttonExportModel.Size = new System.Drawing.Size(75, 23);
+            this.buttonExportModel.TabIndex = 15;
+            this.buttonExportModel.Text = "Export";
+            this.buttonExportModel.UseVisualStyleBackColor = true;
+            this.buttonExportModel.Click += new System.EventHandler(this.buttonExportModel_Click);
             // 
             // buttonDownloadModel
             // 
@@ -631,7 +645,7 @@ namespace AdminApp
             this.groupBoxMaterial.TabStop = false;
             this.groupBoxMaterial.Text = "Material";
             // 
-            // dataGridViewMaterialProps
+            // dataGridViewMaterialProperties
             // 
             this.dataGridViewMaterialProperties.AllowUserToAddRows = false;
             this.dataGridViewMaterialProperties.AllowUserToDeleteRows = false;
@@ -644,7 +658,7 @@ namespace AdminApp
             this.dataGridViewTextBoxColumn9,
             this.dataGridViewTextBoxColumn10});
             this.dataGridViewMaterialProperties.Location = new System.Drawing.Point(6, 183);
-            this.dataGridViewMaterialProperties.Name = "dataGridViewMaterialProps";
+            this.dataGridViewMaterialProperties.Name = "dataGridViewMaterialProperties";
             this.dataGridViewMaterialProperties.ReadOnly = true;
             this.dataGridViewMaterialProperties.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewMaterialProperties.Size = new System.Drawing.Size(605, 86);
@@ -1045,7 +1059,7 @@ namespace AdminApp
             this.groupBoxAllModels.TabStop = false;
             this.groupBoxAllModels.Text = "All Models";
             // 
-            // dataGridViewAllModelProp
+            // dataGridViewAllModelProperties
             // 
             this.dataGridViewAllModelProperties.AllowUserToAddRows = false;
             this.dataGridViewAllModelProperties.AllowUserToDeleteRows = false;
@@ -1058,7 +1072,7 @@ namespace AdminApp
             this.dataGridViewTextBoxColumn17,
             this.dataGridViewTextBoxColumn18});
             this.dataGridViewAllModelProperties.Location = new System.Drawing.Point(6, 376);
-            this.dataGridViewAllModelProperties.Name = "dataGridViewAllModelProp";
+            this.dataGridViewAllModelProperties.Name = "dataGridViewAllModelProperties";
             this.dataGridViewAllModelProperties.ReadOnly = true;
             this.dataGridViewAllModelProperties.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewAllModelProperties.Size = new System.Drawing.Size(605, 130);
@@ -1203,6 +1217,7 @@ namespace AdminApp
             this.groupBoxCatalogDataset.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxCatalogDataset.Controls.Add(this.buttonTestItemAdd);
             this.groupBoxCatalogDataset.Controls.Add(this.dataGridViewDatasetCatalog);
             this.groupBoxCatalogDataset.Controls.Add(this.buttonBulkDeleteCatalog);
             this.groupBoxCatalogDataset.Controls.Add(this.buttonBulkAddCatalog);
@@ -1369,17 +1384,6 @@ namespace AdminApp
             this.buttonBulkAddModel.UseVisualStyleBackColor = true;
             this.buttonBulkAddModel.Click += new System.EventHandler(this.buttonBulkAddModel_Click);
             // 
-            // buttonRefresh
-            // 
-            this.buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRefresh.Location = new System.Drawing.Point(546, 5);
-            this.buttonRefresh.Name = "buttonRefresh";
-            this.buttonRefresh.Size = new System.Drawing.Size(103, 23);
-            this.buttonRefresh.TabIndex = 17;
-            this.buttonRefresh.Text = "Refresh";
-            this.buttonRefresh.UseVisualStyleBackColor = true;
-            this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
-            // 
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1397,9 +1401,9 @@ namespace AdminApp
             // 
             this.numericUpDownUploadLimit.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.numericUpDownUploadLimit.Location = new System.Drawing.Point(75, 10);
+            this.numericUpDownUploadLimit.Location = new System.Drawing.Point(71, 14);
             this.numericUpDownUploadLimit.Name = "numericUpDownUploadLimit";
-            this.numericUpDownUploadLimit.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDownUploadLimit.Size = new System.Drawing.Size(78, 20);
             this.numericUpDownUploadLimit.TabIndex = 0;
             this.numericUpDownUploadLimit.Value = new decimal(new int[] {
             10,
@@ -1407,6 +1411,28 @@ namespace AdminApp
             0,
             0});
             this.numericUpDownUploadLimit.ValueChanged += new System.EventHandler(this.numericUpDownUploadLimit_ValueChanged);
+            // 
+            // buttonRefresh
+            // 
+            this.buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonRefresh.Location = new System.Drawing.Point(546, 5);
+            this.buttonRefresh.Name = "buttonRefresh";
+            this.buttonRefresh.Size = new System.Drawing.Size(103, 23);
+            this.buttonRefresh.TabIndex = 17;
+            this.buttonRefresh.Text = "Refresh";
+            this.buttonRefresh.UseVisualStyleBackColor = true;
+            this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
+            // 
+            // buttonTestItemAdd
+            // 
+            this.buttonTestItemAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonTestItemAdd.Location = new System.Drawing.Point(530, 48);
+            this.buttonTestItemAdd.Name = "buttonTestItemAdd";
+            this.buttonTestItemAdd.Size = new System.Drawing.Size(75, 43);
+            this.buttonTestItemAdd.TabIndex = 11;
+            this.buttonTestItemAdd.Text = "Add Test Item";
+            this.buttonTestItemAdd.UseVisualStyleBackColor = true;
+            this.buttonTestItemAdd.Click += new System.EventHandler(this.buttonTestItemAdd_Click);
             // 
             // Main
             // 
@@ -1569,6 +1595,8 @@ namespace AdminApp
         private System.Windows.Forms.Button buttonBulkAddModel;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.NumericUpDown numericUpDownUploadLimit;
+        private System.Windows.Forms.Button buttonExportModel;
+        private System.Windows.Forms.Button buttonTestItemAdd;
     }
 }
 

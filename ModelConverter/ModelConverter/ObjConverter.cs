@@ -20,6 +20,7 @@ namespace ModelConverter
             IObjLoader objLoader = new ObjLoaderFactory().Create();
             LoadResult result = objLoader.Load(fileStream);
             CatalogObject newModelObject = ConvertObjFile(result, objectName, scale, flipTriangles, flipYZ);
+            newModelObject.Tags.Add(new KeyValuePair<string, string>("Dataset", ConverterGeneral.Datasets.OBJ.ToString()));
             return newModelObject;
         }
 

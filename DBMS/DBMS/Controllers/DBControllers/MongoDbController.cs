@@ -71,6 +71,10 @@ namespace DBMS.Controllers.DBControllers
 
         public User CheckUser(string username, string password)
         {
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                return null;
+            }
             User user = GetUser(username);
             if (user != null)
             {

@@ -34,6 +34,7 @@ public class GameController : MonoBehaviour
     public Material HighlightMatGreen;
     public Material DefaultMat;
     public Material VoxelMaterial;
+    public Material FloorMaterial;
 
     public GameObject LoadingCanvas;
 
@@ -100,6 +101,7 @@ public class GameController : MonoBehaviour
 
         ResetCanvas();
         this.ModelSelectCanvas.SetActive(true);
+
         // Some buttons should all start disabled:
         GenDesignButton.gameObject.SetActive(false);
         ModelCheckButton.gameObject.SetActive(false);
@@ -235,14 +237,22 @@ public class GameController : MonoBehaviour
             modelObject.name = obj.Name;
             modelObject.transform.SetPositionAndRotation(VectorConvert(obj.Location), VectorConvert(obj.Orientation));
             ModelObjectScript script = modelObject.GetComponent<ModelObjectScript>();
-            script.SetMainMaterial(DefaultMat);
             script.ModelObject = obj;
+            if (obj.TypeId == "Floor")
+            {
+                script.SetMainMaterial(FloorMaterial);
+            }
+            else
+            {
+                script.SetMainMaterial(DefaultMat);
+            }
 
             ModelObjects.Add(script);
         }
 
-        this.ResetCanvas();
+        ResetCanvas();
         ModelViewCanvas.SetActive(true);
+        LoadingCanvas.SetActive(false);
     }
 
     #endregion
@@ -333,7 +343,6 @@ public class GameController : MonoBehaviour
         RaycastHit hitData;
         if (Physics.Raycast(ray, out hitData, 1000))
         {
-            Debug.Log("Hit");
             ModelObjectScript mos;
             VoxelScript vos;
             if (ViewingGameObject != null)
@@ -415,8 +424,8 @@ public class GameController : MonoBehaviour
 
     public void AddObjectClicked()
     {
-        RefreshCatalogClicked();
         ResetCanvas();
+        RefreshCatalogClicked();
         AddObjectCanvas.SetActive(true);
         ContinueToGenButton.gameObject.SetActive(false);
     }
@@ -781,9 +790,10 @@ public class GameController : MonoBehaviour
     public async void CheckModelClicked()
     {
         LoadingCanvas.SetActive(true);
+        ResetCanvas();
 
         List<string> rules = RuleButtonData.Where(rbd => rbd.Clicked).Select(r => ((Rule)r.Item).Id).ToList();
-        CheckRequest request = new CheckRequest(DBMSController.Token, RuleAPIController.CurrentUser.Username, CurrentModel.Id, rules, LevelOfDetail.LOD500);
+        CheckRequest request = new CheckRequest(DBMSController.Token, RuleAPIController.CurrentUser.Username, CurrentModel.Id, rules, LevelOfDetail.LOD100);
         APIResponse<List<RuleResult>> response = await MCAPIController.PerformModelCheck(request);
         if (response.Code != System.Net.HttpStatusCode.OK)
         {
@@ -793,6 +803,7 @@ public class GameController : MonoBehaviour
         }
 
         List<RuleResult> results = response.Data;
+
         RemoveAllChidren(this.ResultListViewContent);
         foreach (RuleResult result in results)
         {
@@ -802,8 +813,10 @@ public class GameController : MonoBehaviour
             newButton.onClick.AddListener(action);
         }
 
-        ResetCanvas();
+        RemoveAllChidren(this.InstanceListViewContent);
+
         CheckResultCanvas.SetActive(true);
+        LoadingCanvas.SetActive(false);
     }
 
     private List<GameObject> GeneratingObjects = new List<GameObject>();
@@ -847,6 +860,7 @@ public class GameController : MonoBehaviour
         ExitClicked();
         SignInClicked();
         LoadDBMSModel(response.Data);
+        LoadingCanvas.SetActive(false);
     }
 
     public void CancelRuleSelectClicked()
@@ -877,7 +891,7 @@ public class GameController : MonoBehaviour
 
     #endregion
 
-    #region Model Check Mode
+    #region Model Check Model
 
     private void ResultButtonClicked(RuleResult result)
     {
@@ -1027,7 +1041,6 @@ public class GameController : MonoBehaviour
         this.RuleSelectCanvas.SetActive(false);
         this.CheckResultCanvas.SetActive(false);
         this.ModelViewCanvas.SetActive(false);
-        this.LoadingCanvas.SetActive(false);
         this.AddObjectCanvas.SetActive(false);
         this.ModelSelectCanvas.SetActive(false);
 
@@ -1036,6 +1049,12 @@ public class GameController : MonoBehaviour
         ViewingGameObject = null;
         EditingGameObject = null;
         placingObject = false;
+
+        RemoveAllChidren(this.ModelListViewContent);
+        RemoveAllChidren(this.RuleListViewContent);
+        RemoveAllChidren(this.ResultListViewContent);
+        RemoveAllChidren(this.InstanceListViewContent);
+        RemoveAllChidren(this.CatalogObjectListViewContent);
     }
 
     private void UnHighlightAllObjects()

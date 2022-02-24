@@ -18,8 +18,8 @@ public class ModelObjectScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        IsHighlighted = false;
         MeshRenderers = GetComponentsInChildren<MeshRenderer>();
+        UnHighlight();
 
         LineRenderers = new List<LineRenderer>();
         for (int i = 0; i < 3; i++)

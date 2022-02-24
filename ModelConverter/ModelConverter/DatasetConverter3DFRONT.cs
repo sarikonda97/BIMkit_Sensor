@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ModelConverter.Dataset3DFRONTClasses;
 
 namespace ModelConverter
 {
@@ -82,6 +83,7 @@ namespace ModelConverter
             }
 
             newModel.ModelObjects = CombineModelObjects(modelObjects);
+            newModel.Tags.Add(new KeyValuePair<string, string>("Dataset", ConverterGeneral.Datasets._3DFRONT.ToString()));
 
             return newModel;
         }
@@ -89,7 +91,7 @@ namespace ModelConverter
         public static Dictionary<string, ModelObject> GetModelObjects(Rootobject rootobject, bool flipTriangles, bool flipYZ)
         {
             Dictionary<string, ModelObject> objectList = new Dictionary<string, ModelObject>();
-            foreach (Mesh m in rootobject.mesh)
+            foreach (Dataset3DFRONTClasses.Mesh m in rootobject.mesh)
             {
                 Component newComponent = new Component()
                 {
@@ -264,6 +266,7 @@ namespace ModelConverter
             CatalogObject catalogObject = ObjConverter.ConvertObjFile(fileStream, id, scale, flipTriangles, flipYZ);
             fileStream.Close();
             catalogObject.CatalogID = id;
+            catalogObject.Tags.Add(new KeyValuePair<string, string>("Dataset", ConverterGeneral.Datasets._3DFRONT.ToString()));
             return catalogObject;
         }
     }

@@ -285,7 +285,7 @@ namespace MathPackage
     {
         private double[,] matrix = new double[4, 4];
 
-        public int Dim = 4;
+        public static int Dim = 4;
 
         public Matrix4(Vector4D c1, Vector4D c2, Vector4D c3, Vector4D c4)
         {
@@ -293,6 +293,21 @@ namespace MathPackage
             SetColumn(1, c2);
             SetColumn(2, c3);
             SetColumn(3, c4);
+        }
+
+        public Matrix4(double[] values)
+        {
+            if (values.Length != Dim*Dim)
+            {
+                throw new Exception("Must contain exactly " + Dim * Dim + " values");
+            }
+            for (int i = 0; i < Dim; i++)
+            {
+                for (int j = 0; j < Dim; j++)
+                {
+                    matrix[i, j] = values[i * 4 + j];
+                }
+            }
         }
 
         public Matrix4()
@@ -422,7 +437,7 @@ namespace MathPackage
 
             // assumes determinant is not 0
             // that is, the matrix does have an inverse
-            int n = matrix.Dim;
+            int n = Dim;
             Matrix4 result = new Matrix4(); // make a copy of matrix
             for (int i = 0; i < n; ++i)
                 for (int j = 0; j < n; ++j)
@@ -459,7 +474,7 @@ namespace MathPackage
             // upper gets lum values on diagonal (0.0s below)
 
             int toggle = +1; // even (+1) or odd (-1) row permutatuions
-            int n = m.Dim;
+            int n = Dim;
 
             // make a copy of m[][] into result lu[][]
             lum = new Matrix4();
@@ -523,7 +538,7 @@ namespace MathPackage
 
         public static double[] Helper(Matrix4 luMatrix, double[] b)
         {
-            int n = luMatrix.Dim;
+            int n = Dim;
             double[] x = new double[n];
             b.CopyTo(x, 0);
 
@@ -553,9 +568,25 @@ namespace MathPackage
             int[] perm;
             int toggle = MatrixDecompose(matrix, out lum, out perm);
             double result = toggle;
-            for (int i = 0; i < lum.Dim; ++i)
+            for (int i = 0; i < Dim; ++i)
                 result *= lum.GetCell(i, i);
             return result;
+        }
+
+        public static bool Equal(Matrix4 m1, Matrix4 m2)
+        {
+            for (int i = 0; i < Dim; i++)
+            {
+                for (int j = 0; j < Dim; j++)
+                {
+                    if (m1.GetCell(i, j) != m2.GetCell(i, j))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
     }
 

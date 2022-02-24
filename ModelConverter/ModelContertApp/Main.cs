@@ -54,7 +54,8 @@ namespace ModelContertApp
         private void buttonOpenFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "IFC files (*.ifc)|*.ifc|Object Files (*.obj)|*.obj";
+            ofd.Filter = "Supported Types|*.ifc;*.obj";
+
             if (ofd.ShowDialog() != DialogResult.OK)
             {
                 return;
@@ -169,7 +170,7 @@ namespace ModelContertApp
 
         private void buttonUpdateConverter_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("INCOMPLETE: Meant to reset the type converter");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using RuleAPI.Models;
+﻿using RuleAPI.Methods;
+using RuleAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -20,29 +21,36 @@ namespace BIMRuleEditor
             ExistenceClauseCount = existenceClauseCount;
             SetDropdownVals(keys);
 
-            ObjectCheck = new ObjectCheck(keys.First(), Negation.MUST_HAVE, new PropertyCheckBool("MISSING", OperatorBool.EQUAL, true));
-            RelationCheck = new RelationCheck(keys.First(), keys.First(), Negation.MUST_HAVE, new PropertyCheckBool("MISSING", OperatorBool.EQUAL, true));
+            string firstPropSingle = MethodFinder.GetAllPropertyMethods().Where(kvp => kvp.Value == typeof(bool)).First().Key;
+            string firstPropMultiple = MethodFinder.GetAllRelationMethods().Where(kvp => kvp.Value == typeof(bool)).First().Key;
+
+            ObjectCheck = new ObjectCheck(keys.First(), Negation.MUST_HAVE, new PropertyCheckBool(firstPropSingle, OperatorBool.EQUAL, true));
+            RelationCheck = new RelationCheck(keys.First(), keys.First(), Negation.MUST_HAVE, new PropertyCheckBool(firstPropMultiple, OperatorBool.EQUAL, true));
             LogicalExpression = new LogicalExpression(new List<ObjectCheck>(), new List<RelationCheck>(), new List<LogicalExpression>(), LogicalOperator.AND);
             this.radioButtonNewLE.Checked = true;
             SetCheckAndLEValues();
         }
         public LogicalExpressionForm(int existenceClauseCount, ObjectCheck objectCheck, List<string> keys)
         {
+            string firstPropMultiple = MethodFinder.GetAllRelationMethods().Where(kvp => kvp.Value == typeof(bool)).First().Key;
+
             InitializeComponent();
             ExistenceClauseCount = existenceClauseCount;
             SetDropdownVals(keys);
             ObjectCheck = objectCheck;
-            RelationCheck = new RelationCheck(keys.First(), keys.First(), Negation.MUST_HAVE, new PropertyCheckBool("MISSING", OperatorBool.EQUAL, true));
+            RelationCheck = new RelationCheck(keys.First(), keys.First(), Negation.MUST_HAVE, new PropertyCheckBool(firstPropMultiple, OperatorBool.EQUAL, true));
             LogicalExpression = new LogicalExpression(new List<ObjectCheck>(), new List<RelationCheck>(), new List<LogicalExpression>(), LogicalOperator.AND);
             this.radioButtonNewOC.Checked = true;
             SetCheckAndLEValues();
         }
         public LogicalExpressionForm(int existenceClauseCount, RelationCheck relationCheck, List<string> keys)
         {
+            string firstPropSingle = MethodFinder.GetAllPropertyMethods().Where(kvp => kvp.Value == typeof(bool)).First().Key;
+
             InitializeComponent();
             ExistenceClauseCount = existenceClauseCount;
             SetDropdownVals(keys);
-            ObjectCheck = new ObjectCheck(keys.First(), Negation.MUST_HAVE, new PropertyCheckBool("MISSING", OperatorBool.EQUAL, true));
+            ObjectCheck = new ObjectCheck(keys.First(), Negation.MUST_HAVE, new PropertyCheckBool(firstPropSingle, OperatorBool.EQUAL, true));
             RelationCheck = relationCheck;
             LogicalExpression = new LogicalExpression(new List<ObjectCheck>(), new List<RelationCheck>(), new List<LogicalExpression>(), LogicalOperator.AND);
             this.radioButtonNewRC.Checked = true;
@@ -50,11 +58,14 @@ namespace BIMRuleEditor
         }
         public LogicalExpressionForm(int existenceClauseCount, LogicalExpression logicalExpression, bool mainLE, List<string> keys)
         {
+            string firstPropSingle = MethodFinder.GetAllPropertyMethods().Where(kvp => kvp.Value == typeof(bool)).First().Key;
+            string firstPropMultiple = MethodFinder.GetAllRelationMethods().Where(kvp => kvp.Value == typeof(bool)).First().Key;
+
             InitializeComponent();
             ExistenceClauseCount = existenceClauseCount;
             SetDropdownVals(keys);
-            ObjectCheck = new ObjectCheck(keys.First(), Negation.MUST_HAVE, new PropertyCheckBool("MISSING", OperatorBool.EQUAL, true));
-            RelationCheck = new RelationCheck(keys.First(), keys.First(), Negation.MUST_HAVE, new PropertyCheckBool("MISSING", OperatorBool.EQUAL, true));
+            ObjectCheck = new ObjectCheck(keys.First(), Negation.MUST_HAVE, new PropertyCheckBool(firstPropSingle, OperatorBool.EQUAL, true));
+            RelationCheck = new RelationCheck(keys.First(), keys.First(), Negation.MUST_HAVE, new PropertyCheckBool(firstPropMultiple, OperatorBool.EQUAL, true));
             LogicalExpression = logicalExpression;
             this.radioButtonNewLE.Checked = true;
 

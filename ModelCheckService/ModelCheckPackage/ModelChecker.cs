@@ -205,7 +205,16 @@ namespace ModelCheckPackage
             {
                 return true;
             }
-            return rule.ExistentialClauses.Select(ec => ec.Value.Characteristic.Type).Contains(type);
+
+            List<string> ruleTypesList = rule.ExistentialClauses.Select(ec => ec.Value.Characteristic.Type).Distinct().ToList();
+            foreach (string ruleType in ruleTypesList)
+            {
+                if (RecusiveTypeCheck(ObjectTypeTree.GetType(ruleType), ObjectTypeTree.GetType(type)))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static string GenerateRuleCode(Rule rule)
@@ -461,6 +470,7 @@ namespace ModelCheckPackage
 
         public static bool RecusiveTypeCheck(ObjectType checkType, ObjectType objType)
         {
+            // Checks if the objectType or any of its parents are equal to the checkType
             if (objType == null)
             {
                 return false;

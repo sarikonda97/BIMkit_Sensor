@@ -2660,6 +2660,7 @@ MonoBehaviour:
   HighlightMatGreen: {fileID: 2100000, guid: e46e125b19656b54b9d773a114db65df, type: 2}
   DefaultMat: {fileID: 2100000, guid: 2c0253ac42a2a4442929516de364d4a4, type: 2}
   VoxelMaterial: {fileID: 2100000, guid: 4371d70e9744947408247496054f3c8f, type: 2}
+  FloorMaterial: {fileID: 2100000, guid: b2f6734b9323cd047a15fa85fb0ddb25, type: 2}
   LoadingCanvas: {fileID: 484253825}
   ModelViewCanvas: {fileID: 2076655345}
   ObjectDataText: {fileID: 301491014}

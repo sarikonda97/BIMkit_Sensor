@@ -17,6 +17,8 @@ namespace ModelConverter
             MM, CM, M, Inch, Ft
         }
 
+        public enum Datasets { _3DFRONT, OBJ, COOHOM, IFC, GBXML}
+
         public static double precision = 0.0001;
         public static double GetScale(Units unit)
         {

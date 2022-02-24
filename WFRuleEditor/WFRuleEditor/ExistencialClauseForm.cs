@@ -40,14 +40,14 @@ namespace BIMRuleEditor
 
         private void SetDropdownVals()
         {
+            this.comboBoxObjectExistence.Items.Clear();
             foreach (OccurrenceRule occurrence in Enum.GetValues(typeof(OccurrenceRule)))
             {
                 this.comboBoxObjectExistence.Items.Add(occurrence);
             }
-            foreach (ObjectType type in ObjectTypeTree.GetAllTypes())
-            {
-                this.comboBoxObjectType.Items.Add(type);
-            }
+
+            this.comboBoxObjectType.Items.Clear();
+            this.comboBoxObjectType.Items.AddRange(ObjectTypeTree.GetAllTypes().Select(t => t.Name).ToArray());
         }
 
         private void DisplayExistentialClause()

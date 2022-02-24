@@ -30,7 +30,8 @@ namespace DbmsApi.API
 
         public override string ToString()
         {
-            return Name + " (" + Type.ToString() + ")";
+            string typeString = Type == null ? "N/A" : Type.ToString();
+            return Name + " (" + typeString + ")";
         }
     }
 }

@@ -45,6 +45,19 @@ namespace MCGDApp
             GDAPIController = new GDAPIController(gdURL);
 
             GDSettings = new GenerativeDesignSettings();
+
+            GetTypes();
+        }
+
+        private async Task GetTypes()
+        {
+            APIResponse<List<ObjectType>> response3 = await DBMSController.GetTypes();
+            if (response3.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response3.ReasonPhrase);
+                return;
+            }
+            ObjectTypeTree.BuildTypeTree(response3.Data);
         }
 
         private async void buttonSignInDBMS_Click(object sender, EventArgs e)
@@ -228,6 +241,15 @@ namespace MCGDApp
                 return;
             }
 
+            Model model = response.Data;
+            // Find the center of the floor:
+            Vector3D ModelStartingLocation = new Vector3D();
+            ModelObject floorObject = model.ModelObjects.Where(o => o.TypeId == "Floor").First();
+            if (floorObject != null)
+            {
+                ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
+            }
+
             List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
             List<CatalogInitializer> catalogObjectsInits = new List<CatalogInitializer>();
             foreach (var catalogObjectMeta in catalogObjectsMeta)
@@ -242,19 +264,22 @@ namespace MCGDApp
                 CatalogObject catalogObject = response2.Data;
                 float minZ = (float)catalogObject.Components.Min(c => c.Vertices.Min(v => v.z));
                 float maxZ = (float)catalogObject.Components.Max(c => c.Vertices.Max(v => v.z));
-                float heightOfset = (maxZ - minZ) / 2.0f + 0.0001f;
-                catalogObjectsInits.Add(new CatalogInitializer() { CatalogObject = catalogObject, Location = new Vector3D(0, 0, heightOfset) });
+                float heightOfset = (maxZ - minZ) / 2.0f + 0.0001f; // We want it slightly off the ground for overlap purposes
+
+                catalogObjectsInits.Add(new CatalogInitializer()
+                {
+                    CatalogObject = catalogObject,
+                    Location = new Vector3D(ModelStartingLocation.x, ModelStartingLocation.y, ModelStartingLocation.z + heightOfset)
+                });
             }
 
-            Model model = response.Data;
             List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
 
-            // TODO: Should change the start location to the cetner of the whole model:
             //GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits, GDSettings);
             GenerativeDesignerThread generativeDesigner = new GenerativeDesignerThread(model, rules, catalogObjectsInits, GDSettings);
             Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
 
-            // Save the models:
+            // Save the model:
             newModel.Name = "Generated Model";
             APIResponse<string> response3 = await DBMSController.CreateModel(newModel);
             if (response3.Code != System.Net.HttpStatusCode.OK)

@@ -99,35 +99,41 @@ namespace DBMS.Controllers.APIControllers
 
         public HttpResponseMessage Post([FromBody] MongoCatalogObject catalogObject)
         {
-            User user = db.GetUserFromToken(ActionContext.Request.Headers.Authorization.Parameter);
-            if (user == null)
+            try
             {
-                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Not Logged in or Session has ended");
-            }
+                User user = db.GetUserFromToken(ActionContext.Request.Headers.Authorization.Parameter);
+                if (user == null)
+                {
+                    return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Not Logged in or Session has ended");
+                }
 
-            if (!user.IsAdmin)
+                if (!user.IsAdmin)
+                {
+                    return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Must be an Admin");
+                }
+
+                if (catalogObject == null)
+                {
+                    return Request.CreateResponseDBMS(HttpStatusCode.BadRequest, "Missing CatalogObject");
+                }
+
+                // Make sure the ID is unique and not white space
+                //if (string.IsNullOrWhiteSpace(catalogObject.Id) || db.RetrieveAvailableCatalogObjectIDs().Contains(catalogObject.Id))
+                //{
+                //    catalogObject.Id = null;
+                //}
+                catalogObject.Id = null;
+
+                catalogObject.MeshReps = catalogObject.MeshReps.OrderBy(o => o.LevelOfDetail).ToList();
+                catalogObject.MeshReps.Add(CreateBoundingBox(catalogObject.MeshReps.Last()));
+                catalogObject.MeshReps = catalogObject.MeshReps.OrderBy(o => o.LevelOfDetail).ToList();
+                string coId = db.CreateCatalogObject(catalogObject);
+                return Request.CreateResponseDBMS(HttpStatusCode.OK, coId);
+            }
+            catch (Exception ex)
             {
-                return Request.CreateResponseDBMS(HttpStatusCode.Unauthorized, "Must be an Admin");
+                return Request.CreateResponseDBMS(HttpStatusCode.BadRequest, ex.Message);
             }
-
-            if (catalogObject == null)
-            {
-                return Request.CreateResponseDBMS(HttpStatusCode.BadRequest, "Missing CatalogObject");
-            }
-
-            // Make sure the ID is unique and not white space
-            //if (string.IsNullOrWhiteSpace(catalogObject.Id) || db.RetrieveAvailableCatalogObjectIDs().Contains(catalogObject.Id))
-            //{
-            //    catalogObject.Id = null;
-            //}
-            catalogObject.Id = null;
-
-            catalogObject.MeshReps = catalogObject.MeshReps.OrderBy(o => o.LevelOfDetail).ToList();
-            catalogObject.MeshReps.Add(CreateBoundingBox(catalogObject.MeshReps.Last()));
-            catalogObject.MeshReps = catalogObject.MeshReps.OrderBy(o => o.LevelOfDetail).ToList();
-
-            string coId = db.CreateCatalogObject(catalogObject);
-            return Request.CreateResponseDBMS(HttpStatusCode.OK, coId);
         }
 
         private MeshRep CreateBoundingBox(MeshRep mesh)
