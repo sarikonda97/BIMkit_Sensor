@@ -39,6 +39,9 @@ namespace GenerativeDesignPackage
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
+            // Only get points above a floor:
+            List<RuleCheckObject> floorObjects = ModelCheck.Model.Objects.Where(o => o.Type == "Floor").ToList();
+
             SceneConfiguration scene = new SceneConfiguration()
             {
                 ObjectConfigurations = new List<ObjectConfiguration>()
@@ -87,7 +90,13 @@ namespace GenerativeDesignPackage
                     {
                         double deltaX = RandomGausian(0, moveAmount);
                         double deltaY = RandomGausian(0, moveAmount);
-                        locations.Add(new Vector3D(currentConfig.Location.x + deltaX, currentConfig.Location.y + deltaY, currentConfig.Location.z));
+                        Vector3D newLoc = new Vector3D(currentConfig.Location.x + deltaX, currentConfig.Location.y + deltaY, currentConfig.Location.z);
+
+                        // Check if the object is above the floor or not:
+                        if (floorObjects.Any(floor => Utils.RayIntersectsMesh(newLoc, new Vector3D(0, 0, -1), floor.GetGlobalMesh())))
+                        {
+                            locations.Add(newLoc);
+                        }
                     }
 
                     //remove object
@@ -200,6 +209,9 @@ namespace GenerativeDesignPackage
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
+            // Only get points above a floor:
+            List<RuleCheckObject> floorObjects = ThreadConfigurations.First().ModelChecker.Model.Objects.Where(o => o.Type == "Floor").ToList();
+
             foreach (ThreadConfiguration threadConfiguration in ThreadConfigurations)
             {
                 threadConfiguration.SceneConfiguration = new SceneConfiguration()
@@ -256,7 +268,13 @@ namespace GenerativeDesignPackage
                     {
                         double deltaX = RandomGausian(0, moveAmount);
                         double deltaY = RandomGausian(0, moveAmount);
-                        locations.Add(new Vector3D(bestObjectConfigFori.Location.x + deltaX, bestObjectConfigFori.Location.y + deltaY, bestObjectConfigFori.Location.z));
+                        Vector3D newLoc = new Vector3D(bestObjectConfigFori.Location.x + deltaX, bestObjectConfigFori.Location.y + deltaY, bestObjectConfigFori.Location.z);
+
+                        // Check if the object is above the floor or not:
+                        if (floorObjects.Any(floor => Utils.RayIntersectsMesh(newLoc, new Vector3D(0, 0, -1), floor.GetGlobalMesh())))
+                        {
+                            locations.Add(newLoc);
+                        }
                     }
 
                     // Get all object location and orientation pairs:

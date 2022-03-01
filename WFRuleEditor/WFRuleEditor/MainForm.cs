@@ -35,17 +35,6 @@ namespace BIMRuleEditor
             RedisplayRulesets();
         }
 
-        private async Task GetTypes()
-        {
-            APIResponse<List<ObjectType>> response3 = await Controller.GetTypes();
-            if (response3.Code != System.Net.HttpStatusCode.OK)
-            {
-                MessageBox.Show(response3.ReasonPhrase);
-                return;
-            }
-            ObjectTypeTree.BuildTypeTree(response3.Data);
-        }
-
         #region Display Updates
 
         private void GetUserLocalRules()
@@ -115,10 +104,10 @@ namespace BIMRuleEditor
             TreeNode opNode = new TreeNode(currentRule.LogicalExpression.LogicalOperator.ToString());
             opNode.Tag = currentRule.LogicalExpression;
             this.treeViewLogicalExpressions.Nodes.Add(opNode);
-            displayLogicalExpressions(opNode, currentRule.LogicalExpression);
+            DisplayLogicalExpressions(opNode, currentRule.LogicalExpression);
         }
 
-        private void displayLogicalExpressions(TreeNode parantTreeNode, LogicalExpression parentLE)
+        private void DisplayLogicalExpressions(TreeNode parantTreeNode, LogicalExpression parentLE)
         {
             foreach (ObjectCheck oc in parentLE.ObjectChecks)
             {
@@ -137,7 +126,7 @@ namespace BIMRuleEditor
                 TreeNode node = new TreeNode(le.LogicalOperator.ToString());
                 node.Tag = le;
                 parantTreeNode.Nodes.Add(node);
-                displayLogicalExpressions(node, le);
+                DisplayLogicalExpressions(node, le);
             }
             parantTreeNode.Expand();
         }
@@ -809,6 +798,26 @@ namespace BIMRuleEditor
                 RuleReadWrite.WriteRuleSet(rs, path + "\\" + name + "(" + index + ")" + extn);
                 index++;
             }
+        }
+
+        #endregion
+
+        #region Type Fetching
+
+        private void buttonTypes_Click(object sender, EventArgs e)
+        {
+            GetTypes();
+        }
+
+        private async Task GetTypes()
+        {
+            APIResponse<List<ObjectType>> response3 = await Controller.GetTypes();
+            if (response3.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response3.ReasonPhrase);
+                return;
+            }
+            ObjectTypeTree.BuildTypeTree(response3.Data);
         }
 
         #endregion

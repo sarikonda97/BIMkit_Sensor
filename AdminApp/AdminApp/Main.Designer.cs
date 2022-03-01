@@ -117,6 +117,7 @@ namespace AdminApp
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBoxCatalogDataset = new System.Windows.Forms.GroupBox();
+            this.buttonTestItemAdd = new System.Windows.Forms.Button();
             this.dataGridViewDatasetCatalog = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn27 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn28 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -134,7 +135,6 @@ namespace AdminApp
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.numericUpDownUploadLimit = new System.Windows.Forms.NumericUpDown();
             this.buttonRefresh = new System.Windows.Forms.Button();
-            this.buttonTestItemAdd = new System.Windows.Forms.Button();
             this.groupBoxUser.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCurrentUserProperties)).BeginInit();
             this.groupBoxModel.SuspendLayout();
@@ -1228,6 +1228,17 @@ namespace AdminApp
             this.groupBoxCatalogDataset.TabStop = false;
             this.groupBoxCatalogDataset.Text = "Catalog Dataset";
             // 
+            // buttonTestItemAdd
+            // 
+            this.buttonTestItemAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonTestItemAdd.Location = new System.Drawing.Point(530, 48);
+            this.buttonTestItemAdd.Name = "buttonTestItemAdd";
+            this.buttonTestItemAdd.Size = new System.Drawing.Size(75, 39);
+            this.buttonTestItemAdd.TabIndex = 11;
+            this.buttonTestItemAdd.Text = "Add Test Item";
+            this.buttonTestItemAdd.UseVisualStyleBackColor = true;
+            this.buttonTestItemAdd.Click += new System.EventHandler(this.buttonTestItemAdd_Click);
+            // 
             // dataGridViewDatasetCatalog
             // 
             this.dataGridViewDatasetCatalog.AllowUserToAddRows = false;
@@ -1422,17 +1433,6 @@ namespace AdminApp
             this.buttonRefresh.Text = "Refresh";
             this.buttonRefresh.UseVisualStyleBackColor = true;
             this.buttonRefresh.Click += new System.EventHandler(this.buttonRefresh_Click);
-            // 
-            // buttonTestItemAdd
-            // 
-            this.buttonTestItemAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonTestItemAdd.Location = new System.Drawing.Point(530, 48);
-            this.buttonTestItemAdd.Name = "buttonTestItemAdd";
-            this.buttonTestItemAdd.Size = new System.Drawing.Size(75, 43);
-            this.buttonTestItemAdd.TabIndex = 11;
-            this.buttonTestItemAdd.Text = "Add Test Item";
-            this.buttonTestItemAdd.UseVisualStyleBackColor = true;
-            this.buttonTestItemAdd.Click += new System.EventHandler(this.buttonTestItemAdd_Click);
             // 
             // Main
             // 

@@ -55,6 +55,7 @@
             this.buttonAddRuleSet = new System.Windows.Forms.Button();
             this.buttonMoveRule = new System.Windows.Forms.Button();
             this.groupBoxRulesets = new System.Windows.Forms.GroupBox();
+            this.buttonTypes = new System.Windows.Forms.Button();
             this.groupBoxGeneral.SuspendLayout();
             this.groupBoxObjSearch.SuspendLayout();
             this.groupBoxLogicalExpressions.SuspendLayout();
@@ -267,9 +268,9 @@
             // buttonSave
             // 
             this.buttonSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSave.Location = new System.Drawing.Point(893, 462);
+            this.buttonSave.Location = new System.Drawing.Point(893, 448);
             this.buttonSave.Name = "buttonSave";
-            this.buttonSave.Size = new System.Drawing.Size(81, 29);
+            this.buttonSave.Size = new System.Drawing.Size(81, 43);
             this.buttonSave.TabIndex = 11;
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
@@ -378,11 +379,23 @@
             this.groupBoxRulesets.TabStop = false;
             this.groupBoxRulesets.Text = "Rulesets";
             // 
+            // buttonTypes
+            // 
+            this.buttonTypes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonTypes.Location = new System.Drawing.Point(893, 399);
+            this.buttonTypes.Name = "buttonTypes";
+            this.buttonTypes.Size = new System.Drawing.Size(81, 43);
+            this.buttonTypes.TabIndex = 12;
+            this.buttonTypes.Text = "Refresh Types";
+            this.buttonTypes.UseVisualStyleBackColor = true;
+            this.buttonTypes.Click += new System.EventHandler(this.buttonTypes_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(986, 503);
+            this.Controls.Add(this.buttonTypes);
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.richTextBoxRuleString);
             this.Controls.Add(this.groupBoxLogicalExpressions);
@@ -430,6 +443,7 @@
         private System.Windows.Forms.Button buttonAddRuleSet;
         private System.Windows.Forms.Button buttonMoveRule;
         private System.Windows.Forms.GroupBox groupBoxRulesets;
+        private System.Windows.Forms.Button buttonTypes;
     }
 }
 
