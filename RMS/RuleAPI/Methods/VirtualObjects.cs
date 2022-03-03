@@ -233,7 +233,7 @@ namespace RuleAPI.Methods
                 foreach (Vector3D v in newMesh.VertexList)
                 {
                     Vector3D newVect = Vector3D.Subract(v, center);
-                    newVect = Utils.RotatePointXY(newVect, angleDeg);
+                    newVect = Utils.RotatePointAroundZAxis(newVect, angleDeg);
                     newMeshVects.Add(newVect);
                 }
                 newMesh.VertexList = newMeshVects;

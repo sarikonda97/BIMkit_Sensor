@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TriangleIntersectionTest.cs" />
     <Compile Include="TriTriOverlap.cs" />
     <Compile Include="MathClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

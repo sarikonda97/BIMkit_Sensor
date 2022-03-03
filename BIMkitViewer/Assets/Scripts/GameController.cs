@@ -113,6 +113,11 @@ public class GameController : MonoBehaviour
         this.LevelOfDetailDropdown.options.AddRange(Enum.GetValues(typeof(LevelOfDetail)).Cast<LevelOfDetail>().Select(l => new OptionData(l.ToString())));
         int index = LevelOfDetailDropdown.options.FindIndex((i) => { return i.text.Equals(LevelOfDetail.LOD500.ToString()); });
         this.LevelOfDetailDropdown.value = index;
+
+        // For testing:
+        this.PasswordInput.text = "admin";
+        this.RuleUsernameInput.text = "admin";
+        this.UsernameInput.text = "admin";
     }
 
     // Update is called once per frame
@@ -630,7 +635,7 @@ public class GameController : MonoBehaviour
 
     private Vector3 worldPosition = new Vector3();
     private float heightOfset = 0;
-    private float ERROR = 0.0001f;
+    private float ERROR = 0.01f;
 
     private async void PlaceCatalogObject(string catalogId)
     {
@@ -840,8 +845,8 @@ public class GameController : MonoBehaviour
                                                           rules,
                                                           LevelOfDetail.LOD100,
                                                           new GenerativeDesignSettings(
-                                                                Convert.ToInt32(50),
-                                                                Convert.ToDouble(20),
+                                                                Convert.ToInt32(100),
+                                                                Convert.ToDouble(30),
                                                                 Convert.ToDouble(0.75),
                                                                 Convert.ToInt32(10),
                                                                 false
@@ -891,7 +896,7 @@ public class GameController : MonoBehaviour
 
     #endregion
 
-    #region Model Check Model
+    #region Model Check Mode
 
     private void ResultButtonClicked(RuleResult result)
     {

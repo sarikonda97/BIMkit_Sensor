@@ -65,18 +65,6 @@ namespace MathPackage
         public static double CM_TO_METER = 0.01f;
         public static double MM_TO_METER = 0.001f;
 
-        public static void GetXYZDimentions(List<Vector3D> localVectors, out Vector3D center, out Vector3D dimentions)
-        {
-            double minX = localVectors.Min(v => v.x);
-            double minY = localVectors.Min(v => v.y);
-            double minZ = localVectors.Min(v => v.z);
-            double maxX = localVectors.Max(v => v.x);
-            double maxY = localVectors.Max(v => v.y);
-            double maxZ = localVectors.Max(v => v.z);
-            center = new Vector3D((maxX + minX) / 2.0, (maxY + minY) / 2.0, (maxZ + minZ) / 2.0);
-            dimentions = new Vector3D(maxX - minX, maxY - minY, maxZ - minZ);
-        }
-
         public static double ChangeUnitToMeterOrDeg(double value, Unit unit)
         {
             switch (unit)
@@ -97,6 +85,18 @@ namespace MathPackage
                     return value;
             }
             return value;
+        }
+
+        public static void GetXYZDimentions(List<Vector3D> localVectors, out Vector3D center, out Vector3D dimentions)
+        {
+            double minX = localVectors.Min(v => v.x);
+            double minY = localVectors.Min(v => v.y);
+            double minZ = localVectors.Min(v => v.z);
+            double maxX = localVectors.Max(v => v.x);
+            double maxY = localVectors.Max(v => v.y);
+            double maxZ = localVectors.Max(v => v.z);
+            center = new Vector3D((maxX + minX) / 2.0, (maxY + minY) / 2.0, (maxZ + minZ) / 2.0);
+            dimentions = new Vector3D(maxX - minX, maxY - minY, maxZ - minZ);
         }
 
         public static List<Vector3D> ShrinkShape(List<Vector3D> vects, double ratio)
@@ -435,7 +435,7 @@ namespace MathPackage
                 thetaDeg = 360 - thetaDeg;
             }
             Vector3D v2 = Vector3D.Subract(c, a);
-            Vector3D v3 = RotatePointXY(v2, -thetaDeg);
+            Vector3D v3 = RotatePointAroundZAxis(v2, -thetaDeg);
 
             bool bendLeft = v3.y >= 0;
 
@@ -476,7 +476,7 @@ namespace MathPackage
         }
         // ---------------------------------------------------------------------------------------------------
 
-        public static Vector3D RotatePointXY(Vector3D point, double angleInDegrees)
+        public static Vector3D RotatePointAroundZAxis(Vector3D point, double angleInDegrees)
         {
             double angleInRadians = angleInDegrees * (Math.PI / 180.0f);
             double cosTheta = Math.Cos(angleInRadians);
@@ -495,7 +495,7 @@ namespace MathPackage
                              c.x * (a.y - b.y)) / 2.0);
         }
 
-        public static bool PointInTriangle2(Vector3D p, Vector3D a, Vector3D b, Vector3D c)
+        public static bool PointInTriangleByArea(Vector3D p, Vector3D a, Vector3D b, Vector3D c)
         {
             double A = TriangleArea(a, b, c);
             double A1 = TriangleArea(p, b, c);
@@ -644,6 +644,93 @@ namespace MathPackage
             return minDist;
         }
 
+        public static bool MeshOverlap(Mesh m1, Mesh m2, double shrinkRatio)
+        {
+            Mesh m1Shrink = m1;
+            Mesh m2Shrink = m2;
+            if (shrinkRatio != 1.0)
+            {
+                m1Shrink = ShrinkMesh(m1, shrinkRatio);
+                m2Shrink = ShrinkMesh(m2, shrinkRatio);
+            }
+
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            {
+                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
+                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
+                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
+
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                {
+                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
+                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
+                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
+
+                    //IntrTriangle3Triangle3 intrTriangle3Triangle3 = new IntrTriangle3Triangle3(
+                    //                                                                new Triangle3d(
+                    //                                                                                V3DToV3d(v0),
+                    //                                                                                V3DToV3d(v1),
+                    //                                                                                V3DToV3d(v2)),
+                    //                                                                new Triangle3d(
+                    //                                                                                V3DToV3d(u0),
+                    //                                                                                V3DToV3d(u1),
+                    //                                                                                V3DToV3d(u2)));
+                    //int counter = 0;
+                    //bool testResult1 = intrTriangle3Triangle3.Test();
+                    //if (testResult1) { counter++; }
+                    bool testResult2 = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
+                    //if (testResult2) { counter++; }
+                    //bool testResult3 = TriTriOverlap.TriTriIntersect(v0.GetV3(), v1.GetV3(), v2.GetV3(), u0.GetV3(), u1.GetV3(), u2.GetV3());
+                    //if (testResult3) { counter++; }
+
+                    //if (counter >= 2) { return true; }
+                    //if (testResult1) { return true; }
+                    if (testResult2) { return true; }
+                    //if (testResult3) { return true; }
+                }
+            }
+
+            return MeshInsideMesh(m1Shrink, m2Shrink);
+        }
+
+        public static bool MeshInsideMesh(Mesh m1, Mesh m2)
+        {
+            // Next Two check if one is fully inside the other
+            Vector3D centerM1 = Vector3D.Average(m1.VertexList.ToArray());
+            if (RayIntersectsMesh(centerM1, new Vector3D(0, 0, 1), m2) &&
+                RayIntersectsMesh(centerM1, new Vector3D(0, 0, -1), m2) &&
+                RayIntersectsMesh(centerM1, new Vector3D(0, 1, 0), m2) &&
+                RayIntersectsMesh(centerM1, new Vector3D(0, -1, 0), m2) &&
+                RayIntersectsMesh(centerM1, new Vector3D(1, 0, 0), m2) &&
+                RayIntersectsMesh(centerM1, new Vector3D(-1, 0, 0), m2))
+            {
+                return true;
+            }
+
+            Vector3D centerM2 = Vector3D.Average(m2.VertexList.ToArray());
+            if (RayIntersectsMesh(centerM2, new Vector3D(0, 0, 1), m1) &&
+                RayIntersectsMesh(centerM2, new Vector3D(0, 0, -1), m1) &&
+                RayIntersectsMesh(centerM2, new Vector3D(0, 1, 0), m1) &&
+                RayIntersectsMesh(centerM2, new Vector3D(0, -1, 0), m1) &&
+                RayIntersectsMesh(centerM2, new Vector3D(1, 0, 0), m1) &&
+                RayIntersectsMesh(centerM2, new Vector3D(-1, 0, 0), m1))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static Vector3d V3DToV3d(Vector3D v)
+        {
+            return new Vector3d(v.x, v.y, v.z);
+        }
+
+        public static Vector3D V3DToV3d(Vector3d v)
+        {
+            return new Vector3D(v.x, v.y, v.z);
+        }
+
         public static double PointToMeshDistance(Vector3D v, Mesh m)
         {
             double minDist = double.MaxValue;
@@ -667,83 +754,6 @@ namespace MathPackage
             return minDist;
         }
 
-        public static Vector3d V3DToV3d(Vector3D v)
-        {
-            return new Vector3d(v.x, v.y, v.z);
-        }
-        public static Vector3D V3DToV3d(Vector3d v)
-        {
-            return new Vector3D(v.x, v.y, v.z);
-        }
-        public static bool MeshOverlap(Mesh m1, Mesh m2, double shrinkRatio)
-        {
-            Mesh m1Shrink = ShrinkMesh(m1, shrinkRatio);
-            Mesh m2Shrink = ShrinkMesh(m2, shrinkRatio);
-            //Mesh m1Shrink = m1;
-            //Mesh m2Shrink = m2;
-
-            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
-            {
-                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
-                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
-                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
-
-                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
-                {
-                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
-                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
-                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
-
-                    IntrTriangle3Triangle3 intrTriangle3Triangle3 = new IntrTriangle3Triangle3(
-                                                                                    new Triangle3d(
-                                                                                                    V3DToV3d(v0),
-                                                                                                    V3DToV3d(v1),
-                                                                                                    V3DToV3d(v2)),
-                                                                                    new Triangle3d(
-                                                                                                    V3DToV3d(u0),
-                                                                                                    V3DToV3d(u1),
-                                                                                                    V3DToV3d(u2)));
-                    //int counter = 0;
-                    bool testResult1 = intrTriangle3Triangle3.Test();
-                    //if (testResult1) { counter++; }
-                    //bool testResult2 = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
-                    //if (testResult2) { counter++; }
-                    //bool testResult3 = TriTriOverlap.TriTriIntersect(v0.GetV3(), v1.GetV3(), v2.GetV3(), u0.GetV3(), u1.GetV3(), u2.GetV3());
-                    //if (testResult3) { counter++; }
-
-                    //if (counter >= 2) { return true; }
-                    if (testResult1) { return true; }
-                    //if (testResult2) { return true; }
-                    //if (testResult3) { return true; }
-                }
-            }
-
-            // Next Two check if one is fully inside the other
-            Vector3D centerM1 = Vector3D.Average(m1Shrink.VertexList.ToArray());
-            if (RayIntersectsMesh(centerM1, new Vector3D(0, 0, 1), m2Shrink) &&
-                RayIntersectsMesh(centerM1, new Vector3D(0, 0, -1), m2Shrink) &&
-                RayIntersectsMesh(centerM1, new Vector3D(0, 1, 0), m2Shrink) &&
-                RayIntersectsMesh(centerM1, new Vector3D(0, -1, 0), m2Shrink) &&
-                RayIntersectsMesh(centerM1, new Vector3D(1, 0, 0), m2Shrink) &&
-                RayIntersectsMesh(centerM1, new Vector3D(-1, 0, 0), m2Shrink))
-            {
-                return true;
-            }
-
-            Vector3D centerM2 = Vector3D.Average(m2Shrink.VertexList.ToArray());
-            if (RayIntersectsMesh(centerM2, new Vector3D(0, 0, 1), m1Shrink) &&
-                RayIntersectsMesh(centerM2, new Vector3D(0, 0, -1), m1Shrink) &&
-                RayIntersectsMesh(centerM2, new Vector3D(0, 1, 0), m1Shrink) &&
-                RayIntersectsMesh(centerM2, new Vector3D(0, -1, 0), m1Shrink) &&
-                RayIntersectsMesh(centerM2, new Vector3D(1, 0, 0), m1Shrink) &&
-                RayIntersectsMesh(centerM2, new Vector3D(-1, 0, 0), m1Shrink))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         public static bool TrianglesOverlap(Vector3D v0, Vector3D v1, Vector3D v2, Vector3D u0, Vector3D u1, Vector3D u2)
         {
             // https://web.stanford.edu/class/cs277/resources/papers/Moller1997b.pdf
@@ -756,7 +766,7 @@ namespace MathPackage
             int posiCount = (du0 > 0 ? 1 : 0) + (du1 > 0 ? 1 : 0) + (du2 > 0 ? 1 : 0);
             int negaCount = (du0 < 0 ? 1 : 0) + (du1 < 0 ? 1 : 0) + (du2 < 0 ? 1 : 0);
             int zerpCount = (du0 == 0 ? 1 : 0) + (du1 == 0 ? 1 : 0) + (du2 == 0 ? 1 : 0);
-            if (posiCount == 0 || negaCount == 0)
+            if (posiCount == 0 || negaCount == 0 || zerpCount == 3)
             {
                 return false;
             }
@@ -770,7 +780,7 @@ namespace MathPackage
             posiCount = (dv0 > 0 ? 1 : 0) + (dv1 > 0 ? 1 : 0) + (dv2 > 0 ? 1 : 0);
             negaCount = (dv0 < 0 ? 1 : 0) + (dv1 < 0 ? 1 : 0) + (dv2 < 0 ? 1 : 0);
             zerpCount = (dv0 == 0 ? 1 : 0) + (dv1 == 0 ? 1 : 0) + (dv2 == 0 ? 1 : 0);
-            if (posiCount == 0 || negaCount == 0)
+            if (posiCount == 0 || negaCount == 0 || zerpCount == 3)
             {
                 return false;
             }
