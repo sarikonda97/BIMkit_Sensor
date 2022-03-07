@@ -62,6 +62,7 @@ namespace MCGDApp
             this.buttonGDWeb = new System.Windows.Forms.Button();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.buttonVoxelCreator = new System.Windows.Forms.Button();
+            this.buttonGDSeq = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -242,6 +243,7 @@ namespace MCGDApp
             this.textBoxRMSUsername.Name = "textBoxRMSUsername";
             this.textBoxRMSUsername.Size = new System.Drawing.Size(158, 20);
             this.textBoxRMSUsername.TabIndex = 7;
+            this.textBoxRMSUsername.Text = "admin";
             // 
             // groupBox1
             // 
@@ -291,6 +293,7 @@ namespace MCGDApp
             this.textBoxDBMSUsername.Name = "textBoxDBMSUsername";
             this.textBoxDBMSUsername.Size = new System.Drawing.Size(168, 20);
             this.textBoxDBMSUsername.TabIndex = 2;
+            this.textBoxDBMSUsername.Text = "admin";
             // 
             // label2
             // 
@@ -310,6 +313,7 @@ namespace MCGDApp
             this.textBoxDBMSPassword.PasswordChar = '*';
             this.textBoxDBMSPassword.Size = new System.Drawing.Size(168, 20);
             this.textBoxDBMSPassword.TabIndex = 3;
+            this.textBoxDBMSPassword.Text = "admin";
             // 
             // label1
             // 
@@ -400,6 +404,7 @@ namespace MCGDApp
             this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox5.Controls.Add(this.buttonGDSeq);
             this.groupBox5.Controls.Add(this.buttonGDSettings);
             this.groupBox5.Controls.Add(this.richTextBoxGenDesign);
             this.groupBox5.Controls.Add(this.buttonGDLocal);
@@ -478,6 +483,16 @@ namespace MCGDApp
             this.buttonVoxelCreator.UseVisualStyleBackColor = true;
             this.buttonVoxelCreator.Click += new System.EventHandler(this.buttonVoxelCreator_Click);
             // 
+            // buttonGDSeq
+            // 
+            this.buttonGDSeq.Location = new System.Drawing.Point(6, 135);
+            this.buttonGDSeq.Name = "buttonGDSeq";
+            this.buttonGDSeq.Size = new System.Drawing.Size(97, 52);
+            this.buttonGDSeq.TabIndex = 23;
+            this.buttonGDSeq.Text = "Generative Design (Sequence)";
+            this.buttonGDSeq.UseVisualStyleBackColor = true;
+            this.buttonGDSeq.Click += new System.EventHandler(this.buttonGDSeq_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -539,6 +554,7 @@ namespace MCGDApp
         private System.Windows.Forms.Button buttonGDSettings;
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.Button buttonVoxelCreator;
+        private System.Windows.Forms.Button buttonGDSeq;
     }
 }
 

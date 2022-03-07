@@ -242,6 +242,7 @@ namespace MCGDApp
             }
 
             Model model = response.Data;
+
             // Find the center of the floor:
             Vector3D ModelStartingLocation = new Vector3D();
             ModelObject floorObject = model.ModelObjects.Where(o => o.TypeId == "Floor").First();
@@ -339,6 +340,73 @@ namespace MCGDApp
             if (response.Code != System.Net.HttpStatusCode.OK)
             {
                 MessageBox.Show(response.ReasonPhrase);
+                return;
+            }
+
+            buttonSignInDBMS_Click(null, null);
+
+            this.richTextBoxGenDesign.Text = "Done";
+        }
+
+        private async void buttonGDSeq_Click(object sender, EventArgs e)
+        {
+            // Get the model, object, and rules
+            ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
+            APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return;
+            }
+
+            Model model = response.Data;
+
+            // Find the center of the floor:
+            Vector3D ModelStartingLocation = new Vector3D();
+            ModelObject floorObject = model.ModelObjects.Where(o => o.TypeId == "Floor").First();
+            if (floorObject != null)
+            {
+                ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
+            }
+
+            List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
+            List<CatalogInitializer> catalogObjectsInits = new List<CatalogInitializer>();
+            foreach (var catalogObjectMeta in catalogObjectsMeta)
+            {
+                APIResponse<CatalogObject> response2 = await DBMSController.GetCatalogObject(new ItemRequest(catalogObjectMeta.CatalogObjectId, LevelOfDetail.LOD100));
+                if (response2.Code != System.Net.HttpStatusCode.OK)
+                {
+                    MessageBox.Show(response2.ReasonPhrase);
+                    return;
+                }
+
+                CatalogObject catalogObject = response2.Data;
+                float minZ = (float)catalogObject.Components.Min(c => c.Vertices.Min(v => v.z));
+                float maxZ = (float)catalogObject.Components.Max(c => c.Vertices.Max(v => v.z));
+                float heightOfset = (maxZ - minZ) / 2.0f + 0.01f; // We want it slightly off the ground for overlap purposes
+
+                catalogObjectsInits.Add(new CatalogInitializer()
+                {
+                    CatalogObject = catalogObject,
+                    Location = new Vector3D(ModelStartingLocation.x, ModelStartingLocation.y, ModelStartingLocation.z + heightOfset)
+                });
+            }
+
+            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
+
+            Model newModel = null;
+            foreach (var catalogItem in catalogObjectsInits)
+            {
+                GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, new List<CatalogInitializer>() { catalogItem }, GDSettings);
+                newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
+            }
+
+            // Save the model:
+            newModel.Name = "Generated Model";
+            APIResponse<string> response3 = await DBMSController.CreateModel(newModel);
+            if (response3.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response3.ReasonPhrase);
                 return;
             }
 

@@ -140,6 +140,10 @@ public class GameController : MonoBehaviour
         {
             RotatingObject();
         }
+        if (CheckingMode)
+        {
+            CheckingOverlapMode();
+        }
     }
 
     #region Camera Controls
@@ -1048,6 +1052,7 @@ public class GameController : MonoBehaviour
         this.ModelViewCanvas.SetActive(false);
         this.AddObjectCanvas.SetActive(false);
         this.ModelSelectCanvas.SetActive(false);
+        this.OverlapCanvas.SetActive(false);
 
         UnHighlightAllObjects();
 
@@ -1071,6 +1076,91 @@ public class GameController : MonoBehaviour
                 mo.UnHighlight();
             }
         }
+    }
+
+    #endregion
+
+    #region Overlap Check Methods:
+
+    public GameObject OverlapCanvas;
+    public Text OverlapCheckText;
+    private ModelObjectScript FirstObject;
+    private ModelObjectScript SecondObject;
+    private bool CheckingMode = false;
+    private bool selectingFirstObject = true;
+
+    private void CheckingOverlapMode()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitData;
+            if (Physics.Raycast(ray, out hitData, 1000))
+            {
+                if (selectingFirstObject)
+                {
+                    if (FirstObject != null)
+                    {
+                        FirstObject.UnHighlight();
+                    }
+
+                    GameObject go1 = hitData.collider.gameObject.transform.parent.gameObject;
+                    FirstObject = go1.GetComponent<ModelObjectScript>();
+                    FirstObject.Highlight(HighlightMatRed);
+                }
+                else
+                {
+                    if (SecondObject != null)
+                    {
+                        SecondObject.UnHighlight();
+                    }
+
+                    GameObject go1 = hitData.collider.gameObject.transform.parent.gameObject;
+                    SecondObject = go1.GetComponent<ModelObjectScript>();
+                    SecondObject.Highlight(HighlightMatRed);
+                }
+
+                selectingFirstObject = !selectingFirstObject;
+                if (FirstObject != null && SecondObject != null)
+                {
+                    CheckObjectOverlap();
+                }
+            }
+        }
+    }
+
+    private void CheckObjectOverlap()
+    {
+        Debug.Log("Checking");
+
+        RuleCheckObject rco1 = new RuleCheckObject(FirstObject.ModelObject);
+        RuleCheckObject rco2 = new RuleCheckObject(SecondObject.ModelObject);
+        bool result1 = Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.0);
+        bool result2 = Utils.MeshOverlapTest2(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.0);
+        bool result3 = Utils.MeshOverlapTest3(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.0);
+
+        this.OverlapCheckText.text = "Overlap Result 1: " + result1 +
+                                    "\nOverlap Result 2: " + result2 +
+                                    "\nOverlap Result 3: " + result3 + 
+                                    "\nCombined: " + (result1 || result2 || result3);
+    }
+
+    public void CheckOverlapClicked()
+    {
+        ResetCanvas();
+        OverlapCanvas.SetActive(true);
+        CheckingMode = true;
+    }
+
+    public void DoneOverlap()
+    {
+        selectingFirstObject = true;
+        FirstObject = null;
+        SecondObject = null;
+        CheckingMode = false;
+
+        this.ResetCanvas();
+        this.ModelViewCanvas.SetActive(true);
     }
 
     #endregion

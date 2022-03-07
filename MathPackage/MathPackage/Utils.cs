@@ -58,6 +58,9 @@ namespace MathPackage
         }
     }
 
+    /// <summary>
+    /// Just helpful methods for some Math and Mesh operations (Most still require descriptions so my bad :))
+    /// </summary>
     public class Utils
     {
         public static double INCH_TO_METER = 0.0254f;
@@ -1139,6 +1142,103 @@ namespace MathPackage
             }
 
             return "Unknown";
+        }
+
+        // JUST FOR TESTING:
+        public static bool MeshOverlapTest1(Mesh m1, Mesh m2, double shrinkRatio)
+        {
+            Mesh m1Shrink = m1;
+            Mesh m2Shrink = m2;
+            if (shrinkRatio != 1.0)
+            {
+                m1Shrink = ShrinkMesh(m1, shrinkRatio);
+                m2Shrink = ShrinkMesh(m2, shrinkRatio);
+            }
+
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            {
+                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
+                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
+                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
+
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                {
+                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
+                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
+                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
+
+                    IntrTriangle3Triangle3 intrTriangle3Triangle3 = new IntrTriangle3Triangle3(
+                                                                                    new Triangle3d(
+                                                                                                    V3DToV3d(v0),
+                                                                                                    V3DToV3d(v1),
+                                                                                                    V3DToV3d(v2)),
+                                                                                    new Triangle3d(
+                                                                                                    V3DToV3d(u0),
+                                                                                                    V3DToV3d(u1),
+                                                                                                    V3DToV3d(u2)));
+                    bool testResult1 = intrTriangle3Triangle3.Test();
+                    if (testResult1) { return true; }
+                }
+            }
+
+            return MeshInsideMesh(m1Shrink, m2Shrink);
+        }
+        public static bool MeshOverlapTest2(Mesh m1, Mesh m2, double shrinkRatio)
+        {
+            Mesh m1Shrink = m1;
+            Mesh m2Shrink = m2;
+            if (shrinkRatio != 1.0)
+            {
+                m1Shrink = ShrinkMesh(m1, shrinkRatio);
+                m2Shrink = ShrinkMesh(m2, shrinkRatio);
+            }
+
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            {
+                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
+                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
+                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
+
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                {
+                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
+                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
+                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
+                    bool testResult2 = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
+                    if (testResult2) { return true; }
+                }
+            }
+
+            return MeshInsideMesh(m1Shrink, m2Shrink);
+        }
+        public static bool MeshOverlapTest3(Mesh m1, Mesh m2, double shrinkRatio)
+        {
+            Mesh m1Shrink = m1;
+            Mesh m2Shrink = m2;
+            if (shrinkRatio != 1.0)
+            {
+                m1Shrink = ShrinkMesh(m1, shrinkRatio);
+                m2Shrink = ShrinkMesh(m2, shrinkRatio);
+            }
+
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            {
+                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
+                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
+                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
+
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                {
+                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
+                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
+                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
+
+                    bool testResult3 = TriTriOverlap.TriTriIntersect(v0.GetV3(), v1.GetV3(), v2.GetV3(), u0.GetV3(), u1.GetV3(), u2.GetV3());
+                    if (testResult3) { return true; }
+                }
+            }
+
+            return MeshInsideMesh(m1Shrink, m2Shrink);
         }
     }
 }

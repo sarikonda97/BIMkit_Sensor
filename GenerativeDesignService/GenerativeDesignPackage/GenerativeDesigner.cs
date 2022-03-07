@@ -278,6 +278,16 @@ namespace GenerativeDesignPackage
                     {
                         double deltaX = RandomGausian(0, moveAmount);
                         double deltaY = RandomGausian(0, moveAmount);
+
+                        if (j < (movesPerItteration / 3.0))
+                        {
+                            deltaY = 0;
+                        }
+                        else if (j < (movesPerItteration * 2.0 / 3.0))
+                        {
+                            deltaX = 0;
+                        }
+
                         Vector3D newLoc = new Vector3D(bestObjectConfigFori.Location.x + deltaX, bestObjectConfigFori.Location.y + deltaY, bestObjectConfigFori.Location.z);
 
                         // Check if the object is above the floor or not:
