@@ -1139,10 +1139,17 @@ public class GameController : MonoBehaviour
         bool result2 = Utils.MeshOverlapTest2(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.0);
         bool result3 = Utils.MeshOverlapTest3(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.0);
 
+        bool resultShrink1 = Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
+        bool resultShrink2 = Utils.MeshOverlapTest2(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
+        bool resultShrink3 = Utils.MeshOverlapTest3(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
+
+
         this.OverlapCheckText.text = "Overlap Result 1: " + result1 +
+                                    "\nOverlap Shrink Result 1: " + resultShrink1 +
                                     "\nOverlap Result 2: " + result2 +
-                                    "\nOverlap Result 3: " + result3 + 
-                                    "\nCombined: " + (result1 || result2 || result3);
+                                    "\nOverlap Shrink Result 2: " + resultShrink2 +
+                                    "\nOverlap Result 3: " + result3 +
+                                    "\nOverlap Shrink Result 3: " + resultShrink3;
     }
 
     public void CheckOverlapClicked()

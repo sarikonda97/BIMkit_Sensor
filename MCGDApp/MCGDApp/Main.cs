@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -30,7 +31,7 @@ namespace MCGDApp
         private string ruleServiceURL = "https://localhost:44370/api/";
         private string dbmsURL = "https://localhost:44322//api/";
         private string mcURL = "https://localhost:44346//api/";
-        private string gdURL = "https://localhost:44328///api/"; 
+        private string gdURL = "https://localhost:44328///api/";
 
         private ModelChecker ModelChecker;
         private GenerativeDesignSettings GDSettings;
@@ -134,6 +135,14 @@ namespace MCGDApp
             this.treeViewRules.ExpandAll();
         }
 
+        private void treeViewRules_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            foreach (TreeNode n in e.Node.Nodes)
+            {
+                n.Checked = e.Node.Checked;
+            }
+        }
+
         private async void buttonModelCheck_Click(object sender, EventArgs e)
         {
             this.listBoxRuleResults.Items.Clear();
@@ -230,6 +239,16 @@ namespace MCGDApp
             }
         }
 
+        private List<CatalogObjectMetadata> GetCheckedObjects()
+        {
+            List<CatalogObjectMetadata> selectedObjects = new List<CatalogObjectMetadata>();
+            foreach (CatalogObjectMetadata com in this.listBoxSelectedCatalogList.Items)
+            {
+                selectedObjects.Add(com);
+            }
+            return selectedObjects;
+        }
+
         private async void buttonGDLocal_Click(object sender, EventArgs e)
         {
             // Get the model, object, and rules
@@ -292,16 +311,6 @@ namespace MCGDApp
             buttonSignInDBMS_Click(null, null);
 
             this.richTextBoxGenDesign.Text = "Done";
-        }
-
-        private List<CatalogObjectMetadata> GetCheckedObjects()
-        {
-            List<CatalogObjectMetadata> selectedObjects = new List<CatalogObjectMetadata>();
-            foreach(CatalogObjectMetadata com in this.listBoxSelectedCatalogList.Items)
-            {
-                selectedObjects.Add(com);
-            }
-            return selectedObjects;
         }
 
         private async void buttonGDWeb_Click(object sender, EventArgs e)
@@ -395,9 +404,19 @@ namespace MCGDApp
             List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
 
             Model newModel = null;
+            List<Tuple<Rule, Type, MethodInfo>> compliledRules = null;
             foreach (var catalogItem in catalogObjectsInits)
             {
-                GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, new List<CatalogInitializer>() { catalogItem }, GDSettings);
+                GenerativeDesigner generativeDesigner;
+                if (compliledRules == null)
+                {
+                    generativeDesigner = new GenerativeDesigner(model, rules, new List<CatalogInitializer>() { catalogItem }, GDSettings);
+                }
+                else
+                {
+                    generativeDesigner = new GenerativeDesigner(model, compliledRules, new List<CatalogInitializer>() { catalogItem }, GDSettings);
+                }
+
                 newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
             }
 
@@ -466,6 +485,147 @@ namespace MCGDApp
 
             VoxelCreater voxelCreater = new VoxelCreater(model);
             List<Voxel> voxels = voxelCreater.CreateVoxels(0.5);
+        }
+
+        private void buttonRuleTypeOrder_Click(object sender, EventArgs e)
+        {
+            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
+
+            List<string> typeOrder = GetRecommendedTypeOrderFromRules(rules);
+
+            MessageBox.Show(string.Join("\n", typeOrder));
+        }
+
+        private List<string> GetRecommendedTypeOrderFromRules(List<Rule> rules)
+        {
+            List<TypeConnect> typeConnections = new List<TypeConnect>();
+            foreach (Rule rule in rules)
+            {
+                List<string> keys = new List<string>(rule.ExistentialClauses.Keys);
+                //for (int i = 0; i < keys.Count; i++)
+                //{
+                int i = 0; // For now you can kinda assume that the first type is the one that the rules is about (makes sense too)
+                string key1 = keys[i];
+                for (int j = i + 1; j < keys.Count; j++)
+                {
+                    string key2 = keys[j];
+
+                    string firstType = rule.ExistentialClauses[key1].Characteristic.Type;
+                    string secondType = rule.ExistentialClauses[key2].Characteristic.Type;
+                    if (firstType == secondType)
+                    {
+                        continue;
+                    }
+                    // No duplicates
+                    if (!typeConnections.Any(tc => tc.Type1 == firstType && tc.Type2 == secondType))
+                    {
+                        typeConnections.Add(new TypeConnect(firstType, secondType));
+                    }
+                }
+                //}
+            }
+
+            // First add walls and floors to the list of placed items
+            List<string> placedTypes = new List<string>() { "Floor", "Wall" };
+            typeConnections.RemoveAll(tc => placedTypes.Contains(tc.Type1));
+            while (typeConnections.Count > 0)
+            {
+                // Find everything that depends on the placed items
+                List<string> potentialNextTypes = new List<string>();
+                foreach (TypeConnect tc in typeConnections)
+                {
+                    if (!placedTypes.Contains(tc.Type1) && placedTypes.Contains(tc.Type2))
+                    {
+                        potentialNextTypes.Add(tc.Type1);
+                    }
+                }
+                potentialNextTypes = potentialNextTypes.Distinct().ToList();
+
+                string topTypeConnection = null;
+                if (potentialNextTypes.Count == 0)
+                {
+                    // Find the remaining item with the most dependent connections (second type)
+                    List<string> remainingTypes = typeConnections.Select(tc => tc.Type1).Distinct().ToList();
+                    topTypeConnection = remainingTypes.OrderBy(ty => typeConnections.Count(tc => tc.Type2 == ty)).Last();
+                }
+
+                if (potentialNextTypes.Count == 1)
+                {
+                    topTypeConnection = potentialNextTypes.First();
+                }
+
+                if (potentialNextTypes.Count > 1)
+                {
+                    // If there is more than one, find the one that has the fewest other not-yet-placed dependencies (ideally zero)
+                    Dictionary<string, int> typeDependedntCount = new Dictionary<string, int>();
+                    foreach (string nextTypeOption in potentialNextTypes)
+                    {
+                        typeDependedntCount[nextTypeOption] = 0;
+                        foreach (TypeConnect tc in typeConnections)
+                        {
+                            // Check if this type depends on something that is not placed (which is a bad thing)
+                            if (tc.Type1 == nextTypeOption && !placedTypes.Contains(tc.Type2))
+                            {
+                                typeDependedntCount[nextTypeOption] += 1;
+                            }
+                        }
+                    }
+                    topTypeConnection = typeDependedntCount.Keys.First();
+                    foreach (var key in typeDependedntCount.Keys)
+                    {
+                        if (typeDependedntCount[topTypeConnection] == typeDependedntCount[key])
+                        {
+                            // Might be better to place things that have other dependents first if there is a tie breaker
+                            if (typeConnections.Count(tc => tc.Type2 == topTypeConnection) < typeConnections.Count(tc => tc.Type2 == key))
+                            {
+                                topTypeConnection = key;
+                            }
+                        }
+
+                        // Lower number is better
+                        if (typeDependedntCount[topTypeConnection] > typeDependedntCount[key])
+                        {
+                            topTypeConnection = key;
+                        }
+                    }
+                }
+
+                placedTypes.Add(topTypeConnection);
+                typeConnections.RemoveAll(tc => placedTypes.Contains(tc.Type1));
+            }
+
+            return placedTypes;
+        }
+
+        public class TypeConnect
+        {
+            public string Type1;
+            public string Type2;
+
+            public TypeConnect(string firstType, string secondType)
+            {
+                this.Type1 = firstType;
+                this.Type2 = secondType;
+            }
+        }
+
+        private void buttonRecommended_Click(object sender, EventArgs e)
+        {
+            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
+            List<string> typeOrder = GetRecommendedTypeOrderFromRules(rules);
+
+            // Find an item that matches the types in the type order
+            foreach (string type in typeOrder)
+            {
+                foreach (CatalogObjectMetadata com in this.listBoxCatalogList.Items)
+                {
+                    if (com.Type == type)
+                    {
+                        this.listBoxSelectedCatalogList.Items.Add(com);
+                        continue;
+                    }
+                }
+            }
         }
     }
 }

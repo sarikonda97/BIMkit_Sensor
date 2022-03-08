@@ -36,6 +36,14 @@ namespace ModelCheckPackage
             SetNewModel(model);
         }
 
+        public ModelChecker(Model model, List<Tuple<Rule, Type, MethodInfo>> compiledRules)
+        {
+            // Add all the Functions:
+            GetAllMethods();
+            SetNewRules(compiledRules);
+            SetNewModel(model);
+        }
+
         public void SetNewModel(Model model)
         {
             Model = new RuleCheckModel(model);

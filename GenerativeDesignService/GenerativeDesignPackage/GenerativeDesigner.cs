@@ -7,24 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace GenerativeDesignPackage
 {
-    public class GenerativeDesigner
+    public class GenerativeDesigner : GenerativeDesignSuperClass
     {
         private ModelChecker ModelCheck;
-        private List<CatalogInitializer> CatalogInitializers;
-        private GenerativeDesignSettings Settings;
-        private List<Vector4D> Orientations = new List<Vector4D>()
-        {
-            Utils.GetQuaterion(new Vector3D(0, 0, 1), 0.0 * Math.PI / 180.0),
-            Utils.GetQuaterion(new Vector3D(0, 0, 1), 90.0 * Math.PI / 180.0),
-            Utils.GetQuaterion(new Vector3D(0, 0, 1), 180.0 * Math.PI / 180.0),
-            Utils.GetQuaterion(new Vector3D(0, 0, 1), 270.0 * Math.PI / 180.0)
-        };
 
         public GenerativeDesigner(Model model, List<Rule> rules, List<CatalogInitializer> catalogInitializers, GenerativeDesignSettings settings)
         {
@@ -32,6 +24,14 @@ namespace GenerativeDesignPackage
             Settings = settings;
 
             ModelCheck = new ModelChecker(model, rules);
+        }
+
+        public GenerativeDesigner(Model model, List<Tuple<Rule, Type, MethodInfo>> compiledRules, List<CatalogInitializer> catalogInitializers, GenerativeDesignSettings settings)
+        {
+            CatalogInitializers = catalogInitializers;
+            Settings = settings;
+
+            ModelCheck = new ModelChecker(model, compiledRules);
         }
 
         public Model ExecuteGenDesignRoundRobin()
@@ -84,30 +84,7 @@ namespace GenerativeDesignPackage
                 for (int i = 0; i < scene.ObjectConfigurations.Count; i++)
                 {
                     ObjectConfiguration currentConfig = scene.ObjectConfigurations[i];
-
-                    List<Vector3D> locations = new List<Vector3D>();
-                    for (int j = 0; j < movesPerItteration; j++)
-                    {
-                        double deltaX = RandomGausian(0, moveAmount);
-                        double deltaY = RandomGausian(0, moveAmount);
-
-                        if (j < (movesPerItteration / 3.0))
-                        {
-                            deltaY = 0;
-                        }
-                        else if (j < (movesPerItteration * 2.0 / 3.0))
-                        {
-                            deltaX = 0;
-                        }
-
-                        Vector3D newLoc = new Vector3D(currentConfig.Location.x + deltaX, currentConfig.Location.y + deltaY, currentConfig.Location.z);
-
-                        // Check if the object is above the floor or not:
-                        if (floorObjects.Any(floor => Utils.RayIntersectsMesh(newLoc, new Vector3D(0, 0, -1), floor.GetGlobalMesh())))
-                        {
-                            locations.Add(newLoc);
-                        }
-                    }
+                    List<Vector3D> locations = GetPlacementLocations(floorObjects, moveAmount, movesPerItteration, currentConfig);
 
                     //remove object
                     ModelCheck.Model.RemoveObject(currentConfig.ObjectModelID);
@@ -168,34 +145,14 @@ namespace GenerativeDesignPackage
             }
             return ImprovementVal;
         }
-
-        private Random random = new Random();
-        private double RandomGausian(double mean, double std)
-        {
-            double u1 = 1.0 - random.NextDouble(); //uniform(0,1] random doubles
-            double u2 = 1.0 - random.NextDouble();
-            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
-            double randNormal = mean + std * randStdNormal; //random normal(mean,stdDev^2)
-
-            return randNormal;
-        }
     }
 
     // ==================================================================================================================
 
-    public class GenerativeDesignerThread
+    public class GenerativeDesignerThread : GenerativeDesignSuperClass
     {
         private List<ThreadConfiguration> ThreadConfigurations;
         private int ThreadCount;
-        private GenerativeDesignSettings Settings;
-        private List<CatalogInitializer> CatalogInitializers;
-        private List<Vector4D> Orientations = new List<Vector4D>()
-        {
-            Utils.GetQuaterion(new Vector3D(0, 0, 1), 0.0 * Math.PI / 180.0),
-            Utils.GetQuaterion(new Vector3D(0, 0, 1), 90.0 * Math.PI / 180.0),
-            Utils.GetQuaterion(new Vector3D(0, 0, 1), 180.0 * Math.PI / 180.0),
-            Utils.GetQuaterion(new Vector3D(0, 0, 1), 270.0 * Math.PI / 180.0)
-        };
 
         public GenerativeDesignerThread(Model model, List<Rule> rules, List<CatalogInitializer> catalogInitializers, GenerativeDesignSettings settings)
         {
@@ -273,28 +230,10 @@ namespace GenerativeDesignPackage
                     }
 
                     ObjectConfiguration bestObjectConfigFori = bestThreadForScene.SceneConfiguration.ObjectConfigurations[i];
-                    List<Vector3D> locations = new List<Vector3D>();
-                    for (int j = 0; j < movesPerItteration; j++)
+                    List<Vector3D> locations = GetPlacementLocations(floorObjects, moveAmount, movesPerItteration, bestObjectConfigFori);
+                    if (locations.Count == 0)
                     {
-                        double deltaX = RandomGausian(0, moveAmount);
-                        double deltaY = RandomGausian(0, moveAmount);
-
-                        if (j < (movesPerItteration / 3.0))
-                        {
-                            deltaY = 0;
-                        }
-                        else if (j < (movesPerItteration * 2.0 / 3.0))
-                        {
-                            deltaX = 0;
-                        }
-
-                        Vector3D newLoc = new Vector3D(bestObjectConfigFori.Location.x + deltaX, bestObjectConfigFori.Location.y + deltaY, bestObjectConfigFori.Location.z);
-
-                        // Check if the object is above the floor or not:
-                        if (floorObjects.Any(floor => Utils.RayIntersectsMesh(newLoc, new Vector3D(0, 0, -1), floor.GetGlobalMesh())))
-                        {
-                            locations.Add(newLoc);
-                        }
+                        continue;
                     }
 
                     // Get all object location and orientation pairs:
@@ -313,7 +252,7 @@ namespace GenerativeDesignPackage
                     for (int j = 1; j < ThreadCount; j++)
                     {
                         int val = j;
-                        Task newTask = Task.Run(()=>
+                        Task newTask = Task.Run(() =>
                         {
                             ThreadConfiguration currentThreadConfig = ThreadConfigurations[val];
                             int k = (i - 1 + currentThreadConfig.SceneConfiguration.ObjectConfigurations.Count) % currentThreadConfig.SceneConfiguration.ObjectConfigurations.Count;
@@ -356,16 +295,47 @@ namespace GenerativeDesignPackage
             Console.WriteLine(timer.Elapsed.ToString());
             return bestThreadForScene.ModelChecker.Model.FullModel();
         }
+    }
 
-        private Random random = new Random();
-        private double RandomGausian(double mean, double std)
+    public abstract class GenerativeDesignSuperClass
+    {
+        protected GenerativeDesignSettings Settings;
+        protected List<CatalogInitializer> CatalogInitializers;
+        protected List<Vector4D> Orientations = new List<Vector4D>()
         {
-            double u1 = 1.0 - random.NextDouble(); //uniform(0,1] random doubles
-            double u2 = 1.0 - random.NextDouble();
-            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
-            double randNormal = mean + std * randStdNormal; //random normal(mean,stdDev^2)
+            Utils.GetQuaterion(new Vector3D(0, 0, 1), 0.0 * Math.PI / 180.0),
+            Utils.GetQuaterion(new Vector3D(0, 0, 1), 90.0 * Math.PI / 180.0),
+            Utils.GetQuaterion(new Vector3D(0, 0, 1), 180.0 * Math.PI / 180.0),
+            Utils.GetQuaterion(new Vector3D(0, 0, 1), 270.0 * Math.PI / 180.0)
+        };
 
-            return randNormal;
+        protected List<Vector3D> GetPlacementLocations(List<RuleCheckObject> floorObjects, double moveAmount, int movesPerItteration, ObjectConfiguration configuration)
+        {
+            List<Vector3D> locations = new List<Vector3D>();
+            for (int j = 0; j < movesPerItteration; j++)
+            {
+                double deltaX = Utils.RandomGausian(0, moveAmount);
+                double deltaY = Utils.RandomGausian(0, moveAmount);
+
+                if (j < (movesPerItteration / 3.0))
+                {
+                    deltaY = 0;
+                }
+                else if (j < (movesPerItteration * 2.0 / 3.0))
+                {
+                    deltaX = 0;
+                }
+
+                Vector3D newLoc = new Vector3D(configuration.Location.x + deltaX, configuration.Location.y + deltaY, configuration.Location.z);
+
+                // Check if the object is above the floor or not:
+                if (floorObjects.Any(floor => Utils.RayIntersectsMesh(newLoc, new Vector3D(0, 0, -1), floor.GetGlobalMesh())))
+                {
+                    locations.Add(newLoc);
+                }
+            }
+
+            return locations;
         }
     }
 }

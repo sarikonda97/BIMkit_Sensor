@@ -112,10 +112,9 @@ namespace RuleAPI.Methods
 
             Mesh m1 = obj1.GetGlobalMesh();
             Mesh m2 = obj2.GetGlobalMesh();
-            if (Utils.MeshOverlap(m1, m2, MethodFinder.SchrinkAmount))
+            if (Utils.MeshOverlap(m1, m2, MethodFinder.SchrinkAmount) || Utils.MeshOverlap(m1, m2, 0.99))
             {
                 return true;
-                //return Utils.MeshOverlap(obj1.GlobalMesh(), obj2.GlobalMesh(), shrinkAmount);
             }
 
             return false;

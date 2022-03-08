@@ -68,6 +68,8 @@ namespace MathPackage
         public static double CM_TO_METER = 0.01f;
         public static double MM_TO_METER = 0.001f;
 
+        private static Random random = new Random();
+
         public static double ChangeUnitToMeterOrDeg(double value, Unit unit)
         {
             switch (unit)
@@ -88,6 +90,16 @@ namespace MathPackage
                     return value;
             }
             return value;
+        }
+
+        public static double RandomGausian(double mean, double std)
+        {
+            double u1 = 1.0 - random.NextDouble(); //uniform(0,1] random doubles
+            double u2 = 1.0 - random.NextDouble();
+            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+            double randNormal = mean + std * randStdNormal; //random normal(mean,stdDev^2)
+
+            return randNormal;
         }
 
         public static void GetXYZDimentions(List<Vector3D> localVectors, out Vector3D center, out Vector3D dimentions)
@@ -647,7 +659,7 @@ namespace MathPackage
             return minDist;
         }
 
-        public static bool MeshOverlap(Mesh m1, Mesh m2, double shrinkRatio)
+        public static bool MeshOverlap(Mesh m1, Mesh m2, double shrinkRatio = 1.0)
         {
             Mesh m1Shrink = m1;
             Mesh m2Shrink = m2;
@@ -669,27 +681,8 @@ namespace MathPackage
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
                     Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
 
-                    //IntrTriangle3Triangle3 intrTriangle3Triangle3 = new IntrTriangle3Triangle3(
-                    //                                                                new Triangle3d(
-                    //                                                                                V3DToV3d(v0),
-                    //                                                                                V3DToV3d(v1),
-                    //                                                                                V3DToV3d(v2)),
-                    //                                                                new Triangle3d(
-                    //                                                                                V3DToV3d(u0),
-                    //                                                                                V3DToV3d(u1),
-                    //                                                                                V3DToV3d(u2)));
-                    //int counter = 0;
-                    //bool testResult1 = intrTriangle3Triangle3.Test();
-                    //if (testResult1) { counter++; }
                     bool testResult2 = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
-                    //if (testResult2) { counter++; }
-                    //bool testResult3 = TriTriOverlap.TriTriIntersect(v0.GetV3(), v1.GetV3(), v2.GetV3(), u0.GetV3(), u1.GetV3(), u2.GetV3());
-                    //if (testResult3) { counter++; }
-
-                    //if (counter >= 2) { return true; }
-                    //if (testResult1) { return true; }
                     if (testResult2) { return true; }
-                    //if (testResult3) { return true; }
                 }
             }
 

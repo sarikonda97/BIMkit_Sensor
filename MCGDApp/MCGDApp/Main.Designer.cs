@@ -56,13 +56,15 @@ namespace MCGDApp
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.buttonGDSeq = new System.Windows.Forms.Button();
             this.buttonGDSettings = new System.Windows.Forms.Button();
             this.richTextBoxGenDesign = new System.Windows.Forms.RichTextBox();
             this.buttonGDLocal = new System.Windows.Forms.Button();
             this.buttonGDWeb = new System.Windows.Forms.Button();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.buttonRuleTypeOrder = new System.Windows.Forms.Button();
             this.buttonVoxelCreator = new System.Windows.Forms.Button();
-            this.buttonGDSeq = new System.Windows.Forms.Button();
+            this.buttonRecommended = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -158,6 +160,7 @@ namespace MCGDApp
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel4.Controls.Add(this.buttonLeft, 0, 2);
             this.tableLayoutPanel4.Controls.Add(this.buttonRight, 0, 1);
+            this.tableLayoutPanel4.Controls.Add(this.buttonRecommended, 0, 3);
             this.tableLayoutPanel4.Location = new System.Drawing.Point(134, 3);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 4;
@@ -214,6 +217,7 @@ namespace MCGDApp
             this.treeViewRules.Name = "treeViewRules";
             this.treeViewRules.Size = new System.Drawing.Size(310, 252);
             this.treeViewRules.TabIndex = 9;
+            this.treeViewRules.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeViewRules_AfterCheck);
             // 
             // buttonSignInRMS
             // 
@@ -416,6 +420,16 @@ namespace MCGDApp
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Generative Design";
             // 
+            // buttonGDSeq
+            // 
+            this.buttonGDSeq.Location = new System.Drawing.Point(6, 135);
+            this.buttonGDSeq.Name = "buttonGDSeq";
+            this.buttonGDSeq.Size = new System.Drawing.Size(97, 52);
+            this.buttonGDSeq.TabIndex = 23;
+            this.buttonGDSeq.Text = "Generative Design (Sequence)";
+            this.buttonGDSeq.UseVisualStyleBackColor = true;
+            this.buttonGDSeq.Click += new System.EventHandler(this.buttonGDSeq_Click);
+            // 
             // buttonGDSettings
             // 
             this.buttonGDSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -463,13 +477,26 @@ namespace MCGDApp
             this.groupBox6.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox6.Controls.Add(this.buttonRuleTypeOrder);
             this.groupBox6.Controls.Add(this.buttonVoxelCreator);
             this.groupBox6.Location = new System.Drawing.Point(826, 3);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(157, 274);
             this.groupBox6.TabIndex = 2;
             this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "Voxel Methods";
+            this.groupBox6.Text = "Other Methods";
+            // 
+            // buttonRuleTypeOrder
+            // 
+            this.buttonRuleTypeOrder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonRuleTypeOrder.Location = new System.Drawing.Point(6, 77);
+            this.buttonRuleTypeOrder.Name = "buttonRuleTypeOrder";
+            this.buttonRuleTypeOrder.Size = new System.Drawing.Size(145, 52);
+            this.buttonRuleTypeOrder.TabIndex = 1;
+            this.buttonRuleTypeOrder.Text = "Rule Type Ordering";
+            this.buttonRuleTypeOrder.UseVisualStyleBackColor = true;
+            this.buttonRuleTypeOrder.Click += new System.EventHandler(this.buttonRuleTypeOrder_Click);
             // 
             // buttonVoxelCreator
             // 
@@ -483,15 +510,15 @@ namespace MCGDApp
             this.buttonVoxelCreator.UseVisualStyleBackColor = true;
             this.buttonVoxelCreator.Click += new System.EventHandler(this.buttonVoxelCreator_Click);
             // 
-            // buttonGDSeq
+            // buttonRecommended
             // 
-            this.buttonGDSeq.Location = new System.Drawing.Point(6, 135);
-            this.buttonGDSeq.Name = "buttonGDSeq";
-            this.buttonGDSeq.Size = new System.Drawing.Size(97, 52);
-            this.buttonGDSeq.TabIndex = 23;
-            this.buttonGDSeq.Text = "Generative Design (Sequence)";
-            this.buttonGDSeq.UseVisualStyleBackColor = true;
-            this.buttonGDSeq.Click += new System.EventHandler(this.buttonGDSeq_Click);
+            this.buttonRecommended.Location = new System.Drawing.Point(3, 189);
+            this.buttonRecommended.Name = "buttonRecommended";
+            this.buttonRecommended.Size = new System.Drawing.Size(38, 23);
+            this.buttonRecommended.TabIndex = 3;
+            this.buttonRecommended.Text = "Rec";
+            this.buttonRecommended.UseVisualStyleBackColor = true;
+            this.buttonRecommended.Click += new System.EventHandler(this.buttonRecommended_Click);
             // 
             // Main
             // 
@@ -555,6 +582,8 @@ namespace MCGDApp
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.Button buttonVoxelCreator;
         private System.Windows.Forms.Button buttonGDSeq;
+        private System.Windows.Forms.Button buttonRuleTypeOrder;
+        private System.Windows.Forms.Button buttonRecommended;
     }
 }
 
