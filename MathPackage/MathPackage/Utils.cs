@@ -379,7 +379,7 @@ namespace MathPackage
                     {
                         if (faceSide == FaceSide.FRONT)
                         {
-                            triangleList.Add(new int[] { remainingPoints[index1].Item1 , remainingPoints[index3].Item1, remainingPoints[index2].Item1 });
+                            triangleList.Add(new int[] { remainingPoints[index1].Item1, remainingPoints[index3].Item1, remainingPoints[index2].Item1 });
                             //triangleList.Add(remainingPoints[index1].Item1);
                             //triangleList.Add(remainingPoints[index3].Item1);
                             //triangleList.Add(remainingPoints[index2].Item1);
@@ -681,8 +681,9 @@ namespace MathPackage
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
                     Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
 
-                    bool testResult2 = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
-                    if (testResult2) { return true; }
+                    bool testResultA = OverlapingTriangleTestByRays(v0, v1, v2, u0, u1, u2);
+                    bool testResultB = OverlapingTriangleTestByRays(u0, u1, u2, v0, v1, v2);
+                    if (testResultA || testResultB) { return true; }
                 }
             }
 
@@ -750,89 +751,6 @@ namespace MathPackage
             return minDist;
         }
 
-        public static bool TrianglesOverlap(Vector3D v0, Vector3D v1, Vector3D v2, Vector3D u0, Vector3D u1, Vector3D u2)
-        {
-            // https://web.stanford.edu/class/cs277/resources/papers/Moller1997b.pdf
-            Vector3D norm1 = Vector3D.Cross(Vector3D.Subract(v1, v0), Vector3D.Subract(v2, v0));
-            double d1 = Vector3D.Dot(norm1.Neg(), v0);
-
-            double du0 = Vector3D.Dot(norm1, u0) + d1;
-            double du1 = Vector3D.Dot(norm1, u1) + d1;
-            double du2 = Vector3D.Dot(norm1, u2) + d1;
-            int posiCount = (du0 > 0 ? 1 : 0) + (du1 > 0 ? 1 : 0) + (du2 > 0 ? 1 : 0);
-            int negaCount = (du0 < 0 ? 1 : 0) + (du1 < 0 ? 1 : 0) + (du2 < 0 ? 1 : 0);
-            int zerpCount = (du0 == 0 ? 1 : 0) + (du1 == 0 ? 1 : 0) + (du2 == 0 ? 1 : 0);
-            if (posiCount == 0 || negaCount == 0 || zerpCount == 3)
-            {
-                return false;
-            }
-
-            Vector3D norm2 = Vector3D.Cross(Vector3D.Subract(u1, u0), Vector3D.Subract(u2, u0));
-            double d2 = Vector3D.Dot(norm2.Neg(), u0);
-
-            double dv0 = Vector3D.Dot(norm2, v0) + d2;
-            double dv1 = Vector3D.Dot(norm2, v1) + d2;
-            double dv2 = Vector3D.Dot(norm2, v2) + d2;
-            posiCount = (dv0 > 0 ? 1 : 0) + (dv1 > 0 ? 1 : 0) + (dv2 > 0 ? 1 : 0);
-            negaCount = (dv0 < 0 ? 1 : 0) + (dv1 < 0 ? 1 : 0) + (dv2 < 0 ? 1 : 0);
-            zerpCount = (dv0 == 0 ? 1 : 0) + (dv1 == 0 ? 1 : 0) + (dv2 == 0 ? 1 : 0);
-            if (posiCount == 0 || negaCount == 0 || zerpCount == 3)
-            {
-                return false;
-            }
-
-            Vector3D D = Vector3D.Cross(norm1, norm2);
-
-            double tv1 = 0, tv2 = 0;
-            if ((Math.Sign(dv2) != Math.Sign(dv0)) && (Math.Sign(dv1) == Math.Sign(dv2)))
-            {
-                // if v0 is on the other side of v1, v2:
-                GetTvalues(v1, v0, v2, D, dv1, dv0, dv2, out tv1, out tv2);
-            }
-            if ((Math.Sign(dv0) != Math.Sign(dv1)) && (Math.Sign(dv0) == Math.Sign(dv2)))
-            {
-                // if v1 is on the other side of v0, v2:
-                GetTvalues(v0, v1, v2, D, dv0, dv1, dv2, out tv1, out tv2);
-            }
-            if ((Math.Sign(dv0) != Math.Sign(dv2)) && (Math.Sign(dv0) == Math.Sign(dv1)))
-            {
-                // if v2 is on the other side of v0, v1:
-                GetTvalues(v2, v0, v1, D, dv2, dv0, dv1, out tv1, out tv2);
-            }
-
-            double tu1 = 0, tu2 = 0;
-            if ((Math.Sign(du2) != Math.Sign(du0)) && (Math.Sign(du1) == Math.Sign(du2)))
-            {
-                // if u0 is on the other side of u1, u2:
-                GetTvalues(u1, u0, u2, D, du1, du0, du2, out tu1, out tu2);
-            }
-            if ((Math.Sign(du0) != Math.Sign(du1)) && (Math.Sign(du0) == Math.Sign(du2)))
-            {
-                // if u1 is on the other side of u0, u2:
-                GetTvalues(u0, u1, u2, D, du0, du1, du2, out tu1, out tu2);
-            }
-            if ((Math.Sign(du0) != Math.Sign(du2)) && (Math.Sign(du0) == Math.Sign(du1)))
-            {
-                // if u2 is on the other side of u0, u1:
-                GetTvalues(u0, u2, u1, D, du0, du2, du1, out tu1, out tu2);
-            }
-
-            // Check if tv1, tv2, tu1, tu2 intersect:
-            if (ValueInRange(tv1, tv2, tu1) || ValueInRange(tv1, tv2, tu2) || ValueInRange(tu1, tu2, tv1) || ValueInRange(tu1, tu2, tv2))
-            {
-                // They overlap
-                return true;
-            }
-
-            if (Vector3D.AreParallel(norm1, norm2))
-            {
-                // INCOMPLETE?
-                // Here they would be co-planer but I am not sure that this means they overlap but more that they ar touching...?
-            }
-
-            return false;
-        }
-
         public static void GetTvalues(Vector3D vA, Vector3D vB, Vector3D vC, Vector3D D, double dvA, double dvB, double dvC, out double t1, out double t2)
         {
             // if vB is on the other side of vA, vC:
@@ -848,8 +766,9 @@ namespace MathPackage
             return (value < a && value > b) || (value < b && value > a);
         }
 
-        public static bool RayIntersectsTriangle(Vector3D rayOrigin, Vector3D rayVector, Vector3D vertex0, Vector3D vertex1, Vector3D vertex2)//, out Vector3D  intersectionPoint)
+        public static bool RayIntersectsTriangle(Vector3D rayOrigin, Vector3D rayVector, Vector3D vertex0, Vector3D vertex1, Vector3D vertex2, out Vector3D  intersectionPoint)
         {
+            intersectionPoint = null;
             // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
             //intersectionPoint = null;
 
@@ -877,7 +796,7 @@ namespace MathPackage
             double t = f * Vector3D.Dot(edge2, q);
             if (t > EPSILON) // ray intersection
             {
-                //intersectionPoint = Vector3D.Add(rayOrigin, Vector3D.Multiply(rayVector, t));
+                intersectionPoint = Vector3D.Add(rayOrigin, Vector3D.Multiply(rayVector, t));
                 return true;
             }
             else // This means that there is a line intersection but not a ray intersection.
@@ -894,7 +813,7 @@ namespace MathPackage
                 Vector3D u1 = m.VertexList[m.TriangleList[j][1]];
                 Vector3D u2 = m.VertexList[m.TriangleList[j][2]];
 
-                bool testResult = RayIntersectsTriangle(rayOrigin, rayVector, u0, u1, u2);
+                bool testResult = RayIntersectsTriangle(rayOrigin, rayVector, u0, u1, u2, out Vector3D intP);
                 if (testResult)
                 {
                     return true;
@@ -922,14 +841,14 @@ namespace MathPackage
 
                     Vector3D uM = Vector3D.Average(new Vector3D[] { u0, u1, u2 });
 
-                    bool testResult = RayIntersectsTriangle(v0, m1Forward, u0, u1, u2) ||
-                                      RayIntersectsTriangle(v1, m1Forward, u0, u1, u2) ||
-                                      RayIntersectsTriangle(v2, m1Forward, u0, u1, u2) ||
-                                      RayIntersectsTriangle(vM, m1Forward, u0, u1, u2) ||
-                                      RayIntersectsTriangle(u0, m2Forward, v0, v1, v2) ||
-                                      RayIntersectsTriangle(u1, m2Forward, v0, v1, v2) ||
-                                      RayIntersectsTriangle(u2, m2Forward, v0, v1, v2) ||
-                                      RayIntersectsTriangle(uM, m2Forward, v0, v1, v2);
+                    bool testResult = RayIntersectsTriangle(v0, m1Forward, u0, u1, u2, out Vector3D intP) ||
+                                      RayIntersectsTriangle(v1, m1Forward, u0, u1, u2, out intP) ||
+                                      RayIntersectsTriangle(v2, m1Forward, u0, u1, u2, out intP) ||
+                                      RayIntersectsTriangle(vM, m1Forward, u0, u1, u2, out intP) ||
+                                      RayIntersectsTriangle(u0, m2Forward, v0, v1, v2, out intP) ||
+                                      RayIntersectsTriangle(u1, m2Forward, v0, v1, v2, out intP) ||
+                                      RayIntersectsTriangle(u2, m2Forward, v0, v1, v2, out intP) ||
+                                      RayIntersectsTriangle(uM, m2Forward, v0, v1, v2, out intP);
                     if (testResult)
                     {
                         return true;
@@ -960,14 +879,14 @@ namespace MathPackage
 
                     Vector3D uM = Vector3D.Average(new Vector3D[] { u0, u1, u2 });
 
-                    bool testResult = RayIntersectsTriangle(v0, direction, u0, u1, u2) ||
-                                      RayIntersectsTriangle(v1, direction, u0, u1, u2) ||
-                                      RayIntersectsTriangle(v2, direction, u0, u1, u2) ||
-                                      RayIntersectsTriangle(vM, direction, u0, u1, u2) ||
-                                      RayIntersectsTriangle(u0, negDirection, v0, v1, v2) ||
-                                      RayIntersectsTriangle(u1, negDirection, v0, v1, v2) ||
-                                      RayIntersectsTriangle(u2, negDirection, v0, v1, v2) ||
-                                      RayIntersectsTriangle(uM, negDirection, v0, v1, v2);
+                    bool testResult = RayIntersectsTriangle(v0, direction, u0, u1, u2, out Vector3D intP) ||
+                                      RayIntersectsTriangle(v1, direction, u0, u1, u2, out intP) ||
+                                      RayIntersectsTriangle(v2, direction, u0, u1, u2, out intP) ||
+                                      RayIntersectsTriangle(vM, direction, u0, u1, u2, out intP) ||
+                                      RayIntersectsTriangle(u0, negDirection, v0, v1, v2, out intP) ||
+                                      RayIntersectsTriangle(u1, negDirection, v0, v1, v2, out intP) ||
+                                      RayIntersectsTriangle(u2, negDirection, v0, v1, v2, out intP) ||
+                                      RayIntersectsTriangle(uM, negDirection, v0, v1, v2, out intP);
                     if (testResult)
                     {
                         return true;
@@ -1087,6 +1006,63 @@ namespace MathPackage
             return determinant;
         }
 
+        /// <summary>
+        /// http://paulbourke.net/geometry/pointlineplane/calclineline.cs
+        /// Calculates the intersection line segment between 2 lines (not segments).
+        /// Returns false if no solution can be found.
+        /// </summary>
+        /// <returns></returns>
+        public static bool CalculateLineLineIntersection(Vector3D line1Point1, Vector3D line1Point2,
+            Vector3D line2Point1, Vector3D line2Point2, out Vector3D resultSegmentPoint1, out Vector3D resultSegmentPoint2)
+        {
+            // Algorithm is ported from the C algorithm of 
+            // Paul Bourke at http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline3d/
+            resultSegmentPoint1 = new Vector3D();
+            resultSegmentPoint2 = new Vector3D();
+
+            Vector3D p1 = line1Point1;
+            Vector3D p2 = line1Point2;
+            Vector3D p3 = line2Point1;
+            Vector3D p4 = line2Point2;
+            Vector3D p13 = Vector3D.Subract(p1, p3);
+            Vector3D p43 = Vector3D.Subract(p4, p3);
+
+            if (p43.Length() < double.Epsilon)
+            {
+                return false;
+            }
+            Vector3D p21 = Vector3D.Subract(p2, p1);
+            if (p21.Length() < double.Epsilon)
+            {
+                return false;
+            }
+
+            double d1343 = p13.x * (double)p43.x + (double)p13.y * p43.y + (double)p13.z * p43.z;
+            double d4321 = p43.x * (double)p21.x + (double)p43.y * p21.y + (double)p43.z * p21.z;
+            double d1321 = p13.x * (double)p21.x + (double)p13.y * p21.y + (double)p13.z * p21.z;
+            double d4343 = p43.x * (double)p43.x + (double)p43.y * p43.y + (double)p43.z * p43.z;
+            double d2121 = p21.x * (double)p21.x + (double)p21.y * p21.y + (double)p21.z * p21.z;
+
+            double denom = d2121 * d4343 - d4321 * d4321;
+            if (Math.Abs(denom) < double.Epsilon)
+            {
+                return false;
+            }
+            double numer = d1343 * d4321 - d1321 * d4343;
+
+            double mua = numer / denom;
+            double mub = (d1343 + d4321 * (mua)) / d4343;
+
+            resultSegmentPoint1.x = (float)(p1.x + mua * p21.x);
+            resultSegmentPoint1.y = (float)(p1.y + mua * p21.y);
+            resultSegmentPoint1.z = (float)(p1.z + mua * p21.z);
+            resultSegmentPoint2.x = (float)(p3.x + mub * p43.x);
+            resultSegmentPoint2.y = (float)(p3.y + mub * p43.y);
+            resultSegmentPoint2.z = (float)(p3.z + mub * p43.z);
+
+            return true;
+        }
+
         public static string ReturnKeyword(string name)
         {
             Dictionary<string, List<string>> keyValuePairs = new Dictionary<string, List<string>>();
@@ -1137,7 +1113,7 @@ namespace MathPackage
             return "Unknown";
         }
 
-        // JUST FOR TESTING:
+        // JUST FOR TESTING (3 and 4 seem to be the best):
         public static bool MeshOverlapTest1(Mesh m1, Mesh m2, double shrinkRatio)
         {
             Mesh m1Shrink = m1;
@@ -1197,8 +1173,9 @@ namespace MathPackage
                     Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
                     Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
-                    bool testResult2 = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
-                    if (testResult2) { return true; }
+                    bool testResultA = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
+                    bool testResultB = TrianglesOverlap(u0, u1, u2, v0, v1, v2);
+                    if (testResultA || testResultB) { return true; }
                 }
             }
 
@@ -1226,12 +1203,219 @@ namespace MathPackage
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
                     Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
 
-                    bool testResult3 = TriTriOverlap.TriTriIntersect(v0.GetV3(), v1.GetV3(), v2.GetV3(), u0.GetV3(), u1.GetV3(), u2.GetV3());
-                    if (testResult3) { return true; }
+                    bool testResultA = TriTriOverlap.TriTriIntersect(v0.GetV3(), v1.GetV3(), v2.GetV3(), u0.GetV3(), u1.GetV3(), u2.GetV3());
+                    bool testResultB = TriTriOverlap.TriTriIntersect(u0.GetV3(), u1.GetV3(), u2.GetV3(), v0.GetV3(), v1.GetV3(), v2.GetV3());
+                    if (testResultA || testResultB) { return true; }
                 }
             }
 
             return MeshInsideMesh(m1Shrink, m2Shrink);
+        }
+        public static bool MeshOverlapTest4(Mesh m1, Mesh m2, double shrinkRatio)
+        {
+            Mesh m1Shrink = m1;
+            Mesh m2Shrink = m2;
+            if (shrinkRatio != 1.0)
+            {
+                m1Shrink = ShrinkMesh(m1, shrinkRatio);
+                m2Shrink = ShrinkMesh(m2, shrinkRatio);
+            }
+
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            {
+                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
+                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
+                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
+
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                {
+                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
+                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
+                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
+
+                    bool testResultA = OverlapingTriangleTestByRays(v0, v1, v2, u0, u1, u2);
+                    bool testResultB = OverlapingTriangleTestByRays(u0, u1, u2, v0, v1, v2);
+                    if (testResultA || testResultB) { return true; }
+                }
+            }
+
+            return MeshInsideMesh(m1Shrink, m2Shrink);
+        }
+        public static bool MeshOverlapTest5(Mesh m1, Mesh m2, double shrinkRatio)
+        {
+            Mesh m1Shrink = m1;
+            Mesh m2Shrink = m2;
+            if (shrinkRatio != 1.0)
+            {
+                m1Shrink = ShrinkMesh(m1, shrinkRatio);
+                m2Shrink = ShrinkMesh(m2, shrinkRatio);
+            }
+
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            {
+                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
+                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
+                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
+
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                {
+                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
+                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
+                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
+
+                    bool testResultA = OverlapingTriangleTestChristoph(v0, v1, v2, u0, u1, u2);
+                    bool testResultB = OverlapingTriangleTestChristoph(u0, u1, u2, v0, v1, v2);
+                    if (testResultA || testResultB) { return true; }
+                }
+            }
+
+            return MeshInsideMesh(m1Shrink, m2Shrink);
+        }
+
+        // From Test 2
+        public static bool TrianglesOverlap(Vector3D v0, Vector3D v1, Vector3D v2, Vector3D u0, Vector3D u1, Vector3D u2)
+        {
+            // https://web.stanford.edu/class/cs277/resources/papers/Moller1997b.pdf
+            Vector3D norm1 = Vector3D.Cross(Vector3D.Subract(v1, v0), Vector3D.Subract(v2, v0));
+            double d1 = Vector3D.Dot(norm1.Neg(), v0);
+
+            double du0 = Vector3D.Dot(norm1, u0) + d1;
+            double du1 = Vector3D.Dot(norm1, u1) + d1;
+            double du2 = Vector3D.Dot(norm1, u2) + d1;
+            int posiCount = (du0 > 0 ? 1 : 0) + (du1 > 0 ? 1 : 0) + (du2 > 0 ? 1 : 0);
+            int negaCount = (du0 < 0 ? 1 : 0) + (du1 < 0 ? 1 : 0) + (du2 < 0 ? 1 : 0);
+            int zerpCount = (du0 == 0 ? 1 : 0) + (du1 == 0 ? 1 : 0) + (du2 == 0 ? 1 : 0);
+            if (posiCount == 0 || negaCount == 0 || zerpCount == 3)
+            {
+                return false;
+            }
+
+            Vector3D norm2 = Vector3D.Cross(Vector3D.Subract(u1, u0), Vector3D.Subract(u2, u0));
+            double d2 = Vector3D.Dot(norm2.Neg(), u0);
+
+            double dv0 = Vector3D.Dot(norm2, v0) + d2;
+            double dv1 = Vector3D.Dot(norm2, v1) + d2;
+            double dv2 = Vector3D.Dot(norm2, v2) + d2;
+            posiCount = (dv0 > 0 ? 1 : 0) + (dv1 > 0 ? 1 : 0) + (dv2 > 0 ? 1 : 0);
+            negaCount = (dv0 < 0 ? 1 : 0) + (dv1 < 0 ? 1 : 0) + (dv2 < 0 ? 1 : 0);
+            zerpCount = (dv0 == 0 ? 1 : 0) + (dv1 == 0 ? 1 : 0) + (dv2 == 0 ? 1 : 0);
+            if (posiCount == 0 || negaCount == 0 || zerpCount == 3)
+            {
+                return false;
+            }
+
+            Vector3D D = Vector3D.Cross(norm1, norm2);
+
+            double tv1 = 0, tv2 = 0;
+            if ((Math.Sign(dv2) != Math.Sign(dv0)) && (Math.Sign(dv1) == Math.Sign(dv2)))
+            {
+                // if v0 is on the other side of v1, v2:
+                GetTvalues(v1, v0, v2, D, dv1, dv0, dv2, out tv1, out tv2);
+            }
+            if ((Math.Sign(dv0) != Math.Sign(dv1)) && (Math.Sign(dv0) == Math.Sign(dv2)))
+            {
+                // if v1 is on the other side of v0, v2:
+                GetTvalues(v0, v1, v2, D, dv0, dv1, dv2, out tv1, out tv2);
+            }
+            if ((Math.Sign(dv0) != Math.Sign(dv2)) && (Math.Sign(dv0) == Math.Sign(dv1)))
+            {
+                // if v2 is on the other side of v0, v1:
+                GetTvalues(v2, v0, v1, D, dv2, dv0, dv1, out tv1, out tv2);
+            }
+
+            double tu1 = 0, tu2 = 0;
+            if ((Math.Sign(du2) != Math.Sign(du0)) && (Math.Sign(du1) == Math.Sign(du2)))
+            {
+                // if u0 is on the other side of u1, u2:
+                GetTvalues(u1, u0, u2, D, du1, du0, du2, out tu1, out tu2);
+            }
+            if ((Math.Sign(du0) != Math.Sign(du1)) && (Math.Sign(du0) == Math.Sign(du2)))
+            {
+                // if u1 is on the other side of u0, u2:
+                GetTvalues(u0, u1, u2, D, du0, du1, du2, out tu1, out tu2);
+            }
+            if ((Math.Sign(du0) != Math.Sign(du2)) && (Math.Sign(du0) == Math.Sign(du1)))
+            {
+                // if u2 is on the other side of u0, u1:
+                GetTvalues(u0, u2, u1, D, du0, du2, du1, out tu1, out tu2);
+            }
+
+            // Check if tv1, tv2, tu1, tu2 intersect:
+            if (ValueInRange(tv1, tv2, tu1) || ValueInRange(tv1, tv2, tu2) || ValueInRange(tu1, tu2, tv1) || ValueInRange(tu1, tu2, tv2))
+            {
+                // They overlap
+                return true;
+            }
+
+            if (Vector3D.AreParallel(norm1, norm2))
+            {
+                // INCOMPLETE?
+                // Here they would be co-planer but I am not sure that this means they overlap but more that they ar touching...?
+            }
+
+            return false;
+        }
+        // From Test 4
+        public static bool OverlapingTriangleTestByRays(Vector3D v0, Vector3D v1, Vector3D v2, Vector3D u0, Vector3D u1, Vector3D u2)
+        {
+            return LineIntersectTriangle(v0, v1, u0, u1, u2) ||
+                   LineIntersectTriangle(v1, v2, u0, u1, u2) ||
+                   LineIntersectTriangle(v2, v0, u0, u1, u2) ||
+                   LineIntersectTriangle(v0, Vector3D.Midpoint(v1, v2), u0, u1, u2) ||
+                   LineIntersectTriangle(v1, Vector3D.Midpoint(v0, v2), u0, u1, u2) ||
+                   LineIntersectTriangle(v2, Vector3D.Midpoint(v0, v1), u0, u1, u2);
+        }
+        public static bool LineIntersectTriangle(Vector3D p0, Vector3D p1, Vector3D u0, Vector3D u1, Vector3D u2)
+        {
+            bool rayCheckF = RayIntersectsTriangle(p0, Vector3D.Subract(p1, p0), u0, u1, u2, out Vector3D intP);
+            bool rayCheckB = RayIntersectsTriangle(p1, Vector3D.Subract(p0, p1), u0, u1, u2, out intP);
+            return rayCheckB && rayCheckF;
+        }
+        // From Test 5
+        public static bool OverlapingTriangleTestChristoph(Vector3D v0, Vector3D v1, Vector3D v2, Vector3D u0, Vector3D u1, Vector3D u2)
+        {
+            Vector3D intersectionPoint;
+            if (LineIntersectsPlane(v0, v1, u0, u1, u2, out intersectionPoint))
+            {
+                if (PointInTriangle(intersectionPoint, u0, u1, u2))
+                {
+                    return true;
+                }
+            }
+            if (LineIntersectsPlane(v1, v2, u0, u1, u2, out intersectionPoint))
+            {
+                if (PointInTriangle(intersectionPoint, u0, u1, u2))
+                {
+                    return true;
+                }
+            }
+            if (LineIntersectsPlane(v2, v0, u0, u1, u2, out intersectionPoint))
+            {
+                if (PointInTriangle(intersectionPoint, u0, u1, u2))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        public static bool LineIntersectsPlane(Vector3D p1, Vector3D p2, Vector3D u0, Vector3D u1, Vector3D u2, out Vector3D intersectionPoint)
+        {
+            // From: http://paulbourke.net/geometry/pointlineplane/
+            intersectionPoint = null;
+
+            Vector3D norm = Vector3D.Cross(Vector3D.Subract(u1, u0), Vector3D.Subract(u2, u0));
+            double numer = Vector3D.Dot(norm, Vector3D.Subract(u0, p1));
+            Vector3D lineSegement = Vector3D.Subract(p2, p1);
+            double denom = Vector3D.Dot(norm, lineSegement);
+            if (denom == 0.0)
+            {
+                // Line and plane are perpendicular
+                return false;
+            }
+            double u = numer / denom;
+            intersectionPoint = Vector3D.Add(p1, Vector3D.Multiply(lineSegement, u));
+            return u >= 0.0 || u <= 1.0;
         }
     }
 }

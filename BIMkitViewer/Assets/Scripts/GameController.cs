@@ -52,7 +52,6 @@ public class GameController : MonoBehaviour
     public Dropdown LevelOfDetailDropdown;
 
     public GameObject RuleSelectCanvas;
-    public GameObject CurrentModelGameObj;
     public GameObject ModelObjectPrefab;
     public GameObject ModelComponentPrefab;
 
@@ -86,8 +85,10 @@ public class GameController : MonoBehaviour
     private string gdURL = "https://localhost:44328///api/";
 
     private Model CurrentModel;
+    public GameObject CurrentModelGameObj;
+    public GameObject CurrentModelVoxelGameObj;
+    public GameObject CurrentModelRuleCheckGameObj;
     private List<ModelObjectScript> ModelObjects = new List<ModelObjectScript>();
-    private GameObject VoxelParentGO;
 
     #endregion
 
@@ -151,7 +152,7 @@ public class GameController : MonoBehaviour
     public float cameraSpeed = 200f;
     float sensitivity = 30f;
 
-    public void MoveCamera()
+    private void MoveCamera()
     {
         if (Input.GetMouseButton(1))
         {
@@ -217,13 +218,13 @@ public class GameController : MonoBehaviour
         LoadingCanvas.SetActive(false);
     }
 
-    public async void LoadDBMSModel(string modelId)
+    private async void LoadDBMSModel(string modelId)
     {
         LoadingCanvas.SetActive(true);
 
         string selectedLOD = LevelOfDetailDropdown.options[LevelOfDetailDropdown.value].text;
         LevelOfDetail lod = (LevelOfDetail)Enum.Parse(typeof(LevelOfDetail), selectedLOD);
-        APIResponse <Model> response = await DBMSController.GetModel(new ItemRequest(modelId, lod));
+        APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelId, lod));
         if (response.Code != System.Net.HttpStatusCode.OK)
         {
             Debug.LogWarning(response.ReasonPhrase);
@@ -235,7 +236,7 @@ public class GameController : MonoBehaviour
 
         RemoveAllChidren(CurrentModelGameObj);
 
-        Bounds b = new Bounds(Vector3.zero, Vector3.zero);
+        Bounds b = new Bounds(VectorConvert(CurrentModel.ModelObjects[0].Location), Vector3.zero);
         ModelObjects = new List<ModelObjectScript>();
         foreach (ModelObject obj in CurrentModel.ModelObjects)
         {
@@ -259,6 +260,8 @@ public class GameController : MonoBehaviour
             ModelObjects.Add(script);
         }
 
+        SetupMainCamera();
+
         ResetCanvas();
         ModelViewCanvas.SetActive(true);
         LoadingCanvas.SetActive(false);
@@ -268,7 +271,7 @@ public class GameController : MonoBehaviour
 
     #region Model Load Methods
 
-    public GameObject CreateModelObject(ModelObject o, GameObject parentObj)
+    private GameObject CreateModelObject(ModelObject o, GameObject parentObj)
     {
         o.Id = o.Id ?? Guid.NewGuid().ToString();
         o.Orientation = o.Orientation ?? Utils.GetQuaterion(new Vector3D(0, 0, 1), 0.0 * Math.PI / 180.0);
@@ -298,7 +301,7 @@ public class GameController : MonoBehaviour
         return b;
     }
 
-    public static Vector2[] CalculateUVs(Mesh mesh, List<Vector3> newVerticesFinal)
+    private static Vector2[] CalculateUVs(Mesh mesh, List<Vector3> newVerticesFinal)
     {
         // calculate UVs ============================================
         float scaleFactor = 0.5f;
@@ -346,7 +349,7 @@ public class GameController : MonoBehaviour
     #region Model View Mode
 
     private GameObject ViewingGameObject;
-    public void ViewingMode()
+    private void ViewingMode()
     {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hitData;
@@ -465,7 +468,7 @@ public class GameController : MonoBehaviour
         LoadingCanvas.SetActive(false);
     }
 
-    public void RevertToPreviousVersion()
+    public void ResetClicked()
     {
         string modelId = CurrentModel.Id;
         ExitClicked();
@@ -484,7 +487,7 @@ public class GameController : MonoBehaviour
 
     #region Model Edit Mode
 
-    public void EditingMode()
+    private void EditingMode()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -555,7 +558,7 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            ChangeAllChidrenTags(EditingGameObject, "Untagged");
+            ChangeAllChidrenTagsAndLayer(EditingGameObject, "Untagged", 0);
             ModelObject mo = EditingGameObject.GetComponent<ModelObjectScript>().ModelObject;
             mo.Location = VectorConvert(EditingGameObject.transform.position);
             mo.Orientation = VectorConvert(EditingGameObject.transform.rotation);
@@ -596,7 +599,7 @@ public class GameController : MonoBehaviour
 
     #region Model Select Catalog Object Mode:
 
-    public async void PopulateCatalog()
+    private async void PopulateCatalog()
     {
         // Access all object from the catalog:
         LoadingCanvas.SetActive(true);
@@ -649,7 +652,7 @@ public class GameController : MonoBehaviour
 
     private void PlaceOject()
     {
-        ChangeAllChidrenTags(EditingGameObject, "Temp");
+        ChangeAllChidrenTagsAndLayer(EditingGameObject, "Temp", 2);
 
         ModelObject mo = EditingGameObject.GetComponent<ModelObjectScript>().ModelObject;
         float minZ = (float)mo.Components.Min(c => c.Vertices.Min(v => v.z));
@@ -657,11 +660,6 @@ public class GameController : MonoBehaviour
         heightOfset = (maxZ - minZ) / 2.0f + ERROR;
 
         placingObject = true;
-        if (EditingGameObject == null)
-        {
-            placingObject = false;
-            return;
-        }
     }
 
     #endregion
@@ -672,10 +670,11 @@ public class GameController : MonoBehaviour
     private bool placingObject;
     private void MoveObject()
     {
+        ModelObjectScript mosEditingObj = EditingGameObject.GetComponent<ModelObjectScript>();
+        ModelObject mo = mosEditingObj.ModelObject;
         if (Input.GetMouseButtonDown(0))
         {
-            ChangeAllChidrenTags(EditingGameObject, "Untagged");
-            ModelObject mo = EditingGameObject.GetComponent<ModelObjectScript>().ModelObject;
+            ChangeAllChidrenTagsAndLayer(EditingGameObject, "Untagged", 0);
             mo.Location = VectorConvert(EditingGameObject.transform.position);
             mo.Orientation = VectorConvert(EditingGameObject.transform.rotation);
             placingObject = false;
@@ -695,13 +694,17 @@ public class GameController : MonoBehaviour
             worldPosition = hitData.point + new Vector3(0, heightOfset, 0);
         }
         EditingGameObject.transform.position = worldPosition;
+        mo.Location = VectorConvert(EditingGameObject.transform.position);
+        mo.Orientation = VectorConvert(EditingGameObject.transform.rotation);
+
+        CheckOverlapRuntime(mosEditingObj, mo);
     }
 
     #endregion
 
     #region Catalog Object Load Methods
 
-    public async Task<GameObject> LoadCatalogObject(string catalogId)
+    private async Task<GameObject> LoadCatalogObject(string catalogId)
     {
         LoadingCanvas.SetActive(true);
 
@@ -732,7 +735,7 @@ public class GameController : MonoBehaviour
         return modelObject;
     }
 
-    public ModelCatalogObject CreateModelCatalogObject(CatalogObject o)
+    private ModelCatalogObject CreateModelCatalogObject(CatalogObject o)
     {
         return new ModelCatalogObject()
         {
@@ -788,7 +791,7 @@ public class GameController : MonoBehaviour
         LoadingCanvas.SetActive(false);
     }
 
-    public void RuleButtonClicked(Button ruleButton)
+    private void RuleButtonClicked(Button ruleButton)
     {
         ButtonData data = ruleButton.GetComponent<ButtonData>();
         data.Clicked = !data.Clicked;
@@ -879,7 +882,7 @@ public class GameController : MonoBehaviour
         RestGenDesignMode();
     }
 
-    public void RestGenDesignMode()
+    private void RestGenDesignMode()
     {
         GeneratingObjects = new List<GameObject>();
         genDesignMode = false;
@@ -945,7 +948,7 @@ public class GameController : MonoBehaviour
         displayStr += "=====================================\n";
         foreach (RuleCheckRelation ruleCheckRelation in instance.Rels)
         {
-            displayStr += ruleCheckRelation.FirstObj.Name + " => "+ ruleCheckRelation.SecondObj.Name + "\n";
+            displayStr += ruleCheckRelation.FirstObj.Name + " => " + ruleCheckRelation.SecondObj.Name + "\n";
             foreach (Property property in ruleCheckRelation.Properties)
             {
                 displayStr += property.String() + "\n";
@@ -967,10 +970,10 @@ public class GameController : MonoBehaviour
 
     public void CreateVoxels()
     {
-        if (VoxelParentGO != null)
+        if (CurrentModelVoxelGameObj != null)
         {
-            Destroy(VoxelParentGO);
-            VoxelParentGO = null;
+            Destroy(CurrentModelVoxelGameObj);
+            CurrentModelVoxelGameObj = null;
             return;
         }
         if (CurrentModel == null)
@@ -982,13 +985,13 @@ public class GameController : MonoBehaviour
         VoxelCreater voxelCreater = new VoxelCreater(CurrentModel);
         List<Voxel> voxels = voxelCreater.CreateVoxels(size);
 
-        VoxelParentGO = new GameObject("Voxels");
+        CurrentModelVoxelGameObj = new GameObject("Voxels");
         foreach (Voxel voxel in voxels)
         {
             if (voxel.ModelObjectID != null)
             {
                 GameObject voxelObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                voxelObject.transform.parent = VoxelParentGO.transform;
+                voxelObject.transform.parent = CurrentModelVoxelGameObj.transform;
                 voxelObject.transform.position = VectorConvert(voxel.Location);
                 voxelObject.transform.localScale = new Vector3((float)size, (float)size, (float)size);
                 voxelObject.name = ModelObjects.First(mos => mos.ModelObject.Id == voxel.ModelObjectID).ModelObject.Name;
@@ -1025,7 +1028,7 @@ public class GameController : MonoBehaviour
         this.ObjectTypeChangeDropdown.options.AddRange(types.Select(t => new OptionData(t)));
     }
 
-    public static void RemoveAllChidren(GameObject obj)
+    private static void RemoveAllChidren(GameObject obj)
     {
         for (int i = 0; i < obj.transform.childCount; i++)
         {
@@ -1034,13 +1037,14 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public static void ChangeAllChidrenTags(GameObject obj, string newTag)
+    private static void ChangeAllChidrenTagsAndLayer(GameObject obj, string newTag, int newLayer)
     {
         obj.transform.tag = newTag;
+        obj.layer = newLayer;
         for (int i = 0; i < obj.transform.childCount; i++)
         {
             var child = obj.transform.GetChild(i);
-            ChangeAllChidrenTags(child.gameObject, newTag);
+            ChangeAllChidrenTagsAndLayer(child.gameObject, newTag, newLayer);
         }
     }
 
@@ -1135,21 +1139,23 @@ public class GameController : MonoBehaviour
 
         RuleCheckObject rco1 = new RuleCheckObject(FirstObject.ModelObject);
         RuleCheckObject rco2 = new RuleCheckObject(SecondObject.ModelObject);
-        bool result1 = Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.0);
-        bool result2 = Utils.MeshOverlapTest2(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.0);
-        bool result3 = Utils.MeshOverlapTest3(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.0);
+        bool result1 = Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
+        bool result2 = Utils.MeshOverlapTest2(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
+        bool result3 = Utils.MeshOverlapTest3(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
+        bool result4 = Utils.MeshOverlapTest4(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
+        bool result5 = Utils.MeshOverlapTest5(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
 
-        bool resultShrink1 = Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
-        bool resultShrink2 = Utils.MeshOverlapTest2(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
-        bool resultShrink3 = Utils.MeshOverlapTest3(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
+        //bool resultShrink1 = Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
+        //bool resultShrink2 = Utils.MeshOverlapTest2(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
+        //bool resultShrink3 = Utils.MeshOverlapTest3(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
+        //bool resultShrink4 = Utils.MeshOverlapTest4(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
 
 
         this.OverlapCheckText.text = "Overlap Result 1: " + result1 +
-                                    "\nOverlap Shrink Result 1: " + resultShrink1 +
                                     "\nOverlap Result 2: " + result2 +
-                                    "\nOverlap Shrink Result 2: " + resultShrink2 +
                                     "\nOverlap Result 3: " + result3 +
-                                    "\nOverlap Shrink Result 3: " + resultShrink3;
+                                    "\nOverlap Result 4: " + result4 +
+                                    "\nOverlap Result 5: " + result5;
     }
 
     public void CheckOverlapClicked()
@@ -1168,6 +1174,95 @@ public class GameController : MonoBehaviour
 
         this.ResetCanvas();
         this.ModelViewCanvas.SetActive(true);
+    }
+
+    public void RuleObjectCheckClicked()
+    {
+        if (CurrentModelRuleCheckGameObj != null)
+        {
+            Destroy(CurrentModelRuleCheckGameObj);
+            CurrentModelRuleCheckGameObj = null;
+            return;
+        }
+        if (CurrentModel == null)
+        {
+            return;
+        }
+
+        CurrentModelRuleCheckGameObj = new GameObject("RuleCheckModel");
+        foreach (ModelObject mo in CurrentModel.ModelObjects)
+        {
+            RuleCheckObject rco = new RuleCheckObject(mo);
+
+            // Create an object based on the RuleCheckObject rather than the model object to see if it has the same shape
+
+            GameObject meshObject = Instantiate(ModelComponentPrefab, CurrentModelRuleCheckGameObj.transform);
+            Mesh mesh = new Mesh();
+            MeshFilter meshFilter = meshObject.GetComponent<MeshFilter>();
+            meshFilter.mesh = mesh;
+            MeshCollider meshCollider = meshObject.GetComponent<MeshCollider>();
+            meshCollider.sharedMesh = mesh;
+            mesh.vertices = rco.GetGlobalMesh().VertexList.Select(v => VectorConvert(v)).ToArray();
+            mesh.uv = mesh.vertices.Select(v => new Vector2(v.x, v.y)).ToArray();
+            mesh.triangles = rco.GetGlobalMesh().TriangleList.SelectMany(t => new List<int>() { t[0], t[1], t[2] }).Reverse().ToArray();
+            mesh.RecalculateNormals();
+
+            meshObject.GetComponent<MeshRenderer>().material = VoxelMaterial;
+        }
+    }
+
+    private void CheckOverlapRuntime(ModelObjectScript mosEditingObj, ModelObject mo)
+    {
+        // Just an Overlap Check for testing
+        bool overlapingSomething = false;
+        RuleCheckObject rco1 = new RuleCheckObject(mo);
+        foreach (ModelObjectScript mos in ModelObjects)
+        {
+            if (mos == mosEditingObj)
+            {
+                continue;
+            }
+            mos.UnHighlight();
+
+            RuleCheckObject rco2 = new RuleCheckObject(mos.ModelObject);
+            if (Utils.MeshOverlapTest4(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0))
+            {
+                mos.Highlight(HighlightMatRed);
+                overlapingSomething = true;
+            }
+        }
+        if (overlapingSomething)
+        {
+            mosEditingObj.Highlight(HighlightMatRed);
+        }
+        else
+        {
+            mosEditingObj.UnHighlight();
+        }
+    }
+
+    #endregion
+
+    #region Camera Setup Stuff:
+
+    private void SetupMainCamera()
+    {
+        List<ModelObject> mos = ModelObjects.Select(m => m.ModelObject).ToList();
+        List<Vector3D> vList = mos.SelectMany(m => m.Components.SelectMany(c => c.Vertices.Select(v => Vector3D.Add(v, m.Location)))).ToList();
+        Utils.GetXYZDimentions(vList, out Vector3D mid, out Vector3D dims);
+
+        Vector3 center = VectorConvert(mid);
+        Vector3 diment = VectorConvert(dims);
+
+        Debug.Log(vList.Count);
+        Debug.Log(mos.Count);
+        Debug.Log(center);
+
+        MainCamera.orthographic = false;
+        MainCamera.nearClipPlane = 0.1f;
+        MainCamera.farClipPlane = 100.0f;
+        MainCamera.transform.position = new Vector3(center.x, center.y + 2.0f * diment.y, center.z);
+        MainCamera.transform.LookAt(center, Vector3.up);
     }
 
     #endregion

@@ -15,13 +15,13 @@ namespace GenerativeDesignPackage
         public CatalogObject CatalogObject;
         public Vector3D Location;
         public Vector4D Orientation;
-        public double Eval = 0;
+        public CheckScore Eval;
     }
 
     public class SceneConfiguration
     {
         public List<ObjectConfiguration> ObjectConfigurations;
-        public double Eval = 0;
+        public CheckScore Eval;
     }
 
     public class ThreadConfiguration

@@ -158,7 +158,7 @@ namespace MathPackage
             return new Vector3D(x / vects.Length, y / vects.Length, z / vects.Length);
         }
 
-        public static Vector3D Average(Vector3D v1, Vector3D v2)
+        public static Vector3D Midpoint(Vector3D v1, Vector3D v2)
         {
             return new Vector3D((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0, (v1.z + v2.z) / 2.0);
         }

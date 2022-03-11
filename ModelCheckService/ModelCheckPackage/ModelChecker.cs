@@ -175,7 +175,7 @@ namespace ModelCheckPackage
                 Tuple<Type, MethodInfo> compileResult = new Tuple<Type, MethodInfo>(compiledRule.Item2, compiledRule.Item3);
 
                 // Execute the rule:
-                RuleResult results = new RuleResult(rule, 0, new List<RuleInstance>());
+                RuleResult results = new RuleResult(rule, 0, new List<RuleInstance>(), false);
                 if (RuleRelevance(relaventType, rule))
                 {
                     results = ExecuteRule(compileResult, rule, this, defaultForNoOutput);
@@ -188,6 +188,16 @@ namespace ModelCheckPackage
             }
 
             return RuleResults;
+        }
+
+        public CheckScore GetCheckScore()
+        {
+            if (RuleResults == null || RuleResults.Count == 0)
+            {
+                return null;
+            }
+
+            return new CheckScore(RuleResults);
         }
 
         public static bool ValidateRule(Rule rule)
@@ -363,7 +373,7 @@ namespace ModelCheckPackage
             //calls recursive function
             double rulePassVal = RFunction(output, positions, defaultForNoOutput);
 
-            RuleResult result = new RuleResult(rule, rulePassVal, output);
+            RuleResult result = new RuleResult(rule, rulePassVal, output, true);
 
             return result;
         }

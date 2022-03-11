@@ -14,19 +14,34 @@ namespace ModelCheckPackage
         public double PassVal { get; private set; }
         public List<RuleInstance> RuleInstances { get; private set; }
         public TimeSpan Runtime { get; set; }
+        public bool CheckCompleted { get; set; }
 
         [JsonConstructor]
-        public RuleResult(Rule rule, double passVal, List<RuleInstance> ruleInstances, TimeSpan runtime) : this(rule, passVal, ruleInstances)
+        public RuleResult(Rule rule, double passVal, List<RuleInstance> ruleInstances, TimeSpan runtime, bool checkCompleted) : this(rule, passVal, ruleInstances, checkCompleted)
         {
             Runtime = runtime;
         }
 
-        public RuleResult(Rule rule, double passVal, List<RuleInstance> ruleInstances)
+        public RuleResult(Rule rule, double passVal, List<RuleInstance> ruleInstances, bool checkCompleted)
         {
             Rule = rule;
             PassVal = passVal;
             RuleInstances = ruleInstances;
             Runtime = new TimeSpan();
+            CheckCompleted = checkCompleted;
+        }
+
+        public void UpdateRuleResult(RuleResult ruleResult)
+        {
+            if (Rule.Id != ruleResult.Rule.Id)
+            {
+                throw new Exception("Not the same Rule");
+            }
+
+            this.PassVal = ruleResult.PassVal;
+            this.RuleInstances = ruleResult.RuleInstances;
+            this.Runtime = ruleResult.Runtime;
+            this.CheckCompleted = ruleResult.CheckCompleted;
         }
 
         public override string ToString()
