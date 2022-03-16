@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
@@ -360,7 +361,18 @@ namespace MCGDApp
         private async void buttonGDSeq_Click(object sender, EventArgs e)
         {
             // Get the model, object, and rules
+            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
+            List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
             ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
+            if (modelMetaData == null || rules.Count==0|| catalogObjectsMeta.Count == 0)
+            {
+                MessageBox.Show("Select a model, rules, and objects");
+                return;
+            }
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
             if (response.Code != System.Net.HttpStatusCode.OK)
             {
@@ -378,7 +390,6 @@ namespace MCGDApp
                 ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
             }
 
-            List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
             List<CatalogInitializer> catalogObjectsInits = new List<CatalogInitializer>();
             foreach (var catalogObjectMeta in catalogObjectsMeta)
             {
@@ -401,8 +412,6 @@ namespace MCGDApp
                 });
             }
 
-            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
-
             Model newModel = null;
             List<Tuple<Rule, Type, MethodInfo>> compliledRules = null;
             foreach (var catalogItem in catalogObjectsInits)
@@ -411,6 +420,7 @@ namespace MCGDApp
                 if (compliledRules == null)
                 {
                     generativeDesigner = new GenerativeDesigner(model, rules, new List<CatalogInitializer>() { catalogItem }, GDSettings);
+                    compliledRules = generativeDesigner.GetCompiledRules();
                 }
                 else
                 {
@@ -431,7 +441,7 @@ namespace MCGDApp
 
             buttonSignInDBMS_Click(null, null);
 
-            this.richTextBoxGenDesign.Text = "Done";
+            this.richTextBoxGenDesign.Text = "Done\nRuntime: " + sw.Elapsed.ToString();
         }
 
         private void tableLayoutPanel3_Paint(object sender, PaintEventArgs e)

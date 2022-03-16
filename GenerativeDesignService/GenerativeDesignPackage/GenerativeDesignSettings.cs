@@ -29,7 +29,7 @@ namespace GenerativeDesignPackage
             Itterations = 100;
             Movement = 20;
             Rate = 0.5;
-            Moves = 4;
+            Moves = 5;
             ShowRoute = false;
         }
     }

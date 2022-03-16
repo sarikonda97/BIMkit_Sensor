@@ -629,13 +629,13 @@ namespace MathPackage
         public static double MeshDistance(Mesh m1, Mesh m2)
         {
             double minDist = double.MaxValue;
-            for (int i = 0; i < m1.TriangleList.Count; i += 3)
+            for (int i = 0; i < m1.TriangleList.Count; i++)
             {
                 Vector3D v0 = m1.VertexList[m1.TriangleList[i][0]];
                 Vector3D v1 = m1.VertexList[m1.TriangleList[i][1]];
                 Vector3D v2 = m1.VertexList[m1.TriangleList[i][2]];
 
-                for (int j = 0; j < m2.TriangleList.Count; j += 3)
+                for (int j = 0; j < m2.TriangleList.Count; j++)
                 {
                     Vector3D u0 = m2.VertexList[m2.TriangleList[j][0]];
                     Vector3D u1 = m2.VertexList[m2.TriangleList[j][1]];
@@ -669,21 +669,24 @@ namespace MathPackage
                 m2Shrink = ShrinkMesh(m2, shrinkRatio);
             }
 
-            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i++)
             {
                 Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
                 Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
                 Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
 
-                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j++)
                 {
                     Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
                     Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
 
-                    bool testResultA = OverlapingTriangleTestByRays(v0, v1, v2, u0, u1, u2);
-                    bool testResultB = OverlapingTriangleTestByRays(u0, u1, u2, v0, v1, v2);
-                    if (testResultA || testResultB) { return true; }
+                    bool testResultA = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
+                    //bool testResultB = TrianglesOverlap(u0, u1, u2, v0, v1, v2);
+                    if (testResultA)// || testResultB)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -731,7 +734,7 @@ namespace MathPackage
         public static double PointToMeshDistance(Vector3D v, Mesh m)
         {
             double minDist = double.MaxValue;
-            for (int i = 0; i < m.TriangleList.Count; i += 3)
+            for (int i = 0; i < m.TriangleList.Count; i++)
             {
                 Vector3D v0 = m.VertexList[m.TriangleList[i][0]];
                 Vector3D v1 = m.VertexList[m.TriangleList[i][1]];
@@ -807,7 +810,7 @@ namespace MathPackage
 
         public static bool RayIntersectsMesh(Vector3D rayOrigin, Vector3D rayVector, Mesh m)
         {
-            for (int j = 0; j < m.TriangleList.Count; j += 3)
+            for (int j = 0; j < m.TriangleList.Count; j++)
             {
                 Vector3D u0 = m.VertexList[m.TriangleList[j][0]];
                 Vector3D u1 = m.VertexList[m.TriangleList[j][1]];
@@ -825,7 +828,7 @@ namespace MathPackage
 
         public static bool MeshFacing(Mesh m1, Vector3D m1Forward, Mesh m2, Vector3D m2Forward)
         {
-            for (int i = 0; i < m1.TriangleList.Count; i += 3)
+            for (int i = 0; i < m1.TriangleList.Count; i++)
             {
                 Vector3D v0 = m1.VertexList[m1.TriangleList[i][0]];
                 Vector3D v1 = m1.VertexList[m1.TriangleList[i][1]];
@@ -833,7 +836,7 @@ namespace MathPackage
 
                 Vector3D vM = Vector3D.Average(new Vector3D[] { v0, v1, v2 });
 
-                for (int j = 0; j < m2.TriangleList.Count; j += 3)
+                for (int j = 0; j < m2.TriangleList.Count; j++)
                 {
                     Vector3D u0 = m2.VertexList[m2.TriangleList[j][0]];
                     Vector3D u1 = m2.VertexList[m2.TriangleList[j][1]];
@@ -863,7 +866,7 @@ namespace MathPackage
         {
             // Check if m2 is in the direction of m1 (ie. m2 is being checked if it lies in the direction "direction" from m1)
             Vector3D negDirection = direction.Neg();
-            for (int i = 0; i < m1.TriangleList.Count; i += 3)
+            for (int i = 0; i < m1.TriangleList.Count; i++)
             {
                 Vector3D v0 = m1.VertexList[m1.TriangleList[i][0]];
                 Vector3D v1 = m1.VertexList[m1.TriangleList[i][1]];
@@ -871,7 +874,7 @@ namespace MathPackage
 
                 Vector3D vM = Vector3D.Average(new Vector3D[] { v0, v1, v2 });
 
-                for (int j = 0; j < m2.TriangleList.Count; j += 3)
+                for (int j = 0; j < m2.TriangleList.Count; j++)
                 {
                     Vector3D u0 = m2.VertexList[m2.TriangleList[j][0]];
                     Vector3D u1 = m2.VertexList[m2.TriangleList[j][1]];
@@ -1124,13 +1127,13 @@ namespace MathPackage
                 m2Shrink = ShrinkMesh(m2, shrinkRatio);
             }
 
-            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i++)
             {
                 Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
                 Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
                 Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
 
-                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j++)
                 {
                     Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
@@ -1145,7 +1148,7 @@ namespace MathPackage
                                                                                                     V3DToV3d(u0),
                                                                                                     V3DToV3d(u1),
                                                                                                     V3DToV3d(u2)));
-                    bool testResult1 = intrTriangle3Triangle3.Test();
+                    bool testResult1 = intrTriangle3Triangle3.Find();
                     if (testResult1) { return true; }
                 }
             }
@@ -1162,17 +1165,18 @@ namespace MathPackage
                 m2Shrink = ShrinkMesh(m2, shrinkRatio);
             }
 
-            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i++)
             {
                 Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
                 Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
                 Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
 
-                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j++)
                 {
                     Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
                     Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
+
                     bool testResultA = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
                     bool testResultB = TrianglesOverlap(u0, u1, u2, v0, v1, v2);
                     if (testResultA || testResultB) { return true; }
@@ -1191,13 +1195,13 @@ namespace MathPackage
                 m2Shrink = ShrinkMesh(m2, shrinkRatio);
             }
 
-            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i++)
             {
                 Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
                 Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
                 Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
 
-                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j++)
                 {
                     Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
@@ -1221,13 +1225,13 @@ namespace MathPackage
                 m2Shrink = ShrinkMesh(m2, shrinkRatio);
             }
 
-            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
+            for (int i = 0; i < m1Shrink.TriangleList.Count; i++)
             {
                 Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
                 Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
                 Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
 
-                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
+                for (int j = 0; j < m2Shrink.TriangleList.Count; j++)
                 {
                     Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
@@ -1235,36 +1239,6 @@ namespace MathPackage
 
                     bool testResultA = OverlapingTriangleTestByRays(v0, v1, v2, u0, u1, u2);
                     bool testResultB = OverlapingTriangleTestByRays(u0, u1, u2, v0, v1, v2);
-                    if (testResultA || testResultB) { return true; }
-                }
-            }
-
-            return MeshInsideMesh(m1Shrink, m2Shrink);
-        }
-        public static bool MeshOverlapTest5(Mesh m1, Mesh m2, double shrinkRatio)
-        {
-            Mesh m1Shrink = m1;
-            Mesh m2Shrink = m2;
-            if (shrinkRatio != 1.0)
-            {
-                m1Shrink = ShrinkMesh(m1, shrinkRatio);
-                m2Shrink = ShrinkMesh(m2, shrinkRatio);
-            }
-
-            for (int i = 0; i < m1Shrink.TriangleList.Count; i += 3)
-            {
-                Vector3D v0 = m1Shrink.VertexList[m1Shrink.TriangleList[i][0]];
-                Vector3D v1 = m1Shrink.VertexList[m1Shrink.TriangleList[i][1]];
-                Vector3D v2 = m1Shrink.VertexList[m1Shrink.TriangleList[i][2]];
-
-                for (int j = 0; j < m2Shrink.TriangleList.Count; j += 3)
-                {
-                    Vector3D u0 = m2Shrink.VertexList[m2Shrink.TriangleList[j][0]];
-                    Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
-                    Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
-
-                    bool testResultA = OverlapingTriangleTestChristoph(v0, v1, v2, u0, u1, u2);
-                    bool testResultB = OverlapingTriangleTestChristoph(u0, u1, u2, v0, v1, v2);
                     if (testResultA || testResultB) { return true; }
                 }
             }
@@ -1370,52 +1344,6 @@ namespace MathPackage
             bool rayCheckF = RayIntersectsTriangle(p0, Vector3D.Subract(p1, p0), u0, u1, u2, out Vector3D intP);
             bool rayCheckB = RayIntersectsTriangle(p1, Vector3D.Subract(p0, p1), u0, u1, u2, out intP);
             return rayCheckB && rayCheckF;
-        }
-        // From Test 5
-        public static bool OverlapingTriangleTestChristoph(Vector3D v0, Vector3D v1, Vector3D v2, Vector3D u0, Vector3D u1, Vector3D u2)
-        {
-            Vector3D intersectionPoint;
-            if (LineIntersectsPlane(v0, v1, u0, u1, u2, out intersectionPoint))
-            {
-                if (PointInTriangle(intersectionPoint, u0, u1, u2))
-                {
-                    return true;
-                }
-            }
-            if (LineIntersectsPlane(v1, v2, u0, u1, u2, out intersectionPoint))
-            {
-                if (PointInTriangle(intersectionPoint, u0, u1, u2))
-                {
-                    return true;
-                }
-            }
-            if (LineIntersectsPlane(v2, v0, u0, u1, u2, out intersectionPoint))
-            {
-                if (PointInTriangle(intersectionPoint, u0, u1, u2))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        public static bool LineIntersectsPlane(Vector3D p1, Vector3D p2, Vector3D u0, Vector3D u1, Vector3D u2, out Vector3D intersectionPoint)
-        {
-            // From: http://paulbourke.net/geometry/pointlineplane/
-            intersectionPoint = null;
-
-            Vector3D norm = Vector3D.Cross(Vector3D.Subract(u1, u0), Vector3D.Subract(u2, u0));
-            double numer = Vector3D.Dot(norm, Vector3D.Subract(u0, p1));
-            Vector3D lineSegement = Vector3D.Subract(p2, p1);
-            double denom = Vector3D.Dot(norm, lineSegement);
-            if (denom == 0.0)
-            {
-                // Line and plane are perpendicular
-                return false;
-            }
-            double u = numer / denom;
-            intersectionPoint = Vector3D.Add(p1, Vector3D.Multiply(lineSegement, u));
-            return u >= 0.0 || u <= 1.0;
         }
     }
 }

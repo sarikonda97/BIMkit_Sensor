@@ -11,6 +11,8 @@ using RuleAPI.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -853,9 +855,9 @@ public class GameController : MonoBehaviour
                                                           LevelOfDetail.LOD100,
                                                           new GenerativeDesignSettings(
                                                                 Convert.ToInt32(100),
-                                                                Convert.ToDouble(30),
+                                                                Convert.ToDouble(10),
                                                                 Convert.ToDouble(0.75),
-                                                                Convert.ToInt32(10),
+                                                                Convert.ToInt32(5),
                                                                 false
                                                                 )
                                                           );
@@ -1139,23 +1141,24 @@ public class GameController : MonoBehaviour
 
         RuleCheckObject rco1 = new RuleCheckObject(FirstObject.ModelObject);
         RuleCheckObject rco2 = new RuleCheckObject(SecondObject.ModelObject);
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
         bool result1 = Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
+        TimeSpan ts1 = sw.Elapsed;
+        sw.Restart();
         bool result2 = Utils.MeshOverlapTest2(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
+        TimeSpan ts2 = sw.Elapsed;
+        sw.Restart();
         bool result3 = Utils.MeshOverlapTest3(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
+        TimeSpan ts3 = sw.Elapsed;
+        sw.Restart();
         bool result4 = Utils.MeshOverlapTest4(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
-        bool result5 = Utils.MeshOverlapTest5(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0);
+        TimeSpan ts4 = sw.Elapsed;
 
-        //bool resultShrink1 = Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
-        //bool resultShrink2 = Utils.MeshOverlapTest2(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
-        //bool resultShrink3 = Utils.MeshOverlapTest3(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
-        //bool resultShrink4 = Utils.MeshOverlapTest4(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 0.99);
-
-
-        this.OverlapCheckText.text = "Overlap Result 1: " + result1 +
-                                    "\nOverlap Result 2: " + result2 +
-                                    "\nOverlap Result 3: " + result3 +
-                                    "\nOverlap Result 4: " + result4 +
-                                    "\nOverlap Result 5: " + result5;
+        this.OverlapCheckText.text = "Overlap Result 1: " + result1 + " (" + ts1.ToString() + ")" +
+                                     "\nOverlap Result 2: " + result2 + " (" + ts2.ToString() + ")" +
+                                     "\nOverlap Result 3: " + result3 + " (" + ts3.ToString() + ")" +
+                                     "\nOverlap Result 4: " + result4 + " (" + ts4.ToString() + ")";
     }
 
     public void CheckOverlapClicked()
@@ -1225,7 +1228,7 @@ public class GameController : MonoBehaviour
             mos.UnHighlight();
 
             RuleCheckObject rco2 = new RuleCheckObject(mos.ModelObject);
-            if (Utils.MeshOverlapTest4(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0))
+            if (Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0))
             {
                 mos.Highlight(HighlightMatRed);
                 overlapingSomething = true;
@@ -1239,6 +1242,24 @@ public class GameController : MonoBehaviour
         {
             mosEditingObj.UnHighlight();
         }
+    }
+
+    public void SaveOverlapInstanceClicked()
+    {
+        RuleCheckObject rco1 = new RuleCheckObject(FirstObject.ModelObject);
+        RuleCheckObject rco2 = new RuleCheckObject(SecondObject.ModelObject);
+
+        string outputString = "";
+        outputString += string.Join("\n", rco1.GlobalVerticies.Select(v => v.ToString()));
+        outputString += "\n\n";
+        outputString += string.Join("\n", rco1.Triangles.Select(t => string.Join(",",t)));
+        outputString += "\n\n";
+        outputString += string.Join("\n", rco2.GlobalVerticies.Select(v => v.ToString()));
+        outputString += "\n\n";
+        outputString += string.Join("\n", rco2.Triangles.Select(t => string.Join(",", t)));
+
+        string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\testing.txt";
+        File.WriteAllText(path, outputString);
     }
 
     #endregion

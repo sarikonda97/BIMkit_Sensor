@@ -108,7 +108,8 @@ namespace RuleAPI.Models
     public class PropertyCheckNum : PropertyCheck
     {
         public static double ALPHA = 2.0;
-        double roundingHelper = 0.00001;
+        public static double roundingHelper = 0.00001;
+        public static int CheckRounding = 5;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public OperatorNum Operation { get; set; }
@@ -121,9 +122,8 @@ namespace RuleAPI.Models
         {
             PCType = PCType.NUM;
             Operation = operation;
-            Value = value;
             ValueUnit = valueUnit;
-            ValueInStandardUnit = Utils.ChangeUnitToMeterOrDeg(Value, ValueUnit);
+            SetNewValue(value);
         }
 
         public void SetNewValue(double value)
@@ -148,35 +148,35 @@ namespace RuleAPI.Models
                     case (OperatorNum.EQUAL):
                         if (property.Value < val)
                         {
-                            return Math.Pow((property.Value / val), ALPHA);
+                            return Math.Round(Math.Pow((property.Value / val), ALPHA), CheckRounding);
                         }
                         if (property.Value > val)
                         {
-                            return Math.Pow((val / property.Value), ALPHA);
+                            return Math.Round(Math.Pow((val / property.Value), ALPHA), CheckRounding);
                         }
                         return 1.0;
                     case (OperatorNum.GREATER_THAN):
                         if (property.Value <= val)
                         {
-                            return Math.Pow((property.Value / val), ALPHA);
+                            return Math.Round(Math.Pow((property.Value / val), ALPHA), CheckRounding);
                         }
                         return 1.0;
                     case (OperatorNum.GREATER_THAN_OR_EQUAL):
                         if (property.Value < val)
                         {
-                            return Math.Pow((property.Value / val), ALPHA);
+                            return Math.Round(Math.Pow((property.Value / val), ALPHA), CheckRounding);
                         }
                         return 1.0;
                     case (OperatorNum.LESS_THAN):
                         if (property.Value >= val)
                         {
-                            return Math.Pow((val / property.Value), ALPHA);
+                            return Math.Round(Math.Pow((val / property.Value), ALPHA), CheckRounding);
                         }
                         return 1.0;
                     case (OperatorNum.LESS_THAN_OR_EQUAL):
                         if (property.Value > val)
                         {
-                            return Math.Pow((val / property.Value), ALPHA);
+                            return Math.Round(Math.Pow((val / property.Value), ALPHA), CheckRounding);
                         }
                         return 1.0;
                     case (OperatorNum.NOT_EQUAL):

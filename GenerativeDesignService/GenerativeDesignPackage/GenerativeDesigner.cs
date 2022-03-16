@@ -158,6 +158,11 @@ namespace GenerativeDesignPackage
             }
             return itemMoved;
         }
+
+        public List<Tuple<Rule, Type, MethodInfo>> GetCompiledRules()
+        {
+            return ModelCheck.CompiledRules;
+        }
     }
 
     // ==================================================================================================================
