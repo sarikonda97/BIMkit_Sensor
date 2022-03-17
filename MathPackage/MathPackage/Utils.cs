@@ -681,9 +681,11 @@ namespace MathPackage
                     Vector3D u1 = m2Shrink.VertexList[m2Shrink.TriangleList[j][1]];
                     Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
 
-                    bool testResultA = TrianglesOverlap(v0, v1, v2, u0, u1, u2);
-                    //bool testResultB = TrianglesOverlap(u0, u1, u2, v0, v1, v2);
-                    if (testResultA)// || testResultB)
+                    IntrTriangle3Triangle3 intrTriangle3Triangle3 = new IntrTriangle3Triangle3(
+                                                                                new Triangle3d(V3DToV3d(v0),V3DToV3d(v1),V3DToV3d(v2)),
+                                                                                new Triangle3d(V3DToV3d(u0),V3DToV3d(u1),V3DToV3d(u2)));
+                    bool testResult1 = intrTriangle3Triangle3.Find();
+                    if (testResult1)
                     {
                         return true;
                     }
@@ -1246,7 +1248,7 @@ namespace MathPackage
             return MeshInsideMesh(m1Shrink, m2Shrink);
         }
 
-        // From Test 2
+        // From Test 2 (Seems to be inaccurate)
         public static bool TrianglesOverlap(Vector3D v0, Vector3D v1, Vector3D v2, Vector3D u0, Vector3D u1, Vector3D u2)
         {
             // https://web.stanford.edu/class/cs277/resources/papers/Moller1997b.pdf

@@ -122,7 +122,7 @@ namespace GenerativeDesignPackage
                 }
 
                 interationNum++;
-                if (!itemMoved)
+                if (Settings.FixedItterations || !itemMoved)
                 {
                     moveAmount *= reductionRate;
                 }
@@ -314,7 +314,7 @@ namespace GenerativeDesignPackage
 
                 interationNum++;
                 ThreadConfigurations = ThreadConfigurations.OrderByDescending(t => t.SceneConfiguration.Eval).ToList();
-                if (ThreadConfigurations[0] == bestThreadForScene)
+                if (Settings.FixedItterations || ThreadConfigurations[0] == bestThreadForScene)
                 {
                     // Only if the no better thread was found then we reduce the move amounts (a smaller move is required)
                     moveAmount *= reductionRate;

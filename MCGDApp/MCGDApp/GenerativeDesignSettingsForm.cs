@@ -25,6 +25,7 @@ namespace MCGDApp
             this.textBoxRate.Text = Settings.Rate.ToString();
             this.textBoxMoves.Text = Settings.Moves.ToString();
             this.checkBoxShowRoute.Checked = Settings.ShowRoute;
+            this.checkBoxFixedItterations.Checked = settings.FixedItterations;
         }
 
         private void buttonDone_Click(object sender, EventArgs e)
@@ -34,8 +35,9 @@ namespace MCGDApp
             double rate = Convert.ToDouble(this.textBoxRate.Text);
             int moves = Convert.ToInt32(this.textBoxMoves.Text);
             bool showRoute = this.checkBoxShowRoute.Checked;
+            bool fixedItters = this.checkBoxFixedItterations.Checked;
 
-            Settings = new GenerativeDesignSettings(itterations, movement, rate, moves, showRoute);
+            Settings = new GenerativeDesignSettings(itterations, movement, rate, moves, showRoute, fixedItters);
 
             this.DialogResult = DialogResult.OK;
             this.Close();

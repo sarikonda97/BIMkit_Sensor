@@ -65,7 +65,7 @@ namespace RuleAPI.Methods
             RuleCheckObject obj1 = objRelation.FirstObj;
             RuleCheckObject obj2 = objRelation.SecondObj;
             Vector3D vector = Vector3D.Subract(obj2.Location.Get2D(0), obj1.Location.Get2D(0));
-            double returnVal = Vector3D.AngleRad(obj1.ForwardDirectionY, vector);
+            double returnVal = Vector3D.AngleRad(obj1.ForwardDirectionY.Get2D(0), vector);
             return returnVal;
         }
         public static double AngleBetweenObjects(RuleCheckRelation objRelation)
@@ -74,10 +74,10 @@ namespace RuleAPI.Methods
             RuleCheckObject obj2 = objRelation.SecondObj;
 
             Vector3D vector1 = Vector3D.Subract(obj2.Location.Get2D(0), obj1.Location.Get2D(0));
-            double angle1 = Vector3D.AngleRad(obj1.ForwardDirectionY, vector1);
+            double angle1 = Vector3D.AngleRad(obj1.ForwardDirectionY.Get2D(0), vector1);
 
             Vector3D vector2 = Vector3D.Subract(obj1.Location.Get2D(0), obj2.Location.Get2D(0));
-            double angle2 = Vector3D.AngleRad(obj2.ForwardDirectionY, vector2);
+            double angle2 = Vector3D.AngleRad(obj2.ForwardDirectionY.Get2D(0), vector2);
 
             //double returnVal = (Math.Cos(angle1) + 1) * (Math.Cos(angle2) + 1);
             double returnVal = (angle1 + angle2);
@@ -92,7 +92,7 @@ namespace RuleAPI.Methods
             //double angle2 = Vector3D.AngleRad(obj2.BoundingBox.ForwardDirectionY, new Vector3D(1, 0, 0));
             //double returnVal = Math.Cos(4 * (angle1 - angle2));
 
-            double returnVal = Vector3D.AngleRad(obj1.ForwardDirectionY, obj2.ForwardDirectionY);
+            double returnVal = Vector3D.AngleRad(obj1.ForwardDirectionY.Get2D(0), obj2.ForwardDirectionY.Get2D(0));
             if (double.IsNaN(returnVal))
             {
                 int asdasd = 0;
@@ -112,12 +112,7 @@ namespace RuleAPI.Methods
 
             Mesh m1 = obj1.GetGlobalMesh();
             Mesh m2 = obj2.GetGlobalMesh();
-            if (Utils.MeshOverlap(m1, m2, MethodFinder.SchrinkAmount) || Utils.MeshOverlap(m1, m2, 0.99))
-            {
-                return true;
-            }
-
-            return false;
+            return Utils.MeshOverlap(m1, m2, MethodFinder.SchrinkAmount);
         }
         public static bool Facing(RuleCheckRelation objRelation)
         {

@@ -403,7 +403,7 @@ namespace MCGDApp
                 CatalogObject catalogObject = response2.Data;
                 float minZ = (float)catalogObject.Components.Min(c => c.Vertices.Min(v => v.z));
                 float maxZ = (float)catalogObject.Components.Max(c => c.Vertices.Max(v => v.z));
-                float heightOfset = (maxZ - minZ) / 2.0f + 0.01f; // We want it slightly off the ground for overlap purposes
+                float heightOfset = (maxZ - minZ) / 2.0f + 0.001f; // We want it slightly off the ground for overlap purposes
 
                 catalogObjectsInits.Add(new CatalogInitializer()
                 {
@@ -440,8 +440,15 @@ namespace MCGDApp
             }
 
             buttonSignInDBMS_Click(null, null);
+            ModelChecker = new ModelChecker(newModel, compliledRules);
+            List<RuleResult> ruleResults = ModelChecker.CheckModel(0);
+            CheckScore cs = ModelChecker.GetCheckScore();
 
-            this.richTextBoxGenDesign.Text = "Done\nRuntime: " + sw.Elapsed.ToString();
+            this.richTextBoxGenDesign.Text = "Done\nRuntime: " + sw.Elapsed.ToString() + 
+                                             "\nCheck Result: " + cs.TotalScore() + "/" + rules.Count + 
+                                             "\nErrors: "+cs.ErrorScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Error) +
+                                             "\nWarning: " + cs.WarningScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Warning) +
+                                             "\nRecommended: " + cs.RecommendScore + "/" + rules.Count(r=>r.ErrorLevel == ErrorLevel.Recommended) ;
         }
 
         private void tableLayoutPanel3_Paint(object sender, PaintEventArgs e)

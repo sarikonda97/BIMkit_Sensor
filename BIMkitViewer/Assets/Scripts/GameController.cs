@@ -858,7 +858,8 @@ public class GameController : MonoBehaviour
                                                                 Convert.ToDouble(10),
                                                                 Convert.ToDouble(0.75),
                                                                 Convert.ToInt32(5),
-                                                                false
+                                                                false,
+                                                                true
                                                                 )
                                                           );
 
@@ -1228,7 +1229,7 @@ public class GameController : MonoBehaviour
             mos.UnHighlight();
 
             RuleCheckObject rco2 = new RuleCheckObject(mos.ModelObject);
-            if (Utils.MeshOverlapTest1(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0))
+            if (Utils.MeshOverlap(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0))
             {
                 mos.Highlight(HighlightMatRed);
                 overlapingSomething = true;

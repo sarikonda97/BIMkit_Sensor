@@ -86,12 +86,52 @@ namespace ModelCheckPackage
 
         public static bool operator <=(MinorCheckScore cs1, MinorCheckScore cs2)
         {
-            return !(cs1 > cs2);
+            if (cs1.ErrorScore < cs2.ErrorScore)
+            {
+                return true;
+            }
+            if (cs1.ErrorScore == cs2.ErrorScore)
+            {
+                if (cs1.WarningScore < cs2.WarningScore)
+                {
+                    return true;
+                }
+                if (cs1.WarningScore == cs2.WarningScore)
+                {
+                    if (cs1.RecommendScore < cs2.RecommendScore)
+                    {
+                        return true;
+                    }
+                    if (cs1.RecommendScore == cs2.RecommendScore)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public static bool operator <(MinorCheckScore cs1, MinorCheckScore cs2)
         {
-            return !(cs1 >= cs2);
+            if (cs1.ErrorScore < cs2.ErrorScore)
+            {
+                return true;
+            }
+            if (cs1.ErrorScore == cs2.ErrorScore)
+            {
+                if (cs1.WarningScore < cs2.WarningScore)
+                {
+                    return true;
+                }
+                if (cs1.WarningScore == cs2.WarningScore)
+                {
+                    if (cs1.RecommendScore < cs2.RecommendScore)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 
