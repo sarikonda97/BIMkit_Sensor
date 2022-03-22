@@ -53,7 +53,7 @@ namespace ModelCheckService.Controllers
 
                 // do the check:
                 ModelChecker modelCheck = new ModelChecker(response.Data, rules);
-                List<RuleResult> result = modelCheck.CheckModel(request.DefaultRuleResult);
+                List<RuleResult> result = modelCheck.CheckModel(request.DefaultRuleResult, false);
 
                 return Request.CreateResponse(HttpStatusCode.OK, result);
             }

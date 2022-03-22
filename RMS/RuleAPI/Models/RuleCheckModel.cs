@@ -86,6 +86,7 @@ namespace RuleAPI.Models
                 ModelObject modelObject = _Model.ModelObjects.FirstOrDefault(o => o.Id == rco.ID);
                 if (modelObject != null)
                 {
+                    // Object was moved
                     modelObject.Location = rco.Location;
                     modelObject.Orientation = rco.Orientation;
 
@@ -94,14 +95,14 @@ namespace RuleAPI.Models
                         modelObject.Properties = rco.Properties;
                     }
 
-                    // Might also be allowed to edit the ModelObjects here:
+                    // Might also be allowed to edit something about the ModelObjects here:
 
                 }
                 else
                 {
-                    // Add objects that are new
+                    // Object is new
                     List<int[]> triangles = new List<int[]>();
-                    for (int i = 0; i < rco.Triangles.Count; i += 3)
+                    for (int i = 0; i < rco.Triangles.Count; i++)
                     {
                         triangles.Add(new int[3] { rco.Triangles[i][0], rco.Triangles[i][1], rco.Triangles[i][2] });
                     }

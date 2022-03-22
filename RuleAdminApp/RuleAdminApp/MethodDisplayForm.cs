@@ -14,13 +14,13 @@ namespace RuleAdminApp
 {
     public partial class MethodDisplayForm : Form
     {
-        public MethodDisplayForm(List<ObjectType> types, Dictionary<ObjectType, string> VOs, Dictionary<string, Type> properties, Dictionary<string, Type> relations)
+        public MethodDisplayForm(List<ObjectType> types, Dictionary<string, ObjectType> VOs, Dictionary<string, Type> properties, Dictionary<string, Type> relations)
         {
             InitializeComponent();
 
             foreach (var kvp in types)
             {
-                if (VOs.ContainsKey(kvp))
+                if (VOs.ContainsKey(kvp.Name))
                 {
                     continue;
                 }

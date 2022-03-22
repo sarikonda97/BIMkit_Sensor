@@ -54,7 +54,7 @@ namespace ModelCheckPackage
 
         public void SetNewRules(List<Rule> rules)
         {
-            Rules = rules;
+            Rules = rules.OrderBy(r => r.ErrorLevel).ToList();
             CompiledRules = GetCompiledRules();
 
             RuleResults = new List<RuleResult>();
@@ -62,7 +62,8 @@ namespace ModelCheckPackage
 
         public void SetNewRules(List<Tuple<Rule, Type, MethodInfo>> compiledRules)
         {
-            Rules = compiledRules.Select(cr=>cr.Item1).ToList();
+            compiledRules = compiledRules.OrderBy(r => r.Item1.ErrorLevel).ToList();
+            Rules = compiledRules.Select(cr => cr.Item1).ToList();
             CompiledRules = compiledRules;
         }
 
@@ -150,7 +151,7 @@ namespace ModelCheckPackage
 
         #region Check Methods:
 
-        public List<RuleResult> CheckModel(double defaultForNoOutput, string relaventType = null)
+        public List<RuleResult> CheckModel(double defaultForNoOutput, bool stopIfAnyError, string relaventType = null)
         {
             if (Model == null || Rules == null)
             {
@@ -165,6 +166,9 @@ namespace ModelCheckPackage
             RecreateVirtualObjects();
 
             RuleResults = new List<RuleResult>();
+            double errorRuleCounter = 0;
+            double errorRuleResults = 0;
+            double errorRuleTotal = CompiledRules.Count(r => r.Item1.ErrorLevel == ErrorLevel.Error);
             foreach (Tuple<Rule, Type, MethodInfo> compiledRule in CompiledRules)
             {
                 Rule rule = compiledRule.Item1;
@@ -185,6 +189,17 @@ namespace ModelCheckPackage
                 TimeSpan ts = timer.Elapsed;
                 results.Runtime = ts;
                 RuleResults.Add(results);
+
+                if (stopIfAnyError && rule.ErrorLevel == ErrorLevel.Error)
+                {
+                    errorRuleCounter += 1.0;
+                    errorRuleResults += results.PassVal;
+                    if (errorRuleCounter == errorRuleTotal && errorRuleResults != errorRuleCounter)
+                    {
+                        // Checked all error rules and found one is not a pass
+                        break;
+                    }
+                }
             }
 
             return RuleResults;
@@ -399,14 +414,26 @@ namespace ModelCheckPackage
                     if (positions[0].Value.OccurrenceRule == OccurrenceRule.ALL)
                     {
                         passes = passes * rule.PassVal;
+                        if (passes == 0.0)
+                        {
+                            return passes;
+                        }
                     }
                     if (positions[0].Value.OccurrenceRule == OccurrenceRule.ANY)
                     {
                         passes = Math.Max(passes, rule.PassVal);
+                        if (passes == 1.0)
+                        {
+                            return passes;
+                        }
                     }
                     if (positions[0].Value.OccurrenceRule == OccurrenceRule.NONE)
                     {
                         passes = passes * (1 - rule.PassVal);
+                        if (passes == 0.0)
+                        {
+                            return passes;
+                        }
                     }
                 }
             }
@@ -442,14 +469,26 @@ namespace ModelCheckPackage
                     if (positions[0].Value.OccurrenceRule == OccurrenceRule.ALL)
                     {
                         passes = passes * returnPass;
+                        if (passes == 0.0)
+                        {
+                            return passes;
+                        }
                     }
                     if (positions[0].Value.OccurrenceRule == OccurrenceRule.ANY)
                     {
                         passes = Math.Max(passes, returnPass);
+                        if (passes == 1.0)
+                        {
+                            return passes;
+                        }
                     }
                     if (positions[0].Value.OccurrenceRule == OccurrenceRule.NONE)
                     {
                         passes = passes * returnPass;
+                        if (passes == 0.0)
+                        {
+                            return passes;
+                        }
                     }
                 }
             }
@@ -607,6 +646,7 @@ namespace ModelCheckPackage
         {
             double result = 1.0;
             bool firstResult = true;
+            double checkCounts = logicExp.ObjectChecks.Count + logicExp.RelationChecks.Count + logicExp.LogicalExpressions.Count;
             foreach (ObjectCheck oc in logicExp.ObjectChecks)
             {
                 Property props = GetOrAddPropertyToObject(objects[oc.ObjName], oc.PropertyCheck.Name);
@@ -614,22 +654,32 @@ namespace ModelCheckPackage
                 ocResult = oc.Negation == Negation.MUST_HAVE ? ocResult : 1.0 - ocResult;
                 if (firstResult)
                 {
-                    result = ocResult;
+                    //result = ocResult;
+                    result = logicExp.LogicalOperator == LogicalOperator.AND ? ocResult / checkCounts : ocResult;
                     firstResult = false;
                 }
                 else
                 {
-                    switch (logicExp.LogicalOperator)
+                    if (logicExp.LogicalOperator == LogicalOperator.AND)
                     {
-                        case (LogicalOperator.AND):
-                            result = result * ocResult;
+                        //result = result * ocResult;
+                        //if (result == 0.0)
+                        //{
+                        //    break;
+                        //}
+                        result += ocResult / checkCounts;
+                    }
+                    if (logicExp.LogicalOperator == LogicalOperator.OR)
+                    {
+                        result = Math.Max(result, ocResult);
+                        if (result == 1.0)
+                        {
                             break;
-                        case (LogicalOperator.OR):
-                            result = Math.Max(result, ocResult);
-                            break;
-                        case (LogicalOperator.XOR):
-                            result = Math.Abs(result - ocResult);
-                            break;
+                        }
+                    }
+                    if (logicExp.LogicalOperator == LogicalOperator.XOR)
+                    {
+                        result = Math.Abs(result - ocResult);
                     }
                 }
             }
@@ -643,22 +693,32 @@ namespace ModelCheckPackage
                 rcResult = rc.Negation == Negation.MUST_HAVE ? rcResult : 1.0 - rcResult;
                 if (firstResult)
                 {
-                    result = rcResult;
+                    //result = rcResult;
+                    result = logicExp.LogicalOperator == LogicalOperator.AND ? rcResult / checkCounts : rcResult;
                     firstResult = false;
                 }
                 else
                 {
-                    switch (logicExp.LogicalOperator)
+                    if (logicExp.LogicalOperator == LogicalOperator.AND)
                     {
-                        case (LogicalOperator.AND):
-                            result = result * rcResult;
+                        //result = result * rcResult;
+                        //if (result == 0.0)
+                        //{
+                        //    break;
+                        //}
+                        result += rcResult / checkCounts;
+                    }
+                    if (logicExp.LogicalOperator == LogicalOperator.OR)
+                    {
+                        result = Math.Max(result, rcResult);
+                        if (result == 1.0)
+                        {
                             break;
-                        case (LogicalOperator.OR):
-                            result = Math.Max(result, rcResult);
-                            break;
-                        case (LogicalOperator.XOR):
-                            result = Math.Abs(result - rcResult);
-                            break;
+                        }
+                    }
+                    if (logicExp.LogicalOperator == LogicalOperator.XOR)
+                    {
+                        result = Math.Abs(result - rcResult);
                     }
                 }
             }
@@ -667,22 +727,32 @@ namespace ModelCheckPackage
                 double leResult = GetLogicalExpressionResult(modelCheck, le, objects, ref relations);
                 if (firstResult)
                 {
-                    result = leResult;
+                    //result = leResult;
+                    result = logicExp.LogicalOperator == LogicalOperator.AND ? leResult / checkCounts : leResult;
                     firstResult = false;
                 }
                 else
                 {
-                    switch (logicExp.LogicalOperator)
+                    if (logicExp.LogicalOperator == LogicalOperator.AND)
                     {
-                        case (LogicalOperator.AND):
-                            result = result * leResult;
+                        //result = result * leResult;
+                        //if (result == 0.0)
+                        //{
+                        //    break;
+                        //}
+                        result += leResult / checkCounts;
+                    }
+                    if (logicExp.LogicalOperator == LogicalOperator.OR)
+                    {
+                        result = Math.Max(result, leResult);
+                        if (result == 1.0)
+                        {
                             break;
-                        case (LogicalOperator.OR):
-                            result = Math.Max(result, leResult);
-                            break;
-                        case (LogicalOperator.XOR):
-                            result = Math.Abs(result - leResult);
-                            break;
+                        }
+                    }
+                    if (logicExp.LogicalOperator == LogicalOperator.XOR)
+                    {
+                        result = Math.Abs(result - leResult);
                     }
                 }
             }

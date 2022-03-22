@@ -35,14 +35,8 @@
     <Reference Include="DBMS">
       <HintPath>..\..\DBMS\DBMS\bin\DBMS.dll</HintPath>
     </Reference>
-    <Reference Include="DbmsApi">
-      <HintPath>..\..\DBMS\DbmsApi\bin\Debug\DbmsApi.dll</HintPath>
-    </Reference>
     <Reference Include="geometry3Sharp, Version=1.0.324.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\geometry3Sharp.1.0.324\lib\net45\geometry3Sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="MathPackage">
-      <HintPath>..\..\MathPackage\MathPackage\bin\Debug\MathPackage.dll</HintPath>
     </Reference>
     <Reference Include="MongoDB.Bson, Version=2.11.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MongoDB.Bson.2.11.2\lib\net452\MongoDB.Bson.dll</HintPath>
@@ -88,6 +82,16 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DBMS\DbmsApi\DbmsApi.csproj">
+      <Project>{79b59851-64ee-4388-a904-0921cf334e2f}</Project>
+      <Name>DbmsApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MathPackage\MathPackage\MathPackage.csproj">
+      <Project>{0c409f93-c5db-4b60-86f3-473453bfe014}</Project>
+      <Name>MathPackage</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

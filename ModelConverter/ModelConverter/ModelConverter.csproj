@@ -38,15 +38,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\CjClutter.ObjLoader.Loader\CjClutter.ObjLoader.Loader.dll</HintPath>
     </Reference>
-    <Reference Include="DbmsApi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DBMS\DbmsApi\bin\Debug\DbmsApi.dll</HintPath>
-    </Reference>
     <Reference Include="Esent.Interop, Version=1.9.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedEsent.1.9.4\lib\net40\Esent.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="MathPackage">
-      <HintPath>..\..\MathPackage\MathPackage\bin\Debug\MathPackage.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Configuration, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Configuration.2.1.1\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
@@ -280,6 +273,16 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DBMS\DbmsApi\DbmsApi.csproj">
+      <Project>{79b59851-64ee-4388-a904-0921cf334e2f}</Project>
+      <Name>DbmsApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MathPackage\MathPackage\MathPackage.csproj">
+      <Project>{0c409f93-c5db-4b60-86f3-473453bfe014}</Project>
+      <Name>MathPackage</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Xbim.Geometry.Engine.Interop.5.1.328\build\net47\Xbim.Geometry.Engine.Interop.targets" Condition="Exists('..\packages\Xbim.Geometry.Engine.Interop.5.1.328\build\net47\Xbim.Geometry.Engine.Interop.targets')" />

@@ -39,10 +39,6 @@
     <Reference Include="CjClutter.ObjLoader.Loader">
       <HintPath>..\packages\CjClutter.ObjLoader.Loader\CjClutter.ObjLoader.Loader.dll</HintPath>
     </Reference>
-    <Reference Include="DbmsApi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DBMS\DbmsApi\bin\Debug\DbmsApi.dll</HintPath>
-    </Reference>
     <Reference Include="Esent.Interop, Version=1.9.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedEsent.1.9.4\lib\net40\Esent.Interop.dll</HintPath>
     </Reference>
@@ -170,6 +166,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DBMS\DbmsApi\DbmsApi.csproj">
+      <Project>{79b59851-64ee-4388-a904-0921cf334e2f}</Project>
+      <Name>DbmsApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ModelConverter\ModelConverter.csproj">
       <Project>{79a520ba-1ef8-4cbe-b45a-205cc70c7aa2}</Project>
       <Name>ModelConverter</Name>

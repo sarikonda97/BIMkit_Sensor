@@ -43,10 +43,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DbmsApi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DBMS\DbmsApi\bin\Debug\DbmsApi.dll</HintPath>
-    </Reference>
     <Reference Include="DnsClient, Version=1.3.1.0, Culture=neutral, PublicKeyToken=4574bb5573c51424, processorArchitecture=MSIL">
       <HintPath>..\packages\DnsClient.1.3.1\lib\net471\DnsClient.dll</HintPath>
     </Reference>
@@ -192,6 +188,10 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DBMS\DbmsApi\DbmsApi.csproj">
+      <Project>{79b59851-64ee-4388-a904-0921cf334e2f}</Project>
+      <Name>DbmsApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RuleAPI\RuleAPI.csproj">
       <Project>{3820E1AB-860B-43A6-A0D5-DD3083192AD3}</Project>
       <Name>RuleAPI</Name>

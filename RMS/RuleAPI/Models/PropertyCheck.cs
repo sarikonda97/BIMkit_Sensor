@@ -107,7 +107,7 @@ namespace RuleAPI.Models
     }
     public class PropertyCheckNum : PropertyCheck
     {
-        public static double ALPHA = 2.0;
+        public static double ALPHA = 1.0;//2.0;
         public static double roundingHelper = 0.00001;
         //public static int CheckRounding = 50;
 

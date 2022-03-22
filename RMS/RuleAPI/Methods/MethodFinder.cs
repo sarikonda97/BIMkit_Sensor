@@ -42,15 +42,15 @@ namespace RuleAPI.Methods
             return methodNames;
         }
 
-        public static Dictionary<ObjectType, string> GetAllVOMethods()
+        public static Dictionary<string, ObjectType> GetAllVOMethods()
         {
             MethodInfo[] methodInfos = typeof(VirtualObjects).GetMethods(BindingFlags.Public | BindingFlags.Static);
 
-            Dictionary<ObjectType, string> methodNames = new Dictionary<ObjectType, string>();
+            Dictionary<string, ObjectType> methodNames = new Dictionary<string, ObjectType>();
             foreach (MethodInfo methodInfo in methodInfos)
             {
                 ObjectType methodVOType = GetAllTypes().Where(e => e.Name.Contains(methodInfo.Name)).First();
-                methodNames.Add(methodVOType, methodInfo.Name);
+                methodNames.Add(methodInfo.Name, methodVOType);
             }
             return methodNames;
         }

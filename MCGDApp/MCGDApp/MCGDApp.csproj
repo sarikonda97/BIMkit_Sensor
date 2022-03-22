@@ -33,17 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DbmsApi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DBMS\DbmsApi\bin\Debug\DbmsApi.dll</HintPath>
-    </Reference>
-    <Reference Include="ModelCheckAPI">
-      <HintPath>..\..\ModelCheckService\ModelCheckAPI\bin\Debug\ModelCheckAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="RuleAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\RMS\RuleAPI\bin\Debug\RuleAPI.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -100,6 +89,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DBMS\DbmsApi\DbmsApi.csproj">
+      <Project>{79b59851-64ee-4388-a904-0921cf334e2f}</Project>
+      <Name>DbmsApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\GenerativeDesignService\GenerativeDesignAPI\GenerativeDesignAPI.csproj">
       <Project>{2fbc71de-2eb2-4117-a694-11e88a4d413f}</Project>
       <Name>GenerativeDesignAPI</Name>
@@ -112,9 +105,17 @@
       <Project>{0c409f93-c5db-4b60-86f3-473453bfe014}</Project>
       <Name>MathPackage</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ModelCheckService\ModelCheckAPI\ModelCheckAPI.csproj">
+      <Project>{92532063-87f5-4d50-a563-3049f244e4ce}</Project>
+      <Name>ModelCheckAPI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ModelCheckService\ModelCheckPackage\ModelCheckPackage.csproj">
       <Project>{e5119cd6-c4a9-4834-b857-29d412c01f86}</Project>
       <Name>ModelCheckPackage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\RMS\RuleAPI\RuleAPI.csproj">
+      <Project>{3820e1ab-860b-43a6-a0d5-dd3083192ad3}</Project>
+      <Name>RuleAPI</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\VoxelService\VoxelService\VoxelService.csproj">
       <Project>{61939a6e-ad16-4fd9-ba8c-7af101d952a9}</Project>

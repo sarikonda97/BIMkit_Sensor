@@ -24,6 +24,11 @@ namespace DbmsApi.API
         {
             return this.Name == obj.Name;
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     public static class ObjectTypeTree

@@ -29,7 +29,7 @@ namespace MCGDApp
         private DBMSAPIController DBMSController;
         private MCAPIController MCAPIController;
         private GDAPIController GDAPIController;
-        private string ruleServiceURL = "https://localhost:44370/api/";
+        private string rsURL = "https://localhost:44370//api/";
         private string dbmsURL = "https://localhost:44322//api/";
         private string mcURL = "https://localhost:44346//api/";
         private string gdURL = "https://localhost:44328///api/";
@@ -42,7 +42,7 @@ namespace MCGDApp
             InitializeComponent();
 
             DBMSController = new DBMSAPIController(dbmsURL);
-            RuleAPIController = new RuleAPIController(ruleServiceURL);
+            RuleAPIController = new RuleAPIController(rsURL);
             MCAPIController = new MCAPIController(mcURL);
             GDAPIController = new GDAPIController(gdURL);
 
@@ -162,7 +162,7 @@ namespace MCGDApp
 
             // Execute
             ModelChecker = new ModelChecker(model, rules);
-            List<RuleResult> ruleResults = ModelChecker.CheckModel(0);
+            List<RuleResult> ruleResults = ModelChecker.CheckModel(0, false);
             foreach (RuleResult rr in ruleResults)
             {
                 this.listBoxRuleResults.Items.Add(rr);
@@ -364,7 +364,7 @@ namespace MCGDApp
             List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
             List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
             ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
-            if (modelMetaData == null || rules.Count==0|| catalogObjectsMeta.Count == 0)
+            if (modelMetaData == null || rules.Count == 0 || catalogObjectsMeta.Count == 0)
             {
                 MessageBox.Show("Select a model, rules, and objects");
                 return;
@@ -403,7 +403,7 @@ namespace MCGDApp
                 CatalogObject catalogObject = response2.Data;
                 float minZ = (float)catalogObject.Components.Min(c => c.Vertices.Min(v => v.z));
                 float maxZ = (float)catalogObject.Components.Max(c => c.Vertices.Max(v => v.z));
-                float heightOfset = (maxZ - minZ) / 2.0f + 0.001f; // We want it slightly off the ground for overlap purposes
+                float heightOfset = (maxZ - minZ) / 2.0f + 0.0001f; // We want it slightly off the ground for overlap purposes
 
                 catalogObjectsInits.Add(new CatalogInitializer()
                 {
@@ -441,14 +441,14 @@ namespace MCGDApp
 
             buttonSignInDBMS_Click(null, null);
             ModelChecker = new ModelChecker(newModel, compliledRules);
-            List<RuleResult> ruleResults = ModelChecker.CheckModel(0);
+            List<RuleResult> ruleResults = ModelChecker.CheckModel(0, false);
             CheckScore cs = ModelChecker.GetCheckScore();
 
-            this.richTextBoxGenDesign.Text = "Done\nRuntime: " + sw.Elapsed.ToString() + 
-                                             "\nCheck Result: " + cs.TotalScore() + "/" + rules.Count + 
-                                             "\nErrors: "+cs.ErrorScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Error) +
+            this.richTextBoxGenDesign.Text = "Done\nRuntime: " + sw.Elapsed.ToString() +
+                                             "\nCheck Result: " + cs.TotalScore() + "/" + rules.Count +
+                                             "\nErrors: " + cs.ErrorScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Error) +
                                              "\nWarning: " + cs.WarningScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Warning) +
-                                             "\nRecommended: " + cs.RecommendScore + "/" + rules.Count(r=>r.ErrorLevel == ErrorLevel.Recommended) ;
+                                             "\nRecommended: " + cs.RecommendScore + "/" + rules.Count(r => r.ErrorLevel == ErrorLevel.Recommended);
         }
 
         private void tableLayoutPanel3_Paint(object sender, PaintEventArgs e)

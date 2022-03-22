@@ -33,7 +33,7 @@ namespace RuleAPI.Methods
         public static double MinEdgeLength(RuleCheckObject obj)
         {
             double minLen = double.MaxValue;
-            for (int i = 0; i < obj.Triangles.Count; i += 3)
+            for (int i = 0; i < obj.Triangles.Count; i++)
             {
                 Vector3D v0 = obj.GlobalVerticies[obj.Triangles[i][0]];
                 Vector3D v1 = obj.GlobalVerticies[obj.Triangles[i][1]];
@@ -49,7 +49,7 @@ namespace RuleAPI.Methods
         public static double MaxEdgeLength(RuleCheckObject obj)
         {
             double maxLen = double.MinValue;
-            for (int i = 0; i < obj.Triangles.Count; i += 3)
+            for (int i = 0; i < obj.Triangles.Count; i++)
             {
                 Vector3D v0 = obj.GlobalVerticies[obj.Triangles[i][0]];
                 Vector3D v1 = obj.GlobalVerticies[obj.Triangles[i][1]];
@@ -65,7 +65,7 @@ namespace RuleAPI.Methods
         public static double TotalEdgeLength(RuleCheckObject obj)
         {
             double totalLen = 0;
-            for (int i = 0; i < obj.Triangles.Count; i += 3)
+            for (int i = 0; i < obj.Triangles.Count; i++)
             {
                 Vector3D v0 = obj.GlobalVerticies[obj.Triangles[i][0]];
                 Vector3D v1 = obj.GlobalVerticies[obj.Triangles[i][1]];

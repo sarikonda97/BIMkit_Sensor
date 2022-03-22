@@ -312,31 +312,17 @@ namespace RuleAPI
 
         #region VO/Relation/Properties Methods:
 
-        public async Task<APIResponse<Dictionary<ObjectType, string>>> GetVOMethodsAsync()
+        public async Task<APIResponse<Dictionary<string, ObjectType>>> GetVOMethodsAsync()
         {
             HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("method/vo"));
 
             if (response.IsSuccessStatusCode)
             {
-                return new APIResponse<Dictionary<ObjectType, string>>(response, await response.Content.ReadAsAsync<Dictionary<ObjectType, string>>(mediaTypeFormatters));
+                return new APIResponse<Dictionary<string, ObjectType>>(response, await response.Content.ReadAsAsync<Dictionary<string, ObjectType>>(mediaTypeFormatters));
             }
             else
             {
-                return new APIResponse<Dictionary<ObjectType, string>>(response, default);
-            }
-        }
-
-        public async Task<APIResponse<List<ObjectType>>> GetTypesList()
-        {
-            HttpResponseMessage response = await TryCatchFunctionAsync(client.GetAsync("method/type"));
-
-            if (response.IsSuccessStatusCode)
-            {
-                return new APIResponse<List<ObjectType>>(response, await response.Content.ReadAsAsync<List<ObjectType>>(mediaTypeFormatters));
-            }
-            else
-            {
-                return new APIResponse<List<ObjectType>>(response, default);
+                return new APIResponse<Dictionary<string, ObjectType>>(response, default);
             }
         }
 

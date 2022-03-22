@@ -62,6 +62,7 @@ public class GameController : MonoBehaviour
     public GameObject RuleListViewContent;
     public Text RuleDescriptionText;
     private List<ButtonData> RuleButtonData;
+    private List<Button> RuleButtons;
     public Button ModelCheckButton;
     public Button GenDesignButton;
 
@@ -446,6 +447,7 @@ public class GameController : MonoBehaviour
 
     public void GenDesignClicked()
     {
+        RestGenDesignMode();
         RefreshCatalogClicked();
         ResetCanvas();
         AddObjectCanvas.SetActive(true);
@@ -776,6 +778,7 @@ public class GameController : MonoBehaviour
         List<RuleSet> ruleSets = response2.Data;
         RemoveAllChidren(this.RuleListViewContent);
         RuleButtonData = new List<ButtonData>();
+        RuleButtons = new List<Button>();
         foreach (RuleSet rs in ruleSets)
         {
             foreach (Rule rule in rs.Rules)
@@ -785,7 +788,7 @@ public class GameController : MonoBehaviour
                 newButton.GetComponentInChildren<Text>().text = rs.Name + " - " + rule.Name;
                 UnityAction action = new UnityAction(() => RuleButtonClicked(newButton));
                 newButton.onClick.AddListener(action);
-
+                RuleButtons.Add(newButton);
                 RuleButtonData.Add(newButton.GetComponent<ButtonData>());
             }
         }
@@ -854,10 +857,10 @@ public class GameController : MonoBehaviour
                                                           rules,
                                                           LevelOfDetail.LOD100,
                                                           new GenerativeDesignSettings(
-                                                                Convert.ToInt32(100),
+                                                                Convert.ToInt32(10),
                                                                 Convert.ToDouble(10),
-                                                                Convert.ToDouble(0.75),
-                                                                Convert.ToInt32(5),
+                                                                Convert.ToDouble(0.5),
+                                                                Convert.ToInt32(10),
                                                                 false,
                                                                 true
                                                                 )
@@ -889,6 +892,14 @@ public class GameController : MonoBehaviour
     {
         GeneratingObjects = new List<GameObject>();
         genDesignMode = false;
+    }
+
+    public void SelectAllRules()
+    {
+        foreach (Button button in RuleButtons)
+        {
+            RuleButtonClicked(button);
+        }
     }
 
     #endregion
@@ -1138,8 +1149,6 @@ public class GameController : MonoBehaviour
 
     private void CheckObjectOverlap()
     {
-        Debug.Log("Checking");
-
         RuleCheckObject rco1 = new RuleCheckObject(FirstObject.ModelObject);
         RuleCheckObject rco2 = new RuleCheckObject(SecondObject.ModelObject);
         Stopwatch sw = new Stopwatch();
@@ -1217,12 +1226,16 @@ public class GameController : MonoBehaviour
 
     private void CheckOverlapRuntime(ModelObjectScript mosEditingObj, ModelObject mo)
     {
+        if (mo.Components.Sum(c => c.Triangles.Count) > 20)
+        {
+            return;
+        }
         // Just an Overlap Check for testing
         bool overlapingSomething = false;
         RuleCheckObject rco1 = new RuleCheckObject(mo);
         foreach (ModelObjectScript mos in ModelObjects)
         {
-            if (mos == mosEditingObj)
+            if (mos == mosEditingObj || mos.ModelObject.Components.Sum(c => c.Triangles.Count) > 20)
             {
                 continue;
             }
@@ -1275,10 +1288,6 @@ public class GameController : MonoBehaviour
 
         Vector3 center = VectorConvert(mid);
         Vector3 diment = VectorConvert(dims);
-
-        Debug.Log(vList.Count);
-        Debug.Log(mos.Count);
-        Debug.Log(center);
 
         MainCamera.orthographic = false;
         MainCamera.nearClipPlane = 0.1f;

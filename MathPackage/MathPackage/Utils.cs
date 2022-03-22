@@ -682,13 +682,16 @@ namespace MathPackage
                     Vector3D u2 = m2Shrink.VertexList[m2Shrink.TriangleList[j][2]];
 
                     IntrTriangle3Triangle3 intrTriangle3Triangle3 = new IntrTriangle3Triangle3(
-                                                                                new Triangle3d(V3DToV3d(v0),V3DToV3d(v1),V3DToV3d(v2)),
-                                                                                new Triangle3d(V3DToV3d(u0),V3DToV3d(u1),V3DToV3d(u2)));
+                                                                                    new Triangle3d(
+                                                                                                    V3DToV3d(v0),
+                                                                                                    V3DToV3d(v1),
+                                                                                                    V3DToV3d(v2)),
+                                                                                    new Triangle3d(
+                                                                                                    V3DToV3d(u0),
+                                                                                                    V3DToV3d(u1),
+                                                                                                    V3DToV3d(u2)));
                     bool testResult1 = intrTriangle3Triangle3.Find();
-                    if (testResult1)
-                    {
-                        return true;
-                    }
+                    if (testResult1) { return true; }
                 }
             }
 

@@ -325,17 +325,12 @@ namespace RuleAdminApp
 
         private async void buttonMethodCheck_Click(object sender, EventArgs e)
         {
-            APIResponse<List<ObjectType>> response = await DBMSController.GetTypes();
-            if (response.Code != System.Net.HttpStatusCode.OK)
-            {
-                MessageBox.Show(response.ReasonPhrase);
-            }
-            APIResponse<List<ObjectType>> response0 = await RuleAPIController.GetTypesList();
+            APIResponse<List<ObjectType>> response0 = await DBMSController.GetTypes();
             if (response0.Code != System.Net.HttpStatusCode.OK)
             {
                 MessageBox.Show(response0.ReasonPhrase);
             }
-            APIResponse<Dictionary<ObjectType, string>> response1 = await RuleAPIController.GetVOMethodsAsync();
+            APIResponse<Dictionary<string, ObjectType>> response1 = await RuleAPIController.GetVOMethodsAsync();
             if (response1.Code != System.Net.HttpStatusCode.OK)
             {
                 MessageBox.Show(response1.ReasonPhrase);

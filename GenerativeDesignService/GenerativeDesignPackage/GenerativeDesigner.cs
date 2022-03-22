@@ -61,13 +61,13 @@ namespace GenerativeDesignPackage
             }
 
             // Get the initial scene (global) config score
-            ModelCheck.CheckModel(0);
+            ModelCheck.CheckModel(1.0, false);
             scene.Eval = ModelCheck.GetCheckScore();
 
             // Evaluate all initial configs (When evaluating object configs we only use evaluations relevant to those objects not the whole eval)
             foreach (ObjectConfiguration config in scene.ObjectConfigurations)
             {
-                ModelCheck.CheckModel(0, config.CatalogObject.TypeId);
+                ModelCheck.CheckModel(1.0, true, config.CatalogObject.TypeId);
                 config.Eval = ModelCheck.GetCheckScore();
             }
 
@@ -141,7 +141,7 @@ namespace GenerativeDesignPackage
                 foreach (Vector4D orienation in newOrientations)
                 {
                     string newObjId = ModelCheck.Model.AddObject(config.CatalogObject, location, orienation);
-                    double newEval = ModelCheck.CheckModel(0, config.CatalogObject.TypeId).Sum(r => r.PassVal);
+                    double newEval = ModelCheck.CheckModel(1.0, true, config.CatalogObject.TypeId).Sum(r => r.PassVal);
                     CheckScore newScore = ModelCheck.GetCheckScore();
 
                     // Keep the best one
@@ -222,11 +222,11 @@ namespace GenerativeDesignPackage
             }
 
             // The first thread holds the best location for all objects and so is the master thread
-            ThreadConfigurations[0].ModelChecker.CheckModel(0);
+            ThreadConfigurations[0].ModelChecker.CheckModel(1.0, false);
             ThreadConfigurations[0].SceneConfiguration.Eval = ThreadConfigurations[0].ModelChecker.GetCheckScore();
             foreach (ObjectConfiguration config in ThreadConfigurations[0].SceneConfiguration.ObjectConfigurations)
             {
-                ThreadConfigurations[0].ModelChecker.CheckModel(0, config.CatalogObject.TypeId);
+                ThreadConfigurations[0].ModelChecker.CheckModel(1.0, false, config.CatalogObject.TypeId);
                 config.Eval = ThreadConfigurations[0].ModelChecker.GetCheckScore();
             }
             ThreadConfiguration bestThreadForScene = ThreadConfigurations[0];
@@ -273,7 +273,7 @@ namespace GenerativeDesignPackage
                     }
 
                     // Parallel:
-                    Task[] tasks = new Task[ThreadCount - 1];
+                        Task[] tasks = new Task[ThreadCount - 1];
                     // In all Threads (not including the first), update the ith item so it is at location and orientation pair j and then evaluate
                     for (int j = 1; j < ThreadCount; j++)
                     {
@@ -297,10 +297,11 @@ namespace GenerativeDesignPackage
 
                             // Now move the ith item to its location and orientation and see if it makes it better
                             ObjectConfiguration oConfig = currentThreadConfig.SceneConfiguration.ObjectConfigurations[i];
-                            oConfig.Location = locOrientPairs[val - 1].Item1;
-                            oConfig.Orientation = locOrientPairs[val - 1].Item2;
+                            int locOrientIndex = (val - 1) % locOrientPairs.Count; // Use the mod incase some locations were over floors so they were removed but still have more threads (probably just shouldn't even run this thread)
+                            oConfig.Location = locOrientPairs[locOrientIndex].Item1;
+                            oConfig.Orientation = locOrientPairs[locOrientIndex].Item2;
                             oConfig.ObjectModelID = currentThreadConfig.ModelChecker.Model.MoveObject(oConfig.ObjectModelID, oConfig.CatalogObject, oConfig.Location, oConfig.Orientation);
-                            currentThreadConfig.ModelChecker.CheckModel(0, oConfig.CatalogObject.TypeId);
+                            currentThreadConfig.ModelChecker.CheckModel(1.0, true, oConfig.CatalogObject.TypeId);
                             CheckScore newEval = currentThreadConfig.ModelChecker.GetCheckScore();
                             currentThreadConfig.SceneConfiguration.Eval.UpdateCheckScore(oConfig.Eval);
                             oConfig.Eval = newEval;
