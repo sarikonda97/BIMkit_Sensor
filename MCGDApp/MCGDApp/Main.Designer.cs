@@ -37,6 +37,7 @@ namespace MCGDApp
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.buttonLeft = new System.Windows.Forms.Button();
             this.buttonRight = new System.Windows.Forms.Button();
+            this.buttonRecommended = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.treeViewRules = new System.Windows.Forms.TreeView();
             this.buttonSignInRMS = new System.Windows.Forms.Button();
@@ -59,12 +60,11 @@ namespace MCGDApp
             this.buttonGDSeq = new System.Windows.Forms.Button();
             this.buttonGDSettings = new System.Windows.Forms.Button();
             this.richTextBoxGenDesign = new System.Windows.Forms.RichTextBox();
-            this.buttonGDLocal = new System.Windows.Forms.Button();
+            this.buttonGDThread = new System.Windows.Forms.Button();
             this.buttonGDWeb = new System.Windows.Forms.Button();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.buttonRuleTypeOrder = new System.Windows.Forms.Button();
             this.buttonVoxelCreator = new System.Windows.Forms.Button();
-            this.buttonRecommended = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -190,6 +190,16 @@ namespace MCGDApp
             this.buttonRight.Text = ">";
             this.buttonRight.UseVisualStyleBackColor = true;
             this.buttonRight.Click += new System.EventHandler(this.buttonRight_Click);
+            // 
+            // buttonRecommended
+            // 
+            this.buttonRecommended.Location = new System.Drawing.Point(3, 189);
+            this.buttonRecommended.Name = "buttonRecommended";
+            this.buttonRecommended.Size = new System.Drawing.Size(38, 23);
+            this.buttonRecommended.TabIndex = 3;
+            this.buttonRecommended.Text = "Rec";
+            this.buttonRecommended.UseVisualStyleBackColor = true;
+            this.buttonRecommended.Click += new System.EventHandler(this.buttonRecommended_Click);
             // 
             // groupBox2
             // 
@@ -411,7 +421,7 @@ namespace MCGDApp
             this.groupBox5.Controls.Add(this.buttonGDSeq);
             this.groupBox5.Controls.Add(this.buttonGDSettings);
             this.groupBox5.Controls.Add(this.richTextBoxGenDesign);
-            this.groupBox5.Controls.Add(this.buttonGDLocal);
+            this.groupBox5.Controls.Add(this.buttonGDThread);
             this.groupBox5.Controls.Add(this.buttonGDWeb);
             this.groupBox5.Location = new System.Drawing.Point(497, 3);
             this.groupBox5.Name = "groupBox5";
@@ -422,7 +432,7 @@ namespace MCGDApp
             // 
             // buttonGDSeq
             // 
-            this.buttonGDSeq.Location = new System.Drawing.Point(6, 135);
+            this.buttonGDSeq.Location = new System.Drawing.Point(6, 77);
             this.buttonGDSeq.Name = "buttonGDSeq";
             this.buttonGDSeq.Size = new System.Drawing.Size(97, 52);
             this.buttonGDSeq.TabIndex = 23;
@@ -452,19 +462,19 @@ namespace MCGDApp
             this.richTextBoxGenDesign.TabIndex = 12;
             this.richTextBoxGenDesign.Text = "";
             // 
-            // buttonGDLocal
+            // buttonGDThread
             // 
-            this.buttonGDLocal.Location = new System.Drawing.Point(6, 19);
-            this.buttonGDLocal.Name = "buttonGDLocal";
-            this.buttonGDLocal.Size = new System.Drawing.Size(97, 52);
-            this.buttonGDLocal.TabIndex = 10;
-            this.buttonGDLocal.Text = "Generative Design (Local)";
-            this.buttonGDLocal.UseVisualStyleBackColor = true;
-            this.buttonGDLocal.Click += new System.EventHandler(this.buttonGDLocal_Click);
+            this.buttonGDThread.Location = new System.Drawing.Point(6, 135);
+            this.buttonGDThread.Name = "buttonGDThread";
+            this.buttonGDThread.Size = new System.Drawing.Size(97, 52);
+            this.buttonGDThread.TabIndex = 10;
+            this.buttonGDThread.Text = "Generative Design (Round Robin)";
+            this.buttonGDThread.UseVisualStyleBackColor = true;
+            this.buttonGDThread.Click += new System.EventHandler(this.buttonGDThread_Click);
             // 
             // buttonGDWeb
             // 
-            this.buttonGDWeb.Location = new System.Drawing.Point(6, 77);
+            this.buttonGDWeb.Location = new System.Drawing.Point(6, 19);
             this.buttonGDWeb.Name = "buttonGDWeb";
             this.buttonGDWeb.Size = new System.Drawing.Size(97, 52);
             this.buttonGDWeb.TabIndex = 11;
@@ -509,16 +519,6 @@ namespace MCGDApp
             this.buttonVoxelCreator.Text = "Create Voxels";
             this.buttonVoxelCreator.UseVisualStyleBackColor = true;
             this.buttonVoxelCreator.Click += new System.EventHandler(this.buttonVoxelCreator_Click);
-            // 
-            // buttonRecommended
-            // 
-            this.buttonRecommended.Location = new System.Drawing.Point(3, 189);
-            this.buttonRecommended.Name = "buttonRecommended";
-            this.buttonRecommended.Size = new System.Drawing.Size(38, 23);
-            this.buttonRecommended.TabIndex = 3;
-            this.buttonRecommended.Text = "Rec";
-            this.buttonRecommended.UseVisualStyleBackColor = true;
-            this.buttonRecommended.Click += new System.EventHandler(this.buttonRecommended_Click);
             // 
             // Main
             // 
@@ -570,7 +570,7 @@ namespace MCGDApp
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.RichTextBox richTextBoxGenDesign;
-        private System.Windows.Forms.Button buttonGDLocal;
+        private System.Windows.Forms.Button buttonGDThread;
         private System.Windows.Forms.Button buttonGDWeb;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.ListBox listBoxCatalogList;

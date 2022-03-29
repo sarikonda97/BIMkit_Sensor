@@ -858,11 +858,11 @@ public class GameController : MonoBehaviour
                                                           LevelOfDetail.LOD100,
                                                           new GenerativeDesignSettings(
                                                                 Convert.ToInt32(10),
-                                                                Convert.ToDouble(10),
+                                                                Convert.ToDouble(20),
                                                                 Convert.ToDouble(0.5),
-                                                                Convert.ToInt32(10),
+                                                                Convert.ToInt32(20),
                                                                 false,
-                                                                true
+                                                                false
                                                                 )
                                                           );
 

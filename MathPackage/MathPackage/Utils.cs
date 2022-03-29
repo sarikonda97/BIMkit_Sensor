@@ -1121,7 +1121,7 @@ namespace MathPackage
             return "Unknown";
         }
 
-        // JUST FOR TESTING (3 and 4 seem to be the best):
+        // JUST FOR TESTING (1, 3, and 4 seem to be best):
         public static bool MeshOverlapTest1(Mesh m1, Mesh m2, double shrinkRatio)
         {
             Mesh m1Shrink = m1;

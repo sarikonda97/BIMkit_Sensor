@@ -107,9 +107,7 @@ namespace RuleAPI.Models
     }
     public class PropertyCheckNum : PropertyCheck
     {
-        public static double ALPHA = 1.0;//2.0;
-        public static double roundingHelper = 0.00001;
-        //public static int CheckRounding = 50;
+        public static double ALPHA = 1.0;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public OperatorNum Operation { get; set; }
@@ -142,51 +140,47 @@ namespace RuleAPI.Models
         {
             if (property.Name == Name)
             {
-                double val = (ValueInStandardUnit == 0.0) ? roundingHelper : ValueInStandardUnit;
                 switch (Operation)
                 {
                     case (OperatorNum.EQUAL):
-                        if (property.Value < val)
+                        if (property.Value < ValueInStandardUnit)
                         {
-                            //return Math.Round(Math.Pow((property.Value / val), ALPHA), CheckRounding);
-                            return Math.Pow((property.Value / val), ALPHA);
+                            return Math.Pow(property.Value / ValueInStandardUnit, ALPHA);
+                            //return -Math.Pow(1.0 / (property.Value - ValueInStandardUnit - 1), ALPHA);
                         }
-                        if (property.Value > val)
+                        if (property.Value > ValueInStandardUnit)
                         {
-                            //return Math.Round(Math.Pow((val / property.Value), ALPHA), CheckRounding);
-                            return Math.Pow((val / property.Value), ALPHA);
+                            return Math.Pow(1.0 / (property.Value - ValueInStandardUnit + 1), ALPHA);
                         }
                         return 1.0;
                     case (OperatorNum.GREATER_THAN):
-                        if (property.Value <= val)
+                        if (property.Value <= ValueInStandardUnit)
                         {
-                            //return Math.Round(Math.Pow((property.Value / val), ALPHA), CheckRounding);
-                            return Math.Pow((property.Value / val), ALPHA);
+                            return Math.Pow(property.Value / ValueInStandardUnit, ALPHA);
+                            //return -Math.Pow(1.0 / (property.Value - ValueInStandardUnit - 1), ALPHA);
                         }
                         return 1.0;
                     case (OperatorNum.GREATER_THAN_OR_EQUAL):
-                        if (property.Value < val)
+                        if (property.Value < ValueInStandardUnit)
                         {
-                            //return Math.Round(Math.Pow((property.Value / val), ALPHA), CheckRounding);
-                            return Math.Pow((property.Value / val), ALPHA);
+                            return Math.Pow(property.Value / ValueInStandardUnit, ALPHA);
+                            //return -Math.Pow(1.0 / (property.Value - ValueInStandardUnit - 1), ALPHA);
                         }
                         return 1.0;
                     case (OperatorNum.LESS_THAN):
-                        if (property.Value >= val)
+                        if (property.Value >= ValueInStandardUnit)
                         {
-                            //return Math.Round(Math.Pow((val / property.Value), ALPHA), CheckRounding);
-                            return Math.Pow((val / property.Value), ALPHA);
+                            return Math.Pow(1.0 / (property.Value - ValueInStandardUnit + 1), ALPHA);
                         }
                         return 1.0;
                     case (OperatorNum.LESS_THAN_OR_EQUAL):
-                        if (property.Value > val)
+                        if (property.Value > ValueInStandardUnit)
                         {
-                            //return Math.Round(Math.Pow((val / property.Value), ALPHA), CheckRounding);
-                            return Math.Pow((val / property.Value), ALPHA);
+                            return Math.Pow(1.0 / (property.Value - ValueInStandardUnit + 1), ALPHA);
                         }
                         return 1.0;
                     case (OperatorNum.NOT_EQUAL):
-                        return property.Value != val ? 1.0 : 0.0;
+                        return property.Value != ValueInStandardUnit ? 1.0 : 0.0;
                 }
             }
             return 0.0;

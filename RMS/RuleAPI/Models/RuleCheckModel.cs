@@ -43,12 +43,12 @@ namespace RuleAPI.Models
             }
         }
 
-        public string AddObject(CatalogObject catalogObject, Vector3D location, Vector4D orientation)
+        public string AddObject(CatalogObject catalogObject, Vector3D location, Vector4D orientation, string setID = null)
         {
             ModelCatalogObject mo = new ModelCatalogObject()
             {
                 Name = catalogObject.Name,
-                Id = Guid.NewGuid().ToString(),
+                Id = setID == null ? Guid.NewGuid().ToString() : setID,
                 CatalogId = catalogObject.CatalogID,
                 TypeId = catalogObject.TypeId,
                 Location = location,

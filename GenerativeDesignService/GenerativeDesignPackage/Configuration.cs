@@ -24,12 +24,6 @@ namespace GenerativeDesignPackage
         public CheckScore Eval;
     }
 
-    public class ThreadConfiguration
-    {
-        public SceneConfiguration SceneConfiguration;
-        public ModelChecker ModelChecker;
-    }
-
     public class CatalogInitializerID
     {
         public string CatalogID;

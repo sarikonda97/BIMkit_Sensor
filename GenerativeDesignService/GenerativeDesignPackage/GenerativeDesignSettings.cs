@@ -31,7 +31,7 @@ namespace GenerativeDesignPackage
             Itterations = 10;
             Movement = 10;
             Rate = 0.5;
-            Moves = 5;
+            Moves = 10;
             ShowRoute = false;
             FixedItterations = false;
         }
