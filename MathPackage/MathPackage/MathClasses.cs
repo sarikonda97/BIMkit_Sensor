@@ -116,7 +116,13 @@ namespace MathPackage
 
         public static double AngleRad(Vector3D v1, Vector3D v2)
         {
-            return Math.Acos(Dot(v1, v2) / (v1.Length() * v2.Length()));
+            double dot = Dot(v1, v2);
+            double l1 = v1.Length();
+            double l2 = v2.Length();
+            double val = dot / (l1 * l2);
+            val = val > 1.0 ? 1.0 : val; // Odd times a value exceeds 1...
+            val = val < -1.0 ? -1.0 : val; // Odd times a value less than 1...
+            return Math.Acos(val);
         }
 
         public static bool AreParallel(Vector3D v1, Vector3D v2)

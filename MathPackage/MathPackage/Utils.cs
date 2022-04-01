@@ -263,6 +263,7 @@ namespace MathPackage
             return new Vector4D(axisNorm.x * S, axisNorm.y * S, axisNorm.z * S, C);
         }
 
+        // This is not the best ear clipping should delete!! -------------------------------------------------
         public static List<int[]> EarClippingVariant(List<Vector3D> points, FaceSide faceSide)
         {
             List<int[]> triangleList = new List<int[]>();
@@ -420,7 +421,6 @@ namespace MathPackage
 
             return triangleList;
         }
-        // None of these work but are necessary for EarClippingVariant to work for ALL cases: ----------------
         public static bool IsConvexVectex(Vector3D a, Vector3D b, Vector3D c)
         {
             //https://dai.fmph.uniba.sk/upload/8/89/Gm17_lesson05.pdf
@@ -490,6 +490,89 @@ namespace MathPackage
             return -1;
         }
         // ---------------------------------------------------------------------------------------------------
+
+        public static Vector3D EstimateFaceNormal(List<Vector3D> points)
+        {
+            Vector3D norm = new Vector3D();
+            for (int i = 0; i < points.Count; i++)
+            {
+                int index1 = (i + 0) % points.Count;
+                int index2 = (i + 1) % points.Count;
+                int index3 = (i + 2) % points.Count;
+                Vector3D p1 = points[index1];
+                Vector3D p2 = points[index2];
+                Vector3D p3 = points[index3];
+
+                Vector3D v1 = Vector3D.Subract(p2, p1);
+                Vector3D v2 = Vector3D.Subract(p2, p3);
+                Vector3D dir = Vector3D.Cross(v1, v2);
+                norm = Vector3D.Add(norm, dir);
+            }
+            return norm.Norm();
+        }
+
+        public static List<int> EarClip(List<Vector3D> points, Vector3D normal)
+        {
+            // This just keep the index intact while we remove points because the index is used for the triangles
+            List<Tuple<int, Vector3D>> remainingPoints = new List<Tuple<int, Vector3D>>();
+            for (int i = 0; i < points.Count; i++)
+            {
+                Vector3D p = points[i];
+                remainingPoints.Add(new Tuple<int, Vector3D>(i, p));
+            }
+            List<int> triangleList;
+            try
+            {
+                triangleList = EarClipRecursive(remainingPoints, normal);
+            }
+            catch
+            {
+                triangleList = EarClipRecursive(remainingPoints, normal);
+            }
+            return triangleList;
+        }
+
+        public static List<int> EarClipRecursive(List<Tuple<int, Vector3D>> points, Vector3D normal)
+        {
+            if (points.Count == 3)
+            {
+                return points.Select(p => p.Item1).ToList();
+            }
+
+            // Find an ear by checking if the direction of the points matches the normal direction:
+            for (int i = 0; i < points.Count; i++)
+            {
+                int index1 = (i + 0) % points.Count;
+                int index2 = (i + 1) % points.Count;
+                int index3 = (i + 2) % points.Count;
+                Vector3D p1 = points[index1].Item2;
+                Vector3D p2 = points[index2].Item2;
+                Vector3D p3 = points[index3].Item2;
+
+                // Check that the direction is parallel to the first triangle direction (the first three points will determine the direction)
+                Vector3D v1 = Vector3D.Subract(p2, p1);
+                Vector3D v2 = Vector3D.Subract(p2, p3);
+                Vector3D dir = Vector3D.Cross(v1, v2).Norm();
+                double normaDirAngle = Vector3D.AngleRad(dir, normal);
+                if (normaDirAngle < (Math.PI / 2.0))
+                {
+                    // Add the ear to the triangle list
+                    List<int> triangleList = new List<int>() { points[index1].Item1, points[index2].Item1, points[index3].Item1 };
+                    // Remove the middle point (the ear point) 
+                    points.Remove(points[index2]);
+                    // find the ears with the remaining points
+                    List<int> newEars = EarClipRecursive(points, normal);
+                    triangleList.AddRange(newEars);
+                    return triangleList;
+                }
+                else
+                {
+                    int qqqq = 0;
+                }
+            }
+
+            throw new Exception("No triangles facing normal");
+        }
 
         public static Vector3D RotatePointAroundZAxis(Vector3D point, double angleInDegrees)
         {

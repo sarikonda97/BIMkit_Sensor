@@ -83,40 +83,24 @@ namespace ModelConverter
             foreach (var group in result.Groups)
             {
                 //  Get faces
-                List<List<Vector3D>> faces = group.Faces.Select(face =>
-                {
-                    List<Vector3D> vertices = new List<Vector3D>();
-                    for (int i = 0; i < face.Count; i++)
-                    {
-                        Vertex vertex = result.Vertices[face[i].VertexIndex - 1];
-                        if (flipYZ)
-                        {
-                            vertices.Add(new Vector3D(vertex.X, vertex.Z, vertex.Y));
-                        }
-                        else
-                        {
-                            vertices.Add(new Vector3D(vertex.X, vertex.Y, vertex.Z));
-                        }
-                    }
-                    return vertices;
-                }).ToList();
+                List<Tuple<Vector3D, List<Vector3D>>> faces = group.Faces.Select(face => ObjConverter.GetFace(face, result, flipYZ)).ToList();
 
                 // Attempt to tesellate the faces
                 List<int> triangles = new List<int>();
                 List<Vector3D> finalVertices = new List<Vector3D>();
-                foreach (List<Vector3D> face in faces)
+                foreach (Tuple<Vector3D, List<Vector3D>> face in faces)
                 {
-                    List<int> tempTriangleInts = new List<int>();
-                    if (face.Count >= 3)
+                    if (face.Item2.Count < 3)
                     {
-                        tempTriangleInts = ObjConverter.EarClippingVariant(face, ObjConverter.FaceSide.FRONT);
+                        continue;
                     }
 
+                    List<int> tempTriangleInts = Utils.EarClip(face.Item2, face.Item1);
                     foreach (int intVal in tempTriangleInts)
                     {
                         triangles.Add(intVal + finalVertices.Count);
                     }
-                    finalVertices.AddRange(face);
+                    finalVertices.AddRange(face.Item2);
                 }
 
                 List<int[]> trianglesTuples = new List<int[]>();
