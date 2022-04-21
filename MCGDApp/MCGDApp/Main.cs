@@ -7,12 +7,14 @@ using ModelCheckAPI;
 using ModelCheckPackage;
 using RuleAPI;
 using RuleAPI.Models;
+using RuleGeneratorPackage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -51,6 +53,13 @@ namespace MCGDApp
             GetTypes();
         }
 
+        private void ResetDsiplays()
+        {
+            this.richTextBoxGenDesign.Text = "";
+            this.listBoxRuleResults.Items.Clear();
+            this.treeViewRuleInstance.Nodes.Clear();
+        }
+
         private async Task GetTypes()
         {
             APIResponse<List<ObjectType>> response3 = await DBMSController.GetTypes();
@@ -61,6 +70,8 @@ namespace MCGDApp
             }
             ObjectTypeTree.BuildTypeTree(response3.Data);
         }
+
+        #region DBMS
 
         private async void buttonSignInDBMS_Click(object sender, EventArgs e)
         {
@@ -101,6 +112,60 @@ namespace MCGDApp
 
             this.listBoxSelectedCatalogList.Items.Clear();
         }
+
+        private List<CatalogObjectMetadata> GetCheckedObjects()
+        {
+            List<CatalogObjectMetadata> selectedObjects = new List<CatalogObjectMetadata>();
+            foreach (CatalogObjectMetadata com in this.listBoxSelectedCatalogList.Items)
+            {
+                selectedObjects.Add(com);
+            }
+            return selectedObjects;
+        }
+
+        private void buttonRight_Click(object sender, EventArgs e)
+        {
+            if (this.listBoxCatalogList.SelectedItem == null)
+            {
+                return;
+            }
+            this.listBoxSelectedCatalogList.Items.Add(this.listBoxCatalogList.SelectedItem);
+        }
+
+        private void buttonLeft_Click(object sender, EventArgs e)
+        {
+            if (this.listBoxSelectedCatalogList.SelectedItem == null)
+            {
+                return;
+            }
+            if (this.listBoxSelectedCatalogList.Items.Count > 0)
+            {
+                this.listBoxSelectedCatalogList.Items.RemoveAt(this.listBoxSelectedCatalogList.SelectedIndex);
+            }
+        }
+
+        private void buttonRecommended_Click(object sender, EventArgs e)
+        {
+            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
+            List<string> typeOrder = GetRecommendedTypeOrderFromRules(rules);
+
+            // Find an item that matches the types in the type order
+            foreach (string type in typeOrder)
+            {
+                foreach (CatalogObjectMetadata com in this.listBoxCatalogList.Items)
+                {
+                    if (com.Type == type)
+                    {
+                        this.listBoxSelectedCatalogList.Items.Add(com);
+                        continue;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region RMS
 
         private async void buttonSignInRMS_Click(object sender, EventArgs e)
         {
@@ -144,9 +209,27 @@ namespace MCGDApp
             }
         }
 
+        private List<Rule> GetCheckedRules(TreeNodeCollection nodes)
+        {
+            List<Rule> tempList = new List<Rule>();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                if (nodes[i].Checked && nodes[i].Tag != null)
+                {
+                    tempList.Add(nodes[i].Tag as Rule);
+                }
+                tempList.AddRange(GetCheckedRules(nodes[i].Nodes));
+            }
+            return tempList;
+        }
+
+        #endregion
+
+        #region MC
+
         private async void buttonModelCheck_Click(object sender, EventArgs e)
         {
-            this.listBoxRuleResults.Items.Clear();
+            ResetDsiplays();
 
             // Get the model and rules
             ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
@@ -171,6 +254,8 @@ namespace MCGDApp
 
         private async void buttonCheckService_Click(object sender, EventArgs e)
         {
+            ResetDsiplays();
+
             ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
             List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
 
@@ -188,20 +273,6 @@ namespace MCGDApp
             {
                 this.listBoxRuleResults.Items.Add(rr);
             }
-        }
-
-        private List<Rule> GetCheckedRules(TreeNodeCollection nodes)
-        {
-            List<Rule> tempList = new List<Rule>();
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                if (nodes[i].Checked && nodes[i].Tag != null)
-                {
-                    tempList.Add(nodes[i].Tag as Rule);
-                }
-                tempList.AddRange(GetCheckedRules(nodes[i].Nodes));
-            }
-            return tempList;
         }
 
         private void listBoxRuleResults_SelectedIndexChanged(object sender, EventArgs e)
@@ -240,18 +311,14 @@ namespace MCGDApp
             }
         }
 
-        private List<CatalogObjectMetadata> GetCheckedObjects()
-        {
-            List<CatalogObjectMetadata> selectedObjects = new List<CatalogObjectMetadata>();
-            foreach (CatalogObjectMetadata com in this.listBoxSelectedCatalogList.Items)
-            {
-                selectedObjects.Add(com);
-            }
-            return selectedObjects;
-        }
+        #endregion
+
+        #region GD
 
         private async void buttonGDWeb_Click(object sender, EventArgs e)
         {
+            ResetDsiplays();
+
             ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
             List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
             List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
@@ -296,6 +363,8 @@ namespace MCGDApp
 
         private async void buttonGDSeq_Click(object sender, EventArgs e)
         {
+            ResetDsiplays();
+
             // Get the model, object, and rules
             List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
             List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
@@ -482,6 +551,8 @@ namespace MCGDApp
 
         private async void buttonGDThread_Click(object sender, EventArgs e)
         {
+            ResetDsiplays();
+
             // Get the model, object, and rules
             ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
             APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
@@ -543,32 +614,6 @@ namespace MCGDApp
             this.richTextBoxGenDesign.Text = "Done";
         }
 
-        private void tableLayoutPanel3_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void buttonRight_Click(object sender, EventArgs e)
-        {
-            if (this.listBoxCatalogList.SelectedItem == null)
-            {
-                return;
-            }
-            this.listBoxSelectedCatalogList.Items.Add(this.listBoxCatalogList.SelectedItem);
-        }
-
-        private void buttonLeft_Click(object sender, EventArgs e)
-        {
-            if (this.listBoxSelectedCatalogList.SelectedItem == null)
-            {
-                return;
-            }
-            if (this.listBoxSelectedCatalogList.Items.Count > 0)
-            {
-                this.listBoxSelectedCatalogList.Items.RemoveAt(this.listBoxSelectedCatalogList.SelectedIndex);
-            }
-        }
-
         private void buttonGDSettings_Click(object sender, EventArgs e)
         {
             GenerativeDesignSettingsForm gdsf = new GenerativeDesignSettingsForm(GDSettings);
@@ -580,8 +625,14 @@ namespace MCGDApp
             GDSettings = gdsf.Settings;
         }
 
+        #endregion
+
+        #region Other
+
         private async void buttonVoxelCreator_Click(object sender, EventArgs e)
         {
+            ResetDsiplays();
+
             ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
             APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD500));
             if (response.Code != System.Net.HttpStatusCode.OK)
@@ -718,23 +769,43 @@ namespace MCGDApp
             }
         }
 
-        private void buttonRecommended_Click(object sender, EventArgs e)
+        private void buttonRuleLearner_Click(object sender, EventArgs e)
         {
-            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
-            List<string> typeOrder = GetRecommendedTypeOrderFromRules(rules);
-
-            // Find an item that matches the types in the type order
-            foreach (string type in typeOrder)
+            // Read in data into examples
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            if (fbd.ShowDialog() != DialogResult.OK)
             {
-                foreach (CatalogObjectMetadata com in this.listBoxCatalogList.Items)
-                {
-                    if (com.Type == type)
-                    {
-                        this.listBoxSelectedCatalogList.Items.Add(com);
-                        continue;
-                    }
-                }
+                return;
             }
+
+            List<Example> exampleList = new List<Example>();
+            foreach (string file in Directory.GetFiles(fbd.SelectedPath, "*.csv"))
+            {
+                Example currentExample = new Example();
+                foreach (string line in File.ReadAllLines(file))
+                {
+                    string[] lineSplit = line.Split(',');
+                    RelationInstance newRi = new RelationInstance()
+                    {
+                        id1 = lineSplit[0],
+                        type1 = lineSplit[1],
+                        id2 = lineSplit[2],
+                        type2 = lineSplit[3],
+                        distance = Convert.ToDouble(lineSplit[4]),
+                        facing12 = Convert.ToDouble(lineSplit[5]),
+                        facing21 = Convert.ToDouble(lineSplit[6]),
+                    };
+                    newRi.GetBooleansFromValues();
+                    currentExample.relationInstances.Add(newRi);
+                }
+                exampleList.Add(currentExample);
+            }
+
+            Rule newRule = RuleGenerator.LearnRuleBoolean(OccurrenceRule.ALL, "Couch", OccurrenceRule.ANY, "CoffeeTable", exampleList);
+
+            this.richTextBoxGenDesign.Text = newRule.String();
         }
+
+        #endregion
     }
 }

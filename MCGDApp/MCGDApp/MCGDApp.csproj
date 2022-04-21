@@ -117,6 +117,10 @@
       <Project>{3820e1ab-860b-43a6-a0d5-dd3083192ad3}</Project>
       <Name>RuleAPI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\RuleGeneratorService\RuleGeneratorPackage\RuleGeneratorPackage.csproj">
+      <Project>{e1a8240e-ef8a-4c06-9e74-35386385f978}</Project>
+      <Name>RuleGeneratorPackage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\VoxelService\VoxelService\VoxelService.csproj">
       <Project>{61939a6e-ad16-4fd9-ba8c-7af101d952a9}</Project>
       <Name>VoxelService</Name>

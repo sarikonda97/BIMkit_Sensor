@@ -469,6 +469,9 @@ public class GameController : MonoBehaviour
         }
 
         Debug.LogWarning("Saved");
+
+        Task.Run(() => { PrintOutChangeLog(); });
+
         LoadingCanvas.SetActive(false);
     }
 
@@ -482,6 +485,7 @@ public class GameController : MonoBehaviour
     public void ExitClicked()
     {
         RemoveAllChidren(CurrentModelGameObj);
+        NewUnsavedModelObjects = new List<ModelObjectScript>();
         CurrentModel = null;
         ResetCanvas();
         this.ModelSelectCanvas.SetActive(true);
@@ -535,6 +539,8 @@ public class GameController : MonoBehaviour
             CurrentModel.ModelObjects.Remove(mos.ModelObject);
             Destroy(EditingGameObject);
             EditingGameObject = null;
+
+            NewUnsavedModelObjects.RemoveAll(m => m == mos);
         }
     }
 
@@ -687,6 +693,8 @@ public class GameController : MonoBehaviour
             {
                 GeneratingObjects.Add(EditingGameObject);
             }
+
+            NewUnsavedModelObjects.Add(mosEditingObj);
 
             return;
         }
@@ -1294,6 +1302,47 @@ public class GameController : MonoBehaviour
         MainCamera.farClipPlane = 100.0f;
         MainCamera.transform.position = new Vector3(center.x, center.y + 2.0f * diment.y, center.z);
         MainCamera.transform.LookAt(center, Vector3.up);
+    }
+
+    #endregion
+
+    #region Concept Learning Stuff:
+
+    // Keep track of all the objects that have been added to the model (dont care about the location until it is saved, just worry about IDs)
+    List<ModelObjectScript> NewUnsavedModelObjects = new List<ModelObjectScript>();
+
+    private async void PrintOutChangeLog()
+    {
+        NewUnsavedModelObjects = NewUnsavedModelObjects.Distinct().ToList();
+
+        string outputString = "";
+        // Once the model has been saved, record all the Relations (Distance and FacingAngle) between the newly placed objects and the objects in the model
+        foreach (ModelObjectScript newMos in NewUnsavedModelObjects)
+        {
+            RuleCheckObject rco1 = new RuleCheckObject(newMos.ModelObject);
+            foreach (ModelObjectScript mos in ModelObjects)
+            {
+                if (newMos == mos || newMos.ModelObject.Id == mos.ModelObject.Id)
+                {
+                    continue;
+                }
+                RuleCheckObject rco2 = new RuleCheckObject(mos.ModelObject);
+                double distanceVal = RelationMethods.Distance(new RuleCheckRelation(rco1, rco2));
+                double facingValAB = RelationMethods.FacingAngleTo(new RuleCheckRelation(rco1, rco2));
+                double facingValBA = RelationMethods.FacingAngleTo(new RuleCheckRelation(rco2, rco1));
+
+                outputString += rco1.ID + "," + rco1.Type + "," + rco2.ID + "," + rco2.Type + "," + distanceVal + "," + facingValAB + "," + facingValBA + "\n";
+            }
+        }
+
+        NewUnsavedModelObjects = new List<ModelObjectScript>();
+
+        if (!string.IsNullOrWhiteSpace(outputString))
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ChangeLog.csv";
+            File.WriteAllText(path, outputString);
+            Debug.LogWarning("Output File Complete");
+        }
     }
 
     #endregion

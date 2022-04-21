@@ -60,7 +60,7 @@ namespace RuleAPI.Methods
             Vector3D obj2Front = Vector3D.Add(obj2.Location, Vector3D.Multiply(obj2.ForwardDirectionY, obj2.Dimentions.y / 2.0));
             return Vector3D.Distance(obj1Front.Get2D(0.0), obj2Front.Get2D(0.0));
         }
-        public static double AngleBetweenForwardAndAngleTo(RuleCheckRelation objRelation)
+        public static double FacingAngleTo(RuleCheckRelation objRelation)
         {
             RuleCheckObject obj1 = objRelation.FirstObj;
             RuleCheckObject obj2 = objRelation.SecondObj;
