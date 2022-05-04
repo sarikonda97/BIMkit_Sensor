@@ -346,8 +346,8 @@ namespace MCGDApp
                                                               catalogObjectsInits,
                                                               rules.Select(r => r.Id).ToList(),
                                                               LevelOfDetail.LOD100,
-                                                              GDSettings
-                                                              );
+                                                              GDSettings,
+                                                              GenerationType.Sequential);
 
             APIResponse<string> response = await GDAPIController.PerformGenDesign(request);
             if (response.Code != System.Net.HttpStatusCode.OK)
@@ -395,45 +395,10 @@ namespace MCGDApp
                 ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
             }
 
-            List<CatalogInitializer> catalogObjectsInits = new List<CatalogInitializer>();
-            foreach (var catalogObjectMeta in catalogObjectsMeta)
-            {
-                APIResponse<CatalogObject> response2 = await DBMSController.GetCatalogObject(new ItemRequest(catalogObjectMeta.CatalogObjectId, LevelOfDetail.LOD100));
-                if (response2.Code != System.Net.HttpStatusCode.OK)
-                {
-                    MessageBox.Show(response2.ReasonPhrase);
-                    return;
-                }
+            List<CatalogInitializer> catalogObjectsInits = await GetCatalogInits(catalogObjectsMeta, ModelStartingLocation);
 
-                CatalogObject catalogObject = response2.Data;
-                float minZ = (float)catalogObject.Components.Min(c => c.Vertices.Min(v => v.z));
-                float maxZ = (float)catalogObject.Components.Max(c => c.Vertices.Max(v => v.z));
-                float heightOfset = (maxZ - minZ) / 2.0f + 0.0001f; // We want it slightly off the ground for overlap purposes
-
-                catalogObjectsInits.Add(new CatalogInitializer()
-                {
-                    CatalogObject = catalogObject,
-                    Location = new Vector3D(ModelStartingLocation.x, ModelStartingLocation.y, ModelStartingLocation.z + heightOfset)
-                });
-            }
-
-            Model newModel = null;
-            List<Tuple<Rule, Type, MethodInfo>> compliledRules = null;
-            foreach (var catalogItem in catalogObjectsInits)
-            {
-                GenerativeDesigner generativeDesigner;
-                if (compliledRules == null)
-                {
-                    generativeDesigner = new GenerativeDesigner(model, rules, new List<CatalogInitializer>() { catalogItem }, GDSettings);
-                    compliledRules = generativeDesigner.GetCompiledRules();
-                }
-                else
-                {
-                    generativeDesigner = new GenerativeDesigner(model, compliledRules, new List<CatalogInitializer>() { catalogItem }, GDSettings);
-                }
-
-                newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
-            }
+            GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits, GDSettings);
+            Model newModel = generativeDesigner.ExecuteGenDesignSequential();
 
             // Save the model:
             newModel.Name = "Generated Model";
@@ -444,117 +409,26 @@ namespace MCGDApp
                 return;
             }
 
-            buttonSignInDBMS_Click(null, null);
-            ModelChecker = new ModelChecker(newModel, compliledRules);
-            List<RuleResult> ruleResults = ModelChecker.CheckModel(0, false);
-            CheckScore cs = ModelChecker.GetCheckScore();
-
-            this.richTextBoxGenDesign.Text = "Done\nRuntime: " + sw.Elapsed.ToString() +
-                                             "\nCheck Result: " + cs.TotalScore() + "/" + rules.Count +
-                                             "\nErrors: " + cs.ErrorScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Error) +
-                                             "\nWarning: " + cs.WarningScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Warning) +
-                                             "\nRecommended: " + cs.RecommendScore + "/" + rules.Count(r => r.ErrorLevel == ErrorLevel.Recommended);
+            DisplayGDResults(rules, sw, generativeDesigner, newModel);
         }
 
-        //private async void buttonGDThread_Click(object sender, EventArgs e)
-        //{
-        //    // Get the model, object, and rules
-        //    List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
-        //    List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
-        //    ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
-        //    if (modelMetaData == null || rules.Count == 0 || catalogObjectsMeta.Count == 0)
-        //    {
-        //        MessageBox.Show("Select a model, rules, and objects");
-        //        return;
-        //    }
-
-        //    Stopwatch sw = new Stopwatch();
-        //    sw.Start();
-
-        //    APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
-        //    if (response.Code != System.Net.HttpStatusCode.OK)
-        //    {
-        //        MessageBox.Show(response.ReasonPhrase);
-        //        return;
-        //    }
-
-        //    Model model = response.Data;
-
-        //    // Find the center of the floor:
-        //    Vector3D ModelStartingLocation = new Vector3D();
-        //    ModelObject floorObject = model.ModelObjects.Where(o => o.TypeId == "Floor").First();
-        //    if (floorObject != null)
-        //    {
-        //        ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
-        //    }
-
-        //    List<CatalogInitializer> catalogObjectsInits = new List<CatalogInitializer>();
-        //    foreach (var catalogObjectMeta in catalogObjectsMeta)
-        //    {
-        //        APIResponse<CatalogObject> response2 = await DBMSController.GetCatalogObject(new ItemRequest(catalogObjectMeta.CatalogObjectId, LevelOfDetail.LOD100));
-        //        if (response2.Code != System.Net.HttpStatusCode.OK)
-        //        {
-        //            MessageBox.Show(response2.ReasonPhrase);
-        //            return;
-        //        }
-
-        //        CatalogObject catalogObject = response2.Data;
-        //        float minZ = (float)catalogObject.Components.Min(c => c.Vertices.Min(v => v.z));
-        //        float maxZ = (float)catalogObject.Components.Max(c => c.Vertices.Max(v => v.z));
-        //        float heightOfset = (maxZ - minZ) / 2.0f + 0.0001f; // We want it slightly off the ground for overlap purposes
-
-        //        catalogObjectsInits.Add(new CatalogInitializer()
-        //        {
-        //            CatalogObject = catalogObject,
-        //            Location = new Vector3D(ModelStartingLocation.x, ModelStartingLocation.y, ModelStartingLocation.z + heightOfset)
-        //        });
-        //    }
-
-        //    Model newModel = null;
-        //    List<Tuple<Rule, Type, MethodInfo>> compliledRules = null;
-        //    foreach (var catalogItem in catalogObjectsInits)
-        //    {
-        //        GenerativeDesignerThread generativeDesigner;
-        //        if (compliledRules == null)
-        //        {
-        //            generativeDesigner = new GenerativeDesignerThread(model, rules, new List<CatalogInitializer>() { catalogItem }, GDSettings);
-        //            compliledRules = generativeDesigner.GetCompiledRules();
-        //        }
-        //        else
-        //        {
-        //            generativeDesigner = new GenerativeDesignerThread(model, compliledRules, new List<CatalogInitializer>() { catalogItem }, GDSettings);
-        //        }
-
-        //        newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
-        //    }
-
-        //    // Save the model:
-        //    newModel.Name = "Generated Model";
-        //    APIResponse<string> response3 = await DBMSController.CreateModel(newModel);
-        //    if (response3.Code != System.Net.HttpStatusCode.OK)
-        //    {
-        //        MessageBox.Show(response3.ReasonPhrase);
-        //        return;
-        //    }
-
-        //    buttonSignInDBMS_Click(null, null);
-        //    ModelChecker = new ModelChecker(newModel, compliledRules);
-        //    List<RuleResult> ruleResults = ModelChecker.CheckModel(0, false);
-        //    CheckScore cs = ModelChecker.GetCheckScore();
-
-        //    this.richTextBoxGenDesign.Text = "Done\nRuntime: " + sw.Elapsed.ToString() +
-        //                                     "\nCheck Result: " + cs.TotalScore() + "/" + rules.Count +
-        //                                     "\nErrors: " + cs.ErrorScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Error) +
-        //                                     "\nWarning: " + cs.WarningScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Warning) +
-        //                                     "\nRecommended: " + cs.RecommendScore + "/" + rules.Count(r => r.ErrorLevel == ErrorLevel.Recommended);
-        //}
-
-        private async void buttonGDThread_Click(object sender, EventArgs e)
+        private async void buttonGDRR_Click(object sender, EventArgs e)
         {
             ResetDsiplays();
 
             // Get the model, object, and rules
+            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
+            List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
             ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
+            if (modelMetaData == null || rules.Count == 0 || catalogObjectsMeta.Count == 0)
+            {
+                MessageBox.Show("Select a model, rules, and objects");
+                return;
+            }
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
             if (response.Code != System.Net.HttpStatusCode.OK)
             {
@@ -572,7 +446,39 @@ namespace MCGDApp
                 ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
             }
 
-            List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
+            List<CatalogInitializer> catalogObjectsInits = await GetCatalogInits(catalogObjectsMeta, ModelStartingLocation);
+
+            GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits, GDSettings);
+            Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
+
+            // Save the model:
+            newModel.Name = "Generated Model";
+            APIResponse<string> response3 = await DBMSController.CreateModel(newModel);
+            if (response3.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response3.ReasonPhrase);
+                return;
+            }
+
+            DisplayGDResults(rules, sw, generativeDesigner, newModel);
+        }
+
+        private void DisplayGDResults(List<Rule> rules, Stopwatch sw, GenerativeDesigner generativeDesigner, Model newModel)
+        {
+            buttonSignInDBMS_Click(null, null);
+            ModelChecker = new ModelChecker(newModel, generativeDesigner.GetCompiledRules());
+            List<RuleResult> ruleResults = ModelChecker.CheckModel(0, false);
+            CheckScore cs = ModelChecker.GetCheckScore();
+
+            this.richTextBoxGenDesign.Text = "Done\nRuntime: " + sw.Elapsed.ToString() +
+                                             "\nCheck Result: " + cs.TotalScore() + "/" + rules.Count +
+                                             "\nErrors: " + cs.ErrorScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Error) +
+                                             "\nWarning: " + cs.WarningScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Warning) +
+                                             "\nRecommended: " + cs.RecommendScore + "/" + rules.Count(r => r.ErrorLevel == ErrorLevel.Recommended);
+        }
+
+        private async Task<List<CatalogInitializer>> GetCatalogInits(List<CatalogObjectMetadata> catalogObjectsMeta, Vector3D ModelStartingLocation)
+        {
             List<CatalogInitializer> catalogObjectsInits = new List<CatalogInitializer>();
             foreach (var catalogObjectMeta in catalogObjectsMeta)
             {
@@ -580,7 +486,7 @@ namespace MCGDApp
                 if (response2.Code != System.Net.HttpStatusCode.OK)
                 {
                     MessageBox.Show(response2.ReasonPhrase);
-                    return;
+                    continue;
                 }
 
                 CatalogObject catalogObject = response2.Data;
@@ -595,23 +501,7 @@ namespace MCGDApp
                 });
             }
 
-            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
-
-            GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits, GDSettings);
-            Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
-
-            // Save the model:
-            newModel.Name = "Generated Model";
-            APIResponse<string> response3 = await DBMSController.CreateModel(newModel);
-            if (response3.Code != System.Net.HttpStatusCode.OK)
-            {
-                MessageBox.Show(response3.ReasonPhrase);
-                return;
-            }
-
-            buttonSignInDBMS_Click(null, null);
-
-            this.richTextBoxGenDesign.Text = "Done";
+            return catalogObjectsInits;
         }
 
         private void buttonGDSettings_Click(object sender, EventArgs e)
@@ -771,6 +661,13 @@ namespace MCGDApp
 
         private void buttonRuleLearner_Click(object sender, EventArgs e)
         {
+            // Prompt for the types and the EC clauses (and in the future the relations fo interest)
+            RuleGeneratorSettingsForm rgsf = new RuleGeneratorSettingsForm();
+            if (rgsf.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
             // Read in data into examples
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             if (fbd.ShowDialog() != DialogResult.OK)
@@ -801,7 +698,7 @@ namespace MCGDApp
                 exampleList.Add(currentExample);
             }
 
-            Rule newRule = RuleGenerator.LearnRuleBoolean(OccurrenceRule.ALL, "Couch", OccurrenceRule.ANY, "CoffeeTable", exampleList);
+            Rule newRule = RuleGenerator.LearnRuleBoolean(rgsf.OC1, rgsf.Type1, rgsf.OC2, rgsf.Type2, exampleList);
 
             this.richTextBoxGenDesign.Text = newRule.String();
         }

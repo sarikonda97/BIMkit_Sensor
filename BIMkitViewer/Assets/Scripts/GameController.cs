@@ -64,7 +64,8 @@ public class GameController : MonoBehaviour
     private List<ButtonData> RuleButtonData;
     private List<Button> RuleButtons;
     public Button ModelCheckButton;
-    public Button GenDesignButton;
+    public Button GenDesignButtonRR;
+    public Button GenDesignButtonSE;
 
     public GameObject CheckResultCanvas;
     public Button CheckResultButtonPrefab;
@@ -107,7 +108,8 @@ public class GameController : MonoBehaviour
         this.ModelSelectCanvas.SetActive(true);
 
         // Some buttons should all start disabled:
-        GenDesignButton.gameObject.SetActive(false);
+        GenDesignButtonRR.gameObject.SetActive(false);
+        GenDesignButtonSE.gameObject.SetActive(false);
         ModelCheckButton.gameObject.SetActive(false);
         ContinueToGenButton.gameObject.SetActive(false);
 
@@ -427,7 +429,8 @@ public class GameController : MonoBehaviour
     {
         ResetCanvas();
         this.RuleSelectCanvas.SetActive(true);
-        GenDesignButton.gameObject.SetActive(false);
+        GenDesignButtonRR.gameObject.SetActive(false);
+        GenDesignButtonSE.gameObject.SetActive(false);
         ModelCheckButton.gameObject.SetActive(true);
     }
 
@@ -452,7 +455,8 @@ public class GameController : MonoBehaviour
         ResetCanvas();
         AddObjectCanvas.SetActive(true);
         genDesignMode = true;
-        GenDesignButton.gameObject.SetActive(true);
+        GenDesignButtonRR.gameObject.SetActive(true);
+        GenDesignButtonSE.gameObject.SetActive(true);
         ModelCheckButton.gameObject.SetActive(false);
         ContinueToGenButton.gameObject.SetActive(true);
     }
@@ -845,7 +849,7 @@ public class GameController : MonoBehaviour
     }
 
     private List<GameObject> GeneratingObjects = new List<GameObject>();
-    public async void PerfromGenDesignClicked()
+    public async void PerfromGenDesignSeClicked()
     {
         LoadingCanvas.SetActive(true);
 
@@ -871,7 +875,53 @@ public class GameController : MonoBehaviour
                                                                 Convert.ToInt32(20),
                                                                 false,
                                                                 false
-                                                                )
+                                                                ),
+                                                          GenerationType.Sequential
+                                                          );
+
+        APIResponse<string> response = await GDAPIController.PerformGenDesign(request);
+        if (response.Code != System.Net.HttpStatusCode.OK)
+        {
+            Debug.LogWarning(response.ReasonPhrase);
+            LoadingCanvas.SetActive(false);
+            return;
+        }
+
+        RestGenDesignMode();
+        ExitClicked();
+        SignInClicked();
+        LoadDBMSModel(response.Data);
+        LoadingCanvas.SetActive(false);
+    }
+
+    public async void PerfromGenDesignRRClicked()
+    {
+        LoadingCanvas.SetActive(true);
+
+        List<string> rules = RuleButtonData.Where(rbd => rbd.Clicked).Select(r => ((Rule)r.Item).Id).ToList();
+
+        List<CatalogInitializerID> catalogInitializerIDs = new List<CatalogInitializerID>();
+        foreach (var generatingObj in GeneratingObjects)
+        {
+            ModelCatalogObject mo = (ModelCatalogObject)generatingObj.GetComponent<ModelObjectScript>().ModelObject;
+            CatalogInitializerID newCatInit = new CatalogInitializerID() { CatalogID = mo.CatalogId, Location = VectorConvert(generatingObj.transform.position) };
+            catalogInitializerIDs.Add(newCatInit);
+        }
+        GenerativeRequest request = new GenerativeRequest(DBMSController.Token,
+                                                          RuleAPIController.CurrentUser.Username,
+                                                          CurrentModel.Id,
+                                                          catalogInitializerIDs,
+                                                          rules,
+                                                          LevelOfDetail.LOD100,
+                                                          new GenerativeDesignSettings(
+                                                                Convert.ToInt32(10),
+                                                                Convert.ToDouble(20),
+                                                                Convert.ToDouble(0.5),
+                                                                Convert.ToInt32(20),
+                                                                false,
+                                                                false
+                                                                ),
+                                                          GenerationType.RoundRobin
                                                           );
 
         APIResponse<string> response = await GDAPIController.PerformGenDesign(request);
@@ -1274,7 +1324,7 @@ public class GameController : MonoBehaviour
         string outputString = "";
         outputString += string.Join("\n", rco1.GlobalVerticies.Select(v => v.ToString()));
         outputString += "\n\n";
-        outputString += string.Join("\n", rco1.Triangles.Select(t => string.Join(",",t)));
+        outputString += string.Join("\n", rco1.Triangles.Select(t => string.Join(",", t)));
         outputString += "\n\n";
         outputString += string.Join("\n", rco2.GlobalVerticies.Select(v => v.ToString()));
         outputString += "\n\n";

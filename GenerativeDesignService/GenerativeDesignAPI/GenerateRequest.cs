@@ -19,10 +19,11 @@ namespace GenerativeDesignAPI
         public string RMSUsername;
         public LevelOfDetail LOD;
         public Vector3D StartLocation;
+        public GenerationType GenerationType;
 
         public GenerativeDesignSettings GenSettings;
 
-        public GenerativeRequest(TokenData dbmsToken, string rmsUsername, string modelId, List<CatalogInitializerID> catalogInitializers, List<string> ruleIds, LevelOfDetail lod, GenerativeDesignSettings genSettings)
+        public GenerativeRequest(TokenData dbmsToken, string rmsUsername, string modelId, List<CatalogInitializerID> catalogInitializers, List<string> ruleIds, LevelOfDetail lod, GenerativeDesignSettings genSettings, GenerationType generationType)
         {
             ModelID = modelId;
             CatalogInitializers = catalogInitializers;
@@ -31,6 +32,7 @@ namespace GenerativeDesignAPI
             RMSUsername = rmsUsername;
             LOD = lod;
             GenSettings = genSettings;
+            GenerationType = generationType;
         }
     }
 }

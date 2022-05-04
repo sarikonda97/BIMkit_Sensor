@@ -175,6 +175,104 @@ namespace GenerativeDesignPackage
             return ModelCheck.Model.FullModel();
         }
 
+        public Model ExecuteGenDesignSequential()
+        {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
+            // Only get points above a floor:
+            List<RuleCheckObject> floorObjects = ModelCheck.Model.Objects.Where(o => o.Type == "Floor").ToList();
+
+            SceneConfiguration scene = new SceneConfiguration()
+            {
+                ObjectConfigurations = new List<ObjectConfiguration>()
+            };
+            foreach (CatalogInitializer catalogInitializer in CatalogInitializers)
+            {
+                //place inital config in scene
+                ObjectConfiguration config = new ObjectConfiguration()
+                {
+                    Location = catalogInitializer.Location,
+                    CatalogObject = catalogInitializer.CatalogObject,
+                    Orientation = Orientations.First()
+                };
+                scene.ObjectConfigurations.Add(config);
+            }
+
+            // Going over each object at a time, trying various locations, picking the best, then updating the scene evaluation
+            for (int i = 0; i < scene.ObjectConfigurations.Count; i++)
+            {
+                ObjectConfiguration currentConfig = scene.ObjectConfigurations[i];
+
+                //place and evaluate config in scene
+                string newObjId = ModelCheck.Model.AddObject(currentConfig.CatalogObject, currentConfig.Location, currentConfig.Orientation);
+                currentConfig.ObjectModelID = newObjId;
+
+                // Get the initial scene (global) config score
+                ModelCheck.CheckModel(1.0, false);
+                scene.Eval = ModelCheck.GetCheckScore();
+                ModelCheck.CheckModel(1.0, true, currentConfig.CatalogObject.TypeId);
+                currentConfig.Eval = ModelCheck.GetCheckScore();
+
+                double moveAmount = Settings.Movement;
+                double reductionRate = Settings.Rate;
+                int movesPerItteration = Settings.Moves;
+                int interationNum = 0;
+                bool itemMoved = false;
+
+                while (Settings.Itterations > interationNum)
+                {
+                    itemMoved = false;
+
+                    // All rules passed so may as well stop
+                    if (scene.Eval.TotalScore() == ModelCheck.Rules.Count)
+                    {
+                        break;
+                    }
+
+                    List<Vector3D> locations = GetPlacementLocations(floorObjects, moveAmount, movesPerItteration, currentConfig);
+
+                    //remove object
+                    ModelCheck.Model.RemoveObject(currentConfig.ObjectModelID);
+
+                    // Find best place outa all options
+                    itemMoved = GetBestPlacement(ref currentConfig, locations, Orientations);
+
+                    //place object
+                    currentConfig.ObjectModelID = ModelCheck.Model.AddObject(currentConfig.CatalogObject, currentConfig.Location, currentConfig.Orientation, currentConfig.ObjectModelID);
+
+                    // Update scene evaluation if the item moved
+                    if (itemMoved)
+                    {
+                        // If the item moved then the total scores could have only improved
+                        scene.Eval.UpdateCheckScore(currentConfig.Eval);
+
+                        // But the other configs evaulations could be out of date
+                        foreach (ObjectConfiguration config in scene.ObjectConfigurations)
+                        {
+                            currentConfig.Eval.UpdateCheckScore(currentConfig.Eval);
+                        }
+
+                        // All rules passed so may as well stop
+                        if (scene.Eval.TotalScore() == ModelCheck.Rules.Count)
+                        {
+                            break;
+                        }
+                    }
+
+                    interationNum++;
+                    if (Settings.FixedItterations || !itemMoved)
+                    {
+                        moveAmount *= reductionRate;
+                    }
+                }
+            }
+
+            timer.Stop();
+            Console.WriteLine(timer.Elapsed.ToString());
+            return ModelCheck.Model.FullModel();
+        }
+
         private bool GetBestPlacement(ref ObjectConfiguration config, List<Vector3D> newLocations, List<Vector4D> newOrientations)
         {
             bool itemMoved = false;

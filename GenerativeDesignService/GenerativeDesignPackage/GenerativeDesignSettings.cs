@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace GenerativeDesignPackage
 {
+    public enum GenerationType { Sequential, RoundRobin };
+
     public class GenerativeDesignSettings
     {
         public int Itterations { get; }

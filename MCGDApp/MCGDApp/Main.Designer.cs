@@ -63,9 +63,9 @@ namespace MCGDApp
             this.buttonGDThread = new System.Windows.Forms.Button();
             this.buttonGDWeb = new System.Windows.Forms.Button();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.buttonRuleLearner = new System.Windows.Forms.Button();
             this.buttonRuleTypeOrder = new System.Windows.Forms.Button();
             this.buttonVoxelCreator = new System.Windows.Forms.Button();
-            this.buttonRuleLearner = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -470,7 +470,7 @@ namespace MCGDApp
             this.buttonGDThread.TabIndex = 10;
             this.buttonGDThread.Text = "Generative Design (Round Robin)";
             this.buttonGDThread.UseVisualStyleBackColor = true;
-            this.buttonGDThread.Click += new System.EventHandler(this.buttonGDThread_Click);
+            this.buttonGDThread.Click += new System.EventHandler(this.buttonGDRR_Click);
             // 
             // buttonGDWeb
             // 
@@ -497,6 +497,18 @@ namespace MCGDApp
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Other Methods";
             // 
+            // buttonRuleLearner
+            // 
+            this.buttonRuleLearner.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonRuleLearner.Location = new System.Drawing.Point(6, 135);
+            this.buttonRuleLearner.Name = "buttonRuleLearner";
+            this.buttonRuleLearner.Size = new System.Drawing.Size(145, 52);
+            this.buttonRuleLearner.TabIndex = 2;
+            this.buttonRuleLearner.Text = "Rule Learner";
+            this.buttonRuleLearner.UseVisualStyleBackColor = true;
+            this.buttonRuleLearner.Click += new System.EventHandler(this.buttonRuleLearner_Click);
+            // 
             // buttonRuleTypeOrder
             // 
             this.buttonRuleTypeOrder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -520,18 +532,6 @@ namespace MCGDApp
             this.buttonVoxelCreator.Text = "Create Voxels";
             this.buttonVoxelCreator.UseVisualStyleBackColor = true;
             this.buttonVoxelCreator.Click += new System.EventHandler(this.buttonVoxelCreator_Click);
-            // 
-            // buttonRuleLearner
-            // 
-            this.buttonRuleLearner.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRuleLearner.Location = new System.Drawing.Point(6, 135);
-            this.buttonRuleLearner.Name = "buttonRuleLearner";
-            this.buttonRuleLearner.Size = new System.Drawing.Size(145, 52);
-            this.buttonRuleLearner.TabIndex = 2;
-            this.buttonRuleLearner.Text = "Rule Learner";
-            this.buttonRuleLearner.UseVisualStyleBackColor = true;
-            this.buttonRuleLearner.Click += new System.EventHandler(this.buttonRuleLearner_Click);
             // 
             // Main
             // 
