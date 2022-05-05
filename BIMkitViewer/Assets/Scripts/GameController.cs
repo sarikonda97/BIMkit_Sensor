@@ -472,11 +472,32 @@ public class GameController : MonoBehaviour
             return;
         }
 
-        Debug.LogWarning("Saved");
+        Debug.LogWarning("Saved Model: " + response.Data);
 
         Task.Run(() => { PrintOutChangeLog(); });
 
         LoadingCanvas.SetActive(false);
+    }
+
+    public async void SaveNewModelClicked()
+    {
+        LoadingCanvas.SetActive(true);
+        APIResponse<string> response = await this.DBMSController.CreateModel(CurrentModel);
+        if (response.Code != System.Net.HttpStatusCode.OK)
+        {
+            Debug.LogWarning(response.ReasonPhrase);
+            LoadingCanvas.SetActive(false);
+            return;
+        }
+
+        Debug.LogWarning("Saved New Model: " + response.Data);
+
+        Task.Run(() => { PrintOutChangeLog(); });
+
+        LoadingCanvas.SetActive(false);
+
+        ExitClicked();
+        LoadDBMSModel(response.Data);
     }
 
     public void ResetClicked()
@@ -868,14 +889,7 @@ public class GameController : MonoBehaviour
                                                           catalogInitializerIDs,
                                                           rules,
                                                           LevelOfDetail.LOD100,
-                                                          new GenerativeDesignSettings(
-                                                                Convert.ToInt32(10),
-                                                                Convert.ToDouble(20),
-                                                                Convert.ToDouble(0.5),
-                                                                Convert.ToInt32(20),
-                                                                false,
-                                                                false
-                                                                ),
+                                                          new GenerativeDesignSettings(),
                                                           GenerationType.Sequential
                                                           );
 
@@ -913,14 +927,7 @@ public class GameController : MonoBehaviour
                                                           catalogInitializerIDs,
                                                           rules,
                                                           LevelOfDetail.LOD100,
-                                                          new GenerativeDesignSettings(
-                                                                Convert.ToInt32(10),
-                                                                Convert.ToDouble(20),
-                                                                Convert.ToDouble(0.5),
-                                                                Convert.ToInt32(20),
-                                                                false,
-                                                                false
-                                                                ),
+                                                          new GenerativeDesignSettings(),
                                                           GenerationType.RoundRobin
                                                           );
 
@@ -1389,9 +1396,19 @@ public class GameController : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(outputString))
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ChangeLog.csv";
+            int counter = 0;
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Examples\\ChangeLog" + counter + ".csv";
+            while (File.Exists(path))
+            {
+                counter++;
+                path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Examples\\ChangeLog" + counter + ".csv";
+            }
             File.WriteAllText(path, outputString);
-            Debug.LogWarning("Output File Complete");
+            Debug.LogWarning("Example File Complete");
+        }
+        else
+        {
+            Debug.LogWarning("Example File Incomplete");
         }
     }
 

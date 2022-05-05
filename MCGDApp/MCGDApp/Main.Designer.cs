@@ -66,6 +66,7 @@ namespace MCGDApp
             this.buttonRuleLearner = new System.Windows.Forms.Button();
             this.buttonRuleTypeOrder = new System.Windows.Forms.Button();
             this.buttonVoxelCreator = new System.Windows.Forms.Button();
+            this.buttonSelectAllRules = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -94,7 +95,7 @@ namespace MCGDApp
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1133, 309);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1120, 299);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // groupBox3
@@ -103,9 +104,9 @@ namespace MCGDApp
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Controls.Add(this.tableLayoutPanel3);
-            this.groupBox3.Location = new System.Drawing.Point(757, 3);
+            this.groupBox3.Location = new System.Drawing.Point(749, 3);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(373, 303);
+            this.groupBox3.Size = new System.Drawing.Size(368, 293);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Objects";
@@ -126,7 +127,7 @@ namespace MCGDApp
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(361, 278);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(356, 268);
             this.tableLayoutPanel3.TabIndex = 2;
             // 
             // listBoxCatalogList
@@ -137,7 +138,7 @@ namespace MCGDApp
             this.listBoxCatalogList.FormattingEnabled = true;
             this.listBoxCatalogList.Location = new System.Drawing.Point(3, 3);
             this.listBoxCatalogList.Name = "listBoxCatalogList";
-            this.listBoxCatalogList.Size = new System.Drawing.Size(149, 264);
+            this.listBoxCatalogList.Size = new System.Drawing.Size(147, 251);
             this.listBoxCatalogList.TabIndex = 3;
             // 
             // listBoxSelectedCatalogList
@@ -146,9 +147,9 @@ namespace MCGDApp
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listBoxSelectedCatalogList.FormattingEnabled = true;
-            this.listBoxSelectedCatalogList.Location = new System.Drawing.Point(208, 3);
+            this.listBoxSelectedCatalogList.Location = new System.Drawing.Point(206, 3);
             this.listBoxSelectedCatalogList.Name = "listBoxSelectedCatalogList";
-            this.listBoxSelectedCatalogList.Size = new System.Drawing.Size(150, 264);
+            this.listBoxSelectedCatalogList.Size = new System.Drawing.Size(147, 251);
             this.listBoxSelectedCatalogList.TabIndex = 2;
             // 
             // tableLayoutPanel4
@@ -161,19 +162,19 @@ namespace MCGDApp
             this.tableLayoutPanel4.Controls.Add(this.buttonLeft, 0, 2);
             this.tableLayoutPanel4.Controls.Add(this.buttonRight, 0, 1);
             this.tableLayoutPanel4.Controls.Add(this.buttonRecommended, 0, 3);
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(158, 3);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(156, 3);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 4;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(44, 272);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(44, 262);
             this.tableLayoutPanel4.TabIndex = 4;
             // 
             // buttonLeft
             // 
-            this.buttonLeft.Location = new System.Drawing.Point(3, 139);
+            this.buttonLeft.Location = new System.Drawing.Point(3, 134);
             this.buttonLeft.Name = "buttonLeft";
             this.buttonLeft.Size = new System.Drawing.Size(38, 27);
             this.buttonLeft.TabIndex = 1;
@@ -183,7 +184,7 @@ namespace MCGDApp
             // 
             // buttonRight
             // 
-            this.buttonRight.Location = new System.Drawing.Point(3, 89);
+            this.buttonRight.Location = new System.Drawing.Point(3, 84);
             this.buttonRight.Name = "buttonRight";
             this.buttonRight.Size = new System.Drawing.Size(38, 25);
             this.buttonRight.TabIndex = 2;
@@ -193,7 +194,7 @@ namespace MCGDApp
             // 
             // buttonRecommended
             // 
-            this.buttonRecommended.Location = new System.Drawing.Point(3, 189);
+            this.buttonRecommended.Location = new System.Drawing.Point(3, 184);
             this.buttonRecommended.Name = "buttonRecommended";
             this.buttonRecommended.Size = new System.Drawing.Size(38, 23);
             this.buttonRecommended.TabIndex = 3;
@@ -206,13 +207,14 @@ namespace MCGDApp
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.buttonSelectAllRules);
             this.groupBox2.Controls.Add(this.treeViewRules);
             this.groupBox2.Controls.Add(this.buttonSignInRMS);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.textBoxRMSUsername);
-            this.groupBox2.Location = new System.Drawing.Point(380, 3);
+            this.groupBox2.Location = new System.Drawing.Point(376, 3);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(371, 303);
+            this.groupBox2.Size = new System.Drawing.Size(367, 293);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Rules";
@@ -225,14 +227,14 @@ namespace MCGDApp
             this.treeViewRules.CheckBoxes = true;
             this.treeViewRules.Location = new System.Drawing.Point(6, 45);
             this.treeViewRules.Name = "treeViewRules";
-            this.treeViewRules.Size = new System.Drawing.Size(359, 252);
+            this.treeViewRules.Size = new System.Drawing.Size(355, 213);
             this.treeViewRules.TabIndex = 9;
             this.treeViewRules.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeViewRules_AfterCheck);
             // 
             // buttonSignInRMS
             // 
             this.buttonSignInRMS.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSignInRMS.Location = new System.Drawing.Point(280, 16);
+            this.buttonSignInRMS.Location = new System.Drawing.Point(276, 16);
             this.buttonSignInRMS.Name = "buttonSignInRMS";
             this.buttonSignInRMS.Size = new System.Drawing.Size(85, 24);
             this.buttonSignInRMS.TabIndex = 7;
@@ -255,7 +257,7 @@ namespace MCGDApp
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxRMSUsername.Location = new System.Drawing.Point(67, 19);
             this.textBoxRMSUsername.Name = "textBoxRMSUsername";
-            this.textBoxRMSUsername.Size = new System.Drawing.Size(207, 20);
+            this.textBoxRMSUsername.Size = new System.Drawing.Size(203, 20);
             this.textBoxRMSUsername.TabIndex = 7;
             this.textBoxRMSUsername.Text = "admin";
             // 
@@ -272,7 +274,7 @@ namespace MCGDApp
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(371, 303);
+            this.groupBox1.Size = new System.Drawing.Size(367, 293);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Models";
@@ -285,13 +287,13 @@ namespace MCGDApp
             this.listBoxModelList.FormattingEnabled = true;
             this.listBoxModelList.Location = new System.Drawing.Point(6, 71);
             this.listBoxModelList.Name = "listBoxModelList";
-            this.listBoxModelList.Size = new System.Drawing.Size(359, 225);
+            this.listBoxModelList.Size = new System.Drawing.Size(355, 212);
             this.listBoxModelList.TabIndex = 0;
             // 
             // buttonSignInDBMS
             // 
             this.buttonSignInDBMS.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSignInDBMS.Location = new System.Drawing.Point(290, 19);
+            this.buttonSignInDBMS.Location = new System.Drawing.Point(286, 19);
             this.buttonSignInDBMS.Name = "buttonSignInDBMS";
             this.buttonSignInDBMS.Size = new System.Drawing.Size(75, 46);
             this.buttonSignInDBMS.TabIndex = 6;
@@ -305,7 +307,7 @@ namespace MCGDApp
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxDBMSUsername.Location = new System.Drawing.Point(67, 19);
             this.textBoxDBMSUsername.Name = "textBoxDBMSUsername";
-            this.textBoxDBMSUsername.Size = new System.Drawing.Size(217, 20);
+            this.textBoxDBMSUsername.Size = new System.Drawing.Size(213, 20);
             this.textBoxDBMSUsername.TabIndex = 2;
             this.textBoxDBMSUsername.Text = "admin";
             // 
@@ -325,7 +327,7 @@ namespace MCGDApp
             this.textBoxDBMSPassword.Location = new System.Drawing.Point(67, 45);
             this.textBoxDBMSPassword.Name = "textBoxDBMSPassword";
             this.textBoxDBMSPassword.PasswordChar = '*';
-            this.textBoxDBMSPassword.Size = new System.Drawing.Size(217, 20);
+            this.textBoxDBMSPassword.Size = new System.Drawing.Size(213, 20);
             this.textBoxDBMSPassword.TabIndex = 3;
             this.textBoxDBMSPassword.Text = "admin";
             // 
@@ -355,7 +357,7 @@ namespace MCGDApp
             this.listBoxRuleResults.FormattingEnabled = true;
             this.listBoxRuleResults.Location = new System.Drawing.Point(109, 134);
             this.listBoxRuleResults.Name = "listBoxRuleResults";
-            this.listBoxRuleResults.Size = new System.Drawing.Size(461, 134);
+            this.listBoxRuleResults.Size = new System.Drawing.Size(453, 134);
             this.listBoxRuleResults.TabIndex = 7;
             this.listBoxRuleResults.SelectedIndexChanged += new System.EventHandler(this.listBoxRuleResults_SelectedIndexChanged);
             // 
@@ -366,7 +368,7 @@ namespace MCGDApp
             | System.Windows.Forms.AnchorStyles.Right)));
             this.treeViewRuleInstance.Location = new System.Drawing.Point(109, 19);
             this.treeViewRuleInstance.Name = "treeViewRuleInstance";
-            this.treeViewRuleInstance.Size = new System.Drawing.Size(461, 109);
+            this.treeViewRuleInstance.Size = new System.Drawing.Size(453, 109);
             this.treeViewRuleInstance.TabIndex = 8;
             // 
             // buttonCheckService
@@ -390,11 +392,11 @@ namespace MCGDApp
             this.tableLayoutPanel2.Controls.Add(this.groupBox4, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.groupBox5, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.groupBox6, 2, 0);
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(12, 327);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(12, 317);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(1133, 280);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1120, 280);
             this.tableLayoutPanel2.TabIndex = 10;
             // 
             // groupBox4
@@ -408,7 +410,7 @@ namespace MCGDApp
             this.groupBox4.Controls.Add(this.buttonCheckService);
             this.groupBox4.Location = new System.Drawing.Point(3, 3);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(576, 274);
+            this.groupBox4.Size = new System.Drawing.Size(568, 274);
             this.groupBox4.TabIndex = 0;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Model Check";
@@ -423,9 +425,9 @@ namespace MCGDApp
             this.groupBox5.Controls.Add(this.richTextBoxGenDesign);
             this.groupBox5.Controls.Add(this.buttonGDThread);
             this.groupBox5.Controls.Add(this.buttonGDWeb);
-            this.groupBox5.Location = new System.Drawing.Point(585, 3);
+            this.groupBox5.Location = new System.Drawing.Point(577, 3);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(382, 274);
+            this.groupBox5.Size = new System.Drawing.Size(377, 274);
             this.groupBox5.TabIndex = 1;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Generative Design";
@@ -458,7 +460,7 @@ namespace MCGDApp
             | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBoxGenDesign.Location = new System.Drawing.Point(109, 19);
             this.richTextBoxGenDesign.Name = "richTextBoxGenDesign";
-            this.richTextBoxGenDesign.Size = new System.Drawing.Size(267, 249);
+            this.richTextBoxGenDesign.Size = new System.Drawing.Size(262, 249);
             this.richTextBoxGenDesign.TabIndex = 12;
             this.richTextBoxGenDesign.Text = "";
             // 
@@ -490,7 +492,7 @@ namespace MCGDApp
             this.groupBox6.Controls.Add(this.buttonRuleLearner);
             this.groupBox6.Controls.Add(this.buttonRuleTypeOrder);
             this.groupBox6.Controls.Add(this.buttonVoxelCreator);
-            this.groupBox6.Location = new System.Drawing.Point(973, 3);
+            this.groupBox6.Location = new System.Drawing.Point(960, 3);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(157, 274);
             this.groupBox6.TabIndex = 2;
@@ -533,11 +535,23 @@ namespace MCGDApp
             this.buttonVoxelCreator.UseVisualStyleBackColor = true;
             this.buttonVoxelCreator.Click += new System.EventHandler(this.buttonVoxelCreator_Click);
             // 
+            // buttonSelectAllRules
+            // 
+            this.buttonSelectAllRules.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonSelectAllRules.Location = new System.Drawing.Point(6, 264);
+            this.buttonSelectAllRules.Name = "buttonSelectAllRules";
+            this.buttonSelectAllRules.Size = new System.Drawing.Size(355, 23);
+            this.buttonSelectAllRules.TabIndex = 10;
+            this.buttonSelectAllRules.Text = "Select All";
+            this.buttonSelectAllRules.UseVisualStyleBackColor = true;
+            this.buttonSelectAllRules.Click += new System.EventHandler(this.buttonSelectAllRules_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1157, 619);
+            this.ClientSize = new System.Drawing.Size(1144, 609);
             this.Controls.Add(this.tableLayoutPanel2);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "Main";
@@ -598,6 +612,7 @@ namespace MCGDApp
         private System.Windows.Forms.Button buttonRuleTypeOrder;
         private System.Windows.Forms.Button buttonRecommended;
         private System.Windows.Forms.Button buttonRuleLearner;
+        private System.Windows.Forms.Button buttonSelectAllRules;
     }
 }
 

@@ -201,6 +201,14 @@ namespace MCGDApp
             this.treeViewRules.ExpandAll();
         }
 
+        private void buttonSelectAllRules_Click(object sender, EventArgs e)
+        {
+            foreach (TreeNode tn in this.treeViewRules.Nodes)
+            {
+                tn.Checked = true;
+            }
+        }
+
         private void treeViewRules_AfterCheck(object sender, TreeViewEventArgs e)
         {
             foreach (TreeNode n in e.Node.Nodes)
@@ -701,6 +709,24 @@ namespace MCGDApp
             Rule newRule = RuleGenerator.LearnRuleBoolean(rgsf.OC1, rgsf.Type1, rgsf.OC2, rgsf.Type2, exampleList);
 
             this.richTextBoxGenDesign.Text = newRule.String();
+
+            if (RuleAPIController.CurrentUser != null)
+            {
+                if (MessageBox.Show("Save the new rule?", "Save Rule", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    SaveRule(newRule);
+                }
+            }
+        }
+
+        public async void SaveRule(Rule rule)
+        {
+            APIResponse<string> response = await RuleAPIController.CreateRuleAsync(rule);
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return;
+            }
         }
 
         #endregion
