@@ -10,5 +10,11 @@
   "Xbim.Ifc2x3.SharedBldgServiceElements.IfcFlowTerminal": "FlowTerminal",
   "Xbim.Ifc2x3.SharedBldgElements.IfcDoor": "Door",
   "Xbim.Ifc2x3.ProductExtension.IfcBuildingElementProxy": "BuildingElement",
-  "Xbim.Ifc2x3.ProductExtension.IfcFurnishingElement": "FurnishingElement"
+  "Xbim.Ifc2x3.ProductExtension.IfcFurnishingElement": "FurnishingElement",
+  "Xbim.Ifc2x3.SharedBldgElements.IfcMember": "Real",
+  "Xbim.Ifc2x3.SharedBldgElements.IfcRailing": "Railing",
+  "Xbim.Ifc2x3.SharedBldgElements.IfcStair": "Stair",
+  "Xbim.Ifc2x3.SharedBldgElements.IfcStairFlight": "StairFlight",
+  "Xbim.Ifc2x3.SharedBldgElements.IfcWall": "Wall",
+  "Xbim.Ifc2x3.ProductExtension.IfcCovering": "Covering"
 }

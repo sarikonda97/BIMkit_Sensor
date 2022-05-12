@@ -39,6 +39,7 @@ namespace MCGDApp
             this.buttonRight = new System.Windows.Forms.Button();
             this.buttonRecommended = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.buttonSelectAllRules = new System.Windows.Forms.Button();
             this.treeViewRules = new System.Windows.Forms.TreeView();
             this.buttonSignInRMS = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -66,7 +67,6 @@ namespace MCGDApp
             this.buttonRuleLearner = new System.Windows.Forms.Button();
             this.buttonRuleTypeOrder = new System.Windows.Forms.Button();
             this.buttonVoxelCreator = new System.Windows.Forms.Button();
-            this.buttonSelectAllRules = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -218,6 +218,18 @@ namespace MCGDApp
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Rules";
+            // 
+            // buttonSelectAllRules
+            // 
+            this.buttonSelectAllRules.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonSelectAllRules.Location = new System.Drawing.Point(6, 264);
+            this.buttonSelectAllRules.Name = "buttonSelectAllRules";
+            this.buttonSelectAllRules.Size = new System.Drawing.Size(355, 23);
+            this.buttonSelectAllRules.TabIndex = 10;
+            this.buttonSelectAllRules.Text = "Select All";
+            this.buttonSelectAllRules.UseVisualStyleBackColor = true;
+            this.buttonSelectAllRules.Click += new System.EventHandler(this.buttonSelectAllRules_Click);
             // 
             // treeViewRules
             // 
@@ -534,18 +546,6 @@ namespace MCGDApp
             this.buttonVoxelCreator.Text = "Create Voxels";
             this.buttonVoxelCreator.UseVisualStyleBackColor = true;
             this.buttonVoxelCreator.Click += new System.EventHandler(this.buttonVoxelCreator_Click);
-            // 
-            // buttonSelectAllRules
-            // 
-            this.buttonSelectAllRules.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSelectAllRules.Location = new System.Drawing.Point(6, 264);
-            this.buttonSelectAllRules.Name = "buttonSelectAllRules";
-            this.buttonSelectAllRules.Size = new System.Drawing.Size(355, 23);
-            this.buttonSelectAllRules.TabIndex = 10;
-            this.buttonSelectAllRules.Text = "Select All";
-            this.buttonSelectAllRules.UseVisualStyleBackColor = true;
-            this.buttonSelectAllRules.Click += new System.EventHandler(this.buttonSelectAllRules_Click);
             // 
             // Main
             // 

@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VoxelService;
 using static UnityEngine.UI.Dropdown;
@@ -27,17 +28,9 @@ using Mesh = UnityEngine.Mesh;
 
 public class GameController : MonoBehaviour
 {
-    #region Fields
+    #region UI Fields
 
     public Camera MainCamera;
-
-    public Material HighlightMatRed;
-    public Material HighlightMatYellow;
-    public Material HighlightMatGreen;
-    public Material DefaultMat;
-    public Material VoxelMaterial;
-    public Material FloorMaterial;
-
     public GameObject LoadingCanvas;
 
     public GameObject ModelViewCanvas;
@@ -79,6 +72,10 @@ public class GameController : MonoBehaviour
     public Button CatalogObjectButtonPrefab;
     public Button ContinueToGenButton;
 
+    #endregion
+
+    #region Game Fields
+
     private RuleAPIController RuleAPIController;
     private DBMSAPIController DBMSController;
     private MCAPIController MCAPIController;
@@ -93,6 +90,39 @@ public class GameController : MonoBehaviour
     public GameObject CurrentModelVoxelGameObj;
     public GameObject CurrentModelRuleCheckGameObj;
     private List<ModelObjectScript> ModelObjects = new List<ModelObjectScript>();
+    private GameObject ViewingGameObject;
+    private GameObject EditingGameObject;
+    private List<GameObject> GeneratingObjects = new List<GameObject>();
+    private List<ModelObjectScript> UnsavedModelObjects = new List<ModelObjectScript>(); // Keep track of all the objects that have been added to the model
+    private bool ModelHasBeenChanged = false;
+
+    public float cameraMoveSpeed = 200f;
+    float cameraScrollSensitivity = 10f;
+    float objectRotationSensitivity = 45.0f;
+    private Vector3 worldPosition = new Vector3();
+    private float heightOfset = 0;
+    private float ERROR = 0.01f;
+    private bool objectIsNew;
+    private Vector3 LocationBeforeMove;
+    private Quaternion OrientBeforeMove;
+
+    // Modes:
+    private bool movingObject;
+    private bool genDesignMode;
+    private GameObject PreviouslyActiveCanvas;
+
+    #endregion
+
+    #region Materials
+
+    public Material HighlightMatRed;
+    public Material HighlightMatYellow;
+    public Material HighlightMatGreen;
+    public Material DefaultMat;
+    public Material VoxelMaterial;
+    public Material FloorMaterial;
+
+    private Dictionary<string, Material> MaterialDict;
 
     #endregion
 
@@ -124,6 +154,13 @@ public class GameController : MonoBehaviour
         this.PasswordInput.text = "admin";
         this.RuleUsernameInput.text = "admin";
         this.UsernameInput.text = "admin";
+
+        MaterialDict = new Dictionary<string, Material>()
+        {
+            { "Floor", FloorMaterial },
+            { "Space", VoxelMaterial },
+            { "Room", VoxelMaterial },
+        };
     }
 
     // Update is called once per frame
@@ -134,17 +171,17 @@ public class GameController : MonoBehaviour
         {
             ViewingMode();
         }
-        if (placingObject)
-        {
-            MoveObject();
-        }
         if (this.ModelEditCanvas.activeInHierarchy)
         {
             EditingMode();
         }
-        if (roatatingObject)
+        if (movingObject)
         {
-            RotatingObject();
+            MoveObject();
+        }
+        if (genDesignMode)
+        {
+            AddSelectionToGenDesignObjectList();
         }
         if (CheckingMode)
         {
@@ -154,14 +191,11 @@ public class GameController : MonoBehaviour
 
     #region Camera Controls
 
-    public float cameraSpeed = 200f;
-    float sensitivity = 30f;
-
     private void MoveCamera()
     {
         if (Input.GetMouseButton(1))
         {
-            MainCamera.transform.Rotate(new Vector3(-Input.GetAxis("Mouse Y") * cameraSpeed * Time.deltaTime, Input.GetAxis("Mouse X") * cameraSpeed * Time.deltaTime, 0));
+            MainCamera.transform.Rotate(new Vector3(-Input.GetAxis("Mouse Y") * cameraMoveSpeed * Time.deltaTime, Input.GetAxis("Mouse X") * cameraMoveSpeed * Time.deltaTime, 0));
             float X = MainCamera.transform.rotation.eulerAngles.x;
             float Y = MainCamera.transform.rotation.eulerAngles.y;
             MainCamera.transform.rotation = Quaternion.Euler(X, Y, 0);
@@ -170,15 +204,31 @@ public class GameController : MonoBehaviour
         if (Input.GetMouseButton(2))
         {
             var newPosition = new Vector3();
-            newPosition.x = Input.GetAxis("Mouse X") * cameraSpeed * Time.deltaTime;
-            newPosition.y = Input.GetAxis("Mouse Y") * cameraSpeed * Time.deltaTime;
+            newPosition.x = Input.GetAxis("Mouse X") * cameraMoveSpeed * Time.deltaTime;
+            newPosition.y = Input.GetAxis("Mouse Y") * cameraMoveSpeed * Time.deltaTime;
             MainCamera.transform.Translate(-newPosition);
         }
 
-        if (!roatatingObject)
+        if (!movingObject)
         {
-            MainCamera.transform.position += MainCamera.transform.forward * Input.GetAxis("Mouse ScrollWheel") * sensitivity;
+            MainCamera.transform.position += MainCamera.transform.forward * Input.GetAxis("Mouse ScrollWheel") * cameraScrollSensitivity;
         }
+    }
+
+    private void SetupMainCamera()
+    {
+        List<ModelObject> mos = ModelObjects.Select(m => m.ModelObject).ToList();
+        List<Vector3D> vList = mos.SelectMany(m => m.Components.SelectMany(c => c.Vertices.Select(v => Vector3D.Add(v, m.Location)))).ToList();
+        Utils.GetXYZDimentions(vList, out Vector3D mid, out Vector3D dims);
+
+        Vector3 center = VectorConvert(mid);
+        Vector3 diment = VectorConvert(dims);
+
+        MainCamera.orthographic = false;
+        MainCamera.nearClipPlane = 0.1f;
+        MainCamera.farClipPlane = 100.0f;
+        MainCamera.transform.position = new Vector3(center.x, center.y + 2.0f * diment.y, center.z);
+        MainCamera.transform.LookAt(center, Vector3.up);
     }
 
     #endregion
@@ -253,9 +303,10 @@ public class GameController : MonoBehaviour
             modelObject.transform.SetPositionAndRotation(VectorConvert(obj.Location), VectorConvert(obj.Orientation));
             ModelObjectScript script = modelObject.GetComponent<ModelObjectScript>();
             script.ModelObject = obj;
-            if (obj.TypeId == "Floor")
+
+            if (MaterialDict.TryGetValue(obj.TypeId, out Material material))
             {
-                script.SetMainMaterial(FloorMaterial);
+                script.SetMainMaterial(material);
             }
             else
             {
@@ -353,7 +404,6 @@ public class GameController : MonoBehaviour
 
     #region Model View Mode
 
-    private GameObject ViewingGameObject;
     private void ViewingMode()
     {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -427,6 +477,11 @@ public class GameController : MonoBehaviour
 
     public void ModelCheckClicked()
     {
+        if (ModelHasBeenChanged)
+        {
+            Debug.LogWarning("Unsaved changes will not be included");
+        }
+
         ResetCanvas();
         this.RuleSelectCanvas.SetActive(true);
         GenDesignButtonRR.gameObject.SetActive(false);
@@ -450,6 +505,11 @@ public class GameController : MonoBehaviour
 
     public void GenDesignClicked()
     {
+        if (ModelHasBeenChanged)
+        {
+            Debug.LogWarning("Unsaved changes will not be included");
+        }
+
         RestGenDesignMode();
         RefreshCatalogClicked();
         ResetCanvas();
@@ -510,7 +570,8 @@ public class GameController : MonoBehaviour
     public void ExitClicked()
     {
         RemoveAllChidren(CurrentModelGameObj);
-        NewUnsavedModelObjects = new List<ModelObjectScript>();
+        UnsavedModelObjects = new List<ModelObjectScript>();
+        ModelHasBeenChanged = false;
         CurrentModel = null;
         ResetCanvas();
         this.ModelSelectCanvas.SetActive(true);
@@ -524,6 +585,12 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                Debug.Log("Clicked on UI");
+                return;
+            }
+
             Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hitData;
             if (Physics.Raycast(ray, out hitData, 1000))
@@ -537,7 +604,7 @@ public class GameController : MonoBehaviour
 
                 EditingGameObject = hitData.collider.gameObject.transform.parent.gameObject;
                 mos = EditingGameObject.GetComponent<ModelObjectScript>();
-                mos.Highlight(HighlightMatRed);
+                mos.Highlight(HighlightMatYellow);
 
                 int index = ObjectTypeChangeDropdown.options.FindIndex((i) => { return i.text.Equals(mos.ModelObject.TypeId.ToString()); });
                 this.ObjectTypeChangeDropdown.value = index;
@@ -565,7 +632,11 @@ public class GameController : MonoBehaviour
             Destroy(EditingGameObject);
             EditingGameObject = null;
 
-            NewUnsavedModelObjects.RemoveAll(m => m == mos);
+            // Complicated way of saying deleted items that are already unsaved dont change the model. But if something not unsaved was deleted then something previously in the model has been deleted
+            if (UnsavedModelObjects.RemoveAll(m => m == mos) == 0)
+            {
+                ModelHasBeenChanged = true;
+            }
         }
     }
 
@@ -575,35 +646,15 @@ public class GameController : MonoBehaviour
         {
             return;
         }
-        PlaceOject();
-    }
 
-    public void RotateObjectClicked()
-    {
-        roatatingObject = true;
-        if (EditingGameObject == null)
-        {
-            roatatingObject = false;
-            return;
-        }
-    }
+        PreviouslyActiveCanvas = this.ModelEditCanvas;
+        PreviouslyActiveCanvas.SetActive(false);
 
-    bool roatatingObject;
-    private void RotatingObject()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            ChangeAllChidrenTagsAndLayer(EditingGameObject, "Untagged", 0);
-            ModelObject mo = EditingGameObject.GetComponent<ModelObjectScript>().ModelObject;
-            mo.Location = VectorConvert(EditingGameObject.transform.position);
-            mo.Orientation = VectorConvert(EditingGameObject.transform.rotation);
-            roatatingObject = false;
-            return;
-        }
-
-        float rotationAmount = Input.mouseScrollDelta.y * 90.0f;
-        //Vector4D quaternion = Utils.GetQuaterion(new Vector3D(0, 0, 1), rotationAmount * Math.PI / 180.0);
-        EditingGameObject.transform.Rotate(Vector3.up, rotationAmount);
+        ModelObjectScript mosEditingObj = EditingGameObject.GetComponent<ModelObjectScript>();
+        LocationBeforeMove = VectorConvert(mosEditingObj.ModelObject.Location);
+        OrientBeforeMove = VectorConvert(mosEditingObj.ModelObject.Orientation);
+        objectIsNew = false;
+        PlaceObject();
     }
 
     public void AddPropertyClicked()
@@ -675,34 +726,32 @@ public class GameController : MonoBehaviour
 
     #region Place Catalog Object Mode:
 
-    private Vector3 worldPosition = new Vector3();
-    private float heightOfset = 0;
-    private float ERROR = 0.01f;
-
     private async void PlaceCatalogObject(string catalogId)
     {
         EditingGameObject = await LoadCatalogObject(catalogId);
-        PlaceOject();
+        objectIsNew = true;
+        PreviouslyActiveCanvas = AddObjectCanvas;
+        PreviouslyActiveCanvas.SetActive(false);
+        PlaceObject();
     }
 
-    private void PlaceOject()
+    private void PlaceObject()
     {
         ChangeAllChidrenTagsAndLayer(EditingGameObject, "Temp", 2);
 
-        ModelObject mo = EditingGameObject.GetComponent<ModelObjectScript>().ModelObject;
+        ModelObjectScript mos = EditingGameObject.GetComponent<ModelObjectScript>();
+        ModelObject mo = mos.ModelObject;
         float minZ = (float)mo.Components.Min(c => c.Vertices.Min(v => v.z));
         float maxZ = (float)mo.Components.Max(c => c.Vertices.Max(v => v.z));
         heightOfset = (maxZ - minZ) / 2.0f + ERROR;
 
-        placingObject = true;
+        movingObject = true;
     }
 
     #endregion
 
     #region Moving Objects
 
-    private GameObject EditingGameObject;
-    private bool placingObject;
     private void MoveObject()
     {
         ModelObjectScript mosEditingObj = EditingGameObject.GetComponent<ModelObjectScript>();
@@ -712,17 +761,52 @@ public class GameController : MonoBehaviour
             ChangeAllChidrenTagsAndLayer(EditingGameObject, "Untagged", 0);
             mo.Location = VectorConvert(EditingGameObject.transform.position);
             mo.Orientation = VectorConvert(EditingGameObject.transform.rotation);
-            placingObject = false;
+            movingObject = false;
 
             if (genDesignMode)
             {
                 GeneratingObjects.Add(EditingGameObject);
+                mosEditingObj.Highlight(HighlightMatYellow);
             }
 
-            NewUnsavedModelObjects.Add(mosEditingObj);
+            UnsavedModelObjects.Add(mosEditingObj);
+            ModelHasBeenChanged = true;
+
+            // For some reason the above reseting tag doesnt always work so this is a forced way to do it...
+            ResetAllModelObjectTagAndLayers(ModelObjects);
+
+            PreviouslyActiveCanvas.SetActive(true);
 
             return;
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (objectIsNew)
+            {
+                DeleteObject();
+            }
+            else
+            {
+                ChangeAllChidrenTagsAndLayer(EditingGameObject, "Untagged", 0);
+                EditingGameObject.transform.position = LocationBeforeMove;
+                EditingGameObject.transform.rotation = OrientBeforeMove;
+                mo.Location = VectorConvert(EditingGameObject.transform.position);
+                mo.Orientation = VectorConvert(EditingGameObject.transform.rotation);
+
+                UnHighlightAllObjects();
+            }
+
+            movingObject = false;
+            ResetAllModelObjectTagAndLayers(ModelObjects);
+
+            PreviouslyActiveCanvas.SetActive(true);
+
+            return;
+        }
+
+        float rotationAmount = Input.mouseScrollDelta.y * objectRotationSensitivity;
+        EditingGameObject.transform.Rotate(Vector3.up, rotationAmount);
 
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hitData;
@@ -734,7 +818,75 @@ public class GameController : MonoBehaviour
         mo.Location = VectorConvert(EditingGameObject.transform.position);
         mo.Orientation = VectorConvert(EditingGameObject.transform.rotation);
 
-        CheckOverlapRuntime(mosEditingObj, mo);
+        if (!genDesignMode)
+        {
+            CheckOverlapRuntime(mosEditingObj);
+        }
+    }
+
+    private void CheckOverlapRuntime(ModelObjectScript mosEditingObj)
+    {
+        //if (mo.Components.Sum(c => c.Triangles.Count) > 20)
+        //{
+        //    return;
+        //}
+        // Just an Overlap Check for testing
+        bool overlapingSomething = false;
+        RuleCheckObject rco1 = new RuleCheckObject(mosEditingObj.ModelObject);
+        MathPackage.Mesh mesh1 = GetGlobalMesh(rco1);
+        foreach (ModelObjectScript mos in ModelObjects)
+        {
+            if (mos == mosEditingObj)// || mos.ModelObject.Components.Sum(c => c.Triangles.Count) > 20)
+            {
+                continue;
+            }
+            mos.UnHighlight();
+
+            RuleCheckObject rco2 = new RuleCheckObject(mos.ModelObject);
+            MathPackage.Mesh mesh2 = GetGlobalMesh(rco2);
+            if (Utils.MeshOverlap(mesh1, mesh2, 1.0))
+            {
+                mos.Highlight(HighlightMatRed);
+                overlapingSomething = true;
+                break;
+            }
+        }
+        if (overlapingSomething)
+        {
+            mosEditingObj.Highlight(HighlightMatRed);
+        }
+        else
+        {
+            mosEditingObj.UnHighlight();
+        }
+    }
+
+    #endregion
+
+    #region Gen Design placing Object Mode:
+
+    private void AddSelectionToGenDesignObjectList()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitData;
+            if (Physics.Raycast(ray, out hitData, 1000))
+            {
+                GameObject hitObject = hitData.collider.gameObject.transform.parent.gameObject;
+                ModelObjectScript hitMos = hitObject.GetComponent<ModelObjectScript>();
+                if (GeneratingObjects.Contains(hitObject))
+                {
+                    GeneratingObjects.Remove(hitObject);
+                    hitMos.UnHighlight();
+                }
+                else
+                {
+                    GeneratingObjects.Add(hitObject);
+                    hitMos.Highlight(HighlightMatYellow);
+                }
+            }
+        }
     }
 
     #endregion
@@ -869,7 +1021,6 @@ public class GameController : MonoBehaviour
         LoadingCanvas.SetActive(false);
     }
 
-    private List<GameObject> GeneratingObjects = new List<GameObject>();
     public async void PerfromGenDesignSeClicked()
     {
         LoadingCanvas.SetActive(true);
@@ -877,7 +1028,7 @@ public class GameController : MonoBehaviour
         List<string> rules = RuleButtonData.Where(rbd => rbd.Clicked).Select(r => ((Rule)r.Item).Id).ToList();
 
         List<CatalogInitializerID> catalogInitializerIDs = new List<CatalogInitializerID>();
-        foreach (var generatingObj in GeneratingObjects)
+        foreach (GameObject generatingObj in GeneratingObjects)
         {
             ModelCatalogObject mo = (ModelCatalogObject)generatingObj.GetComponent<ModelObjectScript>().ModelObject;
             CatalogInitializerID newCatInit = new CatalogInitializerID() { CatalogID = mo.CatalogId, Location = VectorConvert(generatingObj.transform.position) };
@@ -970,8 +1121,6 @@ public class GameController : MonoBehaviour
     #endregion
 
     #region Generative Design Mode
-
-    bool genDesignMode;
 
     public void ContinueToRulesclicked()
     {
@@ -1116,8 +1265,21 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private static void ResetAllModelObjectTagAndLayers(List<ModelObjectScript> modelObjects)
+    {
+        foreach (ModelObjectScript moScript in modelObjects)
+        {
+            ChangeAllChidrenTagsAndLayer(moScript.gameObject, "Untagged", 0);
+        }
+    }
+
     private static void ChangeAllChidrenTagsAndLayer(GameObject obj, string newTag, int newLayer)
     {
+        if (obj == null)
+        {
+            Debug.LogError("GameObject is Null");
+        }
+
         obj.transform.tag = newTag;
         obj.layer = newLayer;
         for (int i = 0; i < obj.transform.childCount; i++)
@@ -1125,6 +1287,8 @@ public class GameController : MonoBehaviour
             var child = obj.transform.GetChild(i);
             ChangeAllChidrenTagsAndLayer(child.gameObject, newTag, newLayer);
         }
+        obj.transform.tag = newTag;
+        obj.layer = newLayer;
     }
 
     private void ResetCanvas()
@@ -1141,7 +1305,7 @@ public class GameController : MonoBehaviour
 
         ViewingGameObject = null;
         EditingGameObject = null;
-        placingObject = false;
+        movingObject = false;
 
         RemoveAllChidren(this.ModelListViewContent);
         RemoveAllChidren(this.RuleListViewContent);
@@ -1162,6 +1326,8 @@ public class GameController : MonoBehaviour
     }
 
     #endregion
+
+    // TESTING METHODS NOT OFFICIAL
 
     #region Overlap Check Methods:
 
@@ -1289,38 +1455,13 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void CheckOverlapRuntime(ModelObjectScript mosEditingObj, ModelObject mo)
+    private MathPackage.Mesh GetGlobalMesh(RuleCheckObject rco)
     {
-        if (mo.Components.Sum(c => c.Triangles.Count) > 20)
-        {
-            return;
-        }
-        // Just an Overlap Check for testing
-        bool overlapingSomething = false;
-        RuleCheckObject rco1 = new RuleCheckObject(mo);
-        foreach (ModelObjectScript mos in ModelObjects)
-        {
-            if (mos == mosEditingObj || mos.ModelObject.Components.Sum(c => c.Triangles.Count) > 20)
-            {
-                continue;
-            }
-            mos.UnHighlight();
-
-            RuleCheckObject rco2 = new RuleCheckObject(mos.ModelObject);
-            if (Utils.MeshOverlap(rco1.GetGlobalMesh(), rco2.GetGlobalMesh(), 1.0))
-            {
-                mos.Highlight(HighlightMatRed);
-                overlapingSomething = true;
-            }
-        }
-        if (overlapingSomething)
-        {
-            mosEditingObj.Highlight(HighlightMatRed);
-        }
-        else
-        {
-            mosEditingObj.UnHighlight();
-        }
+        Utils.GetXYZDimentions(rco.LocalVerticies, out Vector3D center, out Vector3D dims);
+        MathPackage.Mesh bbMesh = Utils.CreateBoundingBox(center, dims, FaceSide.FRONT);
+        Matrix4 transMat = Utils.GetTranslationMatrixFromLocationOrientation(rco.Location, rco.Orientation);
+        List<Vector3D> transVects = Utils.TranslateVerticies(transMat, bbMesh.VertexList);
+        return new MathPackage.Mesh(transVects, bbMesh.TriangleList);
     }
 
     public void SaveOverlapInstanceClicked()
@@ -1343,38 +1484,15 @@ public class GameController : MonoBehaviour
 
     #endregion
 
-    #region Camera Setup Stuff:
-
-    private void SetupMainCamera()
-    {
-        List<ModelObject> mos = ModelObjects.Select(m => m.ModelObject).ToList();
-        List<Vector3D> vList = mos.SelectMany(m => m.Components.SelectMany(c => c.Vertices.Select(v => Vector3D.Add(v, m.Location)))).ToList();
-        Utils.GetXYZDimentions(vList, out Vector3D mid, out Vector3D dims);
-
-        Vector3 center = VectorConvert(mid);
-        Vector3 diment = VectorConvert(dims);
-
-        MainCamera.orthographic = false;
-        MainCamera.nearClipPlane = 0.1f;
-        MainCamera.farClipPlane = 100.0f;
-        MainCamera.transform.position = new Vector3(center.x, center.y + 2.0f * diment.y, center.z);
-        MainCamera.transform.LookAt(center, Vector3.up);
-    }
-
-    #endregion
-
     #region Concept Learning Stuff:
-
-    // Keep track of all the objects that have been added to the model (dont care about the location until it is saved, just worry about IDs)
-    List<ModelObjectScript> NewUnsavedModelObjects = new List<ModelObjectScript>();
 
     private async void PrintOutChangeLog()
     {
-        NewUnsavedModelObjects = NewUnsavedModelObjects.Distinct().ToList();
+        UnsavedModelObjects = UnsavedModelObjects.Distinct().ToList();
 
         string outputString = "";
         // Once the model has been saved, record all the Relations (Distance and FacingAngle) between the newly placed objects and the objects in the model
-        foreach (ModelObjectScript newMos in NewUnsavedModelObjects)
+        foreach (ModelObjectScript newMos in UnsavedModelObjects)
         {
             RuleCheckObject rco1 = new RuleCheckObject(newMos.ModelObject);
             foreach (ModelObjectScript mos in ModelObjects)
@@ -1392,7 +1510,7 @@ public class GameController : MonoBehaviour
             }
         }
 
-        NewUnsavedModelObjects = new List<ModelObjectScript>();
+        UnsavedModelObjects = new List<ModelObjectScript>();
 
         if (!string.IsNullOrWhiteSpace(outputString))
         {
