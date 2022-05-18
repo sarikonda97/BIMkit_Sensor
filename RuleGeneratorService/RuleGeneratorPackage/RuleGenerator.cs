@@ -94,33 +94,47 @@ namespace RuleGeneratorPackage
             // Convert that back to a Rule for the output
             Dictionary<string, ExistentialClause> ecDict = new Dictionary<string, ExistentialClause>()
             {
-                { "obj1",new ExistentialClause(OccurrenceRule1, new Characteristic(type1, new List<PropertyCheck>())) },
-                { "obj2",new ExistentialClause(OccurrenceRule2, new Characteristic(type2, new List<PropertyCheck>())) }
+                { "obj1", new ExistentialClause(OccurrenceRule1, new Characteristic(type1, new List<PropertyCheck>())) },
+                { "obj2", new ExistentialClause(OccurrenceRule2, new Characteristic(type2, new List<PropertyCheck>())) }
             };
 
             // Only add these depending on which were true in the rule checks
             List<RelationCheck> relChecks = new List<RelationCheck>();
+            GetRelationChecks(bestResult, relChecks);
+
+            LogicalExpression newLE = new LogicalExpression(new List<ObjectCheck>(), relChecks, new List<LogicalExpression>(), LogicalOperator.AND);
+            return new Rule("Generated Rule", "", ErrorLevel.Warning, ecDict, newLE);
+        }
+
+        private static void GetRelationChecks(List<bool?> bestResult, List<RelationCheck> relChecks)
+        {
             if (bestResult[0] == true)
                 relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("Distance", OperatorNum.LESS_THAN_OR_EQUAL, 1.0, Unit.M)));
             if (bestResult[1] == true)
                 relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("Distance", OperatorNum.EQUAL, 1.5, Unit.M)));
             if (bestResult[2] == true)
                 relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("Distance", OperatorNum.GREATER_THAN_OR_EQUAL, 2.0, Unit.M)));
-            if (bestResult[3] == true)
-                relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("Facing", OperatorNum.EQUAL, 0.0, Unit.DEG)));
-            if (bestResult[4] == true)
-                relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("Facing", OperatorNum.EQUAL, 90.0, Unit.DEG)));
-            if (bestResult[5] == true)
-                relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("Facing", OperatorNum.EQUAL, 180.0, Unit.DEG)));
-            if (bestResult[6] == true)
-                relChecks.Add(new RelationCheck("obj2", "obj1", Negation.MUST_HAVE, new PropertyCheckNum("Facing", OperatorNum.EQUAL, 0.0, Unit.DEG)));
-            if (bestResult[7] == true)
-                relChecks.Add(new RelationCheck("obj2", "obj1", Negation.MUST_HAVE, new PropertyCheckNum("Facing", OperatorNum.EQUAL, 90.0, Unit.DEG)));
-            if (bestResult[8] == true)
-                relChecks.Add(new RelationCheck("obj2", "obj1", Negation.MUST_HAVE, new PropertyCheckNum("Facing", OperatorNum.EQUAL, 180.0, Unit.DEG)));
 
-            LogicalExpression newLE = new LogicalExpression(new List<ObjectCheck>(), relChecks, new List<LogicalExpression>(), LogicalOperator.AND);
-            return new Rule("Generated Rule", "", ErrorLevel.Warning, ecDict, newLE);
+            if (bestResult[3] == true)
+                relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("FacingAngleTo", OperatorNum.EQUAL, 0.0, Unit.DEG)));
+            if (bestResult[4] == true)
+                relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("FacingAngleTo", OperatorNum.EQUAL, 90.0, Unit.DEG)));
+            if (bestResult[5] == true)
+                relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("FacingAngleTo", OperatorNum.EQUAL, 180.0, Unit.DEG)));
+
+            if (bestResult[6] == true)
+                relChecks.Add(new RelationCheck("obj2", "obj1", Negation.MUST_HAVE, new PropertyCheckNum("FacingAngleTo", OperatorNum.EQUAL, 0.0, Unit.DEG)));
+            if (bestResult[7] == true)
+                relChecks.Add(new RelationCheck("obj2", "obj1", Negation.MUST_HAVE, new PropertyCheckNum("FacingAngleTo", OperatorNum.EQUAL, 90.0, Unit.DEG)));
+            if (bestResult[8] == true)
+                relChecks.Add(new RelationCheck("obj2", "obj1", Negation.MUST_HAVE, new PropertyCheckNum("FacingAngleTo", OperatorNum.EQUAL, 180.0, Unit.DEG)));
+
+            if (bestResult[9] == true)
+                relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("AlignmentAngle", OperatorNum.EQUAL, 0.0, Unit.DEG)));
+            if (bestResult[10] == true)
+                relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("AlignmentAngle", OperatorNum.EQUAL, 90.0, Unit.DEG)));
+            if (bestResult[11] == true)
+                relChecks.Add(new RelationCheck("obj1", "obj2", Negation.MUST_HAVE, new PropertyCheckNum("AlignmentAngle", OperatorNum.EQUAL, 180.0, Unit.DEG)));
         }
 
         private static List<bool?> CombineLists(List<bool?> l1, List<bool?> l2)
@@ -236,21 +250,42 @@ namespace RuleGeneratorPackage
         public double distance;
         public double facing12;
         public double facing21;
+        public double alignment;
 
         public List<bool?> BooleanResults;
-        public void GetBooleansFromValues()
+
+        public RelationInstance(string id1, string id2, string type1, string type2, double distance, double facing12, double facing21, double alignment)
+        {
+            this.id1 = id1;
+            this.id2 = id2;
+            this.type1 = type1;
+            this.type2 = type2;
+            this.distance = distance;
+            this.facing12 = facing12;
+            this.facing21 = facing21;
+            this.alignment = alignment;
+            GetBooleansFromValues();
+        }
+
+        private void GetBooleansFromValues()
         {
             BooleanResults = new List<bool?>()
-                {
-                    distance <= 1.0,
-                    distance > 1.0 && distance >= 2.0,
-                    distance > 2.0,
-                    facing12 <= 45.0*Math.PI/180.0,
-                    facing12 > 45.0*Math.PI/180.0 && facing12 <= 135.0*Math.PI/180.0,
-                    facing12 > 135.0*Math.PI/180.0,
-                    facing21 <= 45.0*Math.PI/180.0,
-                    facing21 > 45.0*Math.PI/180.0 && facing21 <= 135.0*Math.PI/180.0,
-                    facing21 > 135.0*Math.PI/180.0,
+            {
+                distance <= 1.0,
+                distance > 1.0 && distance >= 2.0,
+                distance > 2.0,
+
+                facing12 <= 45.0*Math.PI/180.0,
+                facing12 > 45.0*Math.PI/180.0 && facing12 <= 135.0*Math.PI/180.0,
+                facing12 > 135.0*Math.PI/180.0,
+
+                facing21 <= 45.0*Math.PI/180.0,
+                facing21 > 45.0*Math.PI/180.0 && facing21 <= 135.0*Math.PI/180.0,
+                facing21 > 135.0*Math.PI/180.0,
+
+                alignment <= 45.0*Math.PI/180.0,
+                alignment > 45.0*Math.PI/180.0 && alignment <= 135.0*Math.PI/180.0,
+                alignment > 135.0*Math.PI/180.0,
                 };
         }
     }

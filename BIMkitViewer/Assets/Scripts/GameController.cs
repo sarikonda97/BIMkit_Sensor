@@ -833,7 +833,7 @@ public class GameController : MonoBehaviour
         // Just an Overlap Check for testing
         bool overlapingSomething = false;
         RuleCheckObject rco1 = new RuleCheckObject(mosEditingObj.ModelObject);
-        MathPackage.Mesh mesh1 = GetGlobalMesh(rco1);
+        MathPackage.Mesh mesh1 = GetGlobalBBMesh(rco1);
         foreach (ModelObjectScript mos in ModelObjects)
         {
             if (mos == mosEditingObj)// || mos.ModelObject.Components.Sum(c => c.Triangles.Count) > 20)
@@ -843,7 +843,7 @@ public class GameController : MonoBehaviour
             mos.UnHighlight();
 
             RuleCheckObject rco2 = new RuleCheckObject(mos.ModelObject);
-            MathPackage.Mesh mesh2 = GetGlobalMesh(rco2);
+            MathPackage.Mesh mesh2 = GetGlobalBBMesh(rco2);
             if (Utils.MeshOverlap(mesh1, mesh2, 1.0))
             {
                 mos.Highlight(HighlightMatRed);
@@ -859,6 +859,15 @@ public class GameController : MonoBehaviour
         {
             mosEditingObj.UnHighlight();
         }
+    }
+
+    private MathPackage.Mesh GetGlobalBBMesh(RuleCheckObject rco)
+    {
+        Utils.GetXYZDimentions(rco.LocalVerticies, out Vector3D center, out Vector3D dims);
+        MathPackage.Mesh bbMesh = Utils.CreateBoundingBox(center, dims, FaceSide.FRONT);
+        Matrix4 transMat = Utils.GetTranslationMatrixFromLocationOrientation(rco.Location, rco.Orientation);
+        List<Vector3D> transVects = Utils.TranslateVerticies(transMat, bbMesh.VertexList);
+        return new MathPackage.Mesh(transVects, bbMesh.TriangleList);
     }
 
     #endregion
@@ -1455,15 +1464,6 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private MathPackage.Mesh GetGlobalMesh(RuleCheckObject rco)
-    {
-        Utils.GetXYZDimentions(rco.LocalVerticies, out Vector3D center, out Vector3D dims);
-        MathPackage.Mesh bbMesh = Utils.CreateBoundingBox(center, dims, FaceSide.FRONT);
-        Matrix4 transMat = Utils.GetTranslationMatrixFromLocationOrientation(rco.Location, rco.Orientation);
-        List<Vector3D> transVects = Utils.TranslateVerticies(transMat, bbMesh.VertexList);
-        return new MathPackage.Mesh(transVects, bbMesh.TriangleList);
-    }
-
     public void SaveOverlapInstanceClicked()
     {
         RuleCheckObject rco1 = new RuleCheckObject(FirstObject.ModelObject);
@@ -1491,10 +1491,15 @@ public class GameController : MonoBehaviour
         UnsavedModelObjects = UnsavedModelObjects.Distinct().ToList();
 
         string outputString = "";
-        // Once the model has been saved, record all the Relations (Distance and FacingAngle) between the newly placed objects and the objects in the model
-        foreach (ModelObjectScript newMos in UnsavedModelObjects)
+        // Once the model has been saved, record all the Relations (Distance, FacingAngle, aligment, etc.) between the furnishing objects and all objects in the model
+        IEnumerable<ModelObjectScript> listOfFurnishingObjectInModel = ModelObjects.Where(mo => ObjectType.RecusiveTypeCheck(ObjectTypeTree.GetType("FurnishingElement"), ObjectTypeTree.GetType(mo.ModelObject.TypeId)));
+        foreach (ModelObjectScript newMos in listOfFurnishingObjectInModel) // UnsavedModelObjects)
         {
             RuleCheckObject rco1 = new RuleCheckObject(newMos.ModelObject);
+            MathPackage.Mesh rcoMesh1 = GetGlobalBBMesh(rco1);
+            rco1.GlobalVerticies = rcoMesh1.VertexList;
+            rco1.Triangles = rcoMesh1.TriangleList;
+
             foreach (ModelObjectScript mos in ModelObjects)
             {
                 if (newMos == mos || newMos.ModelObject.Id == mos.ModelObject.Id)
@@ -1502,11 +1507,17 @@ public class GameController : MonoBehaviour
                     continue;
                 }
                 RuleCheckObject rco2 = new RuleCheckObject(mos.ModelObject);
+                MathPackage.Mesh rcoMesh2 = GetGlobalBBMesh(rco2);
+                rco2.GlobalVerticies = rcoMesh2.VertexList;
+                rco2.Triangles = rcoMesh2.TriangleList;
+
+                // ADD MORE HERE IF YOU WANT:
                 double distanceVal = RelationMethods.Distance(new RuleCheckRelation(rco1, rco2));
                 double facingValAB = RelationMethods.FacingAngleTo(new RuleCheckRelation(rco1, rco2));
                 double facingValBA = RelationMethods.FacingAngleTo(new RuleCheckRelation(rco2, rco1));
+                double alignmentVal = RelationMethods.AlignmentAngle(new RuleCheckRelation(rco2, rco1));
 
-                outputString += rco1.ID + "," + rco1.Type + "," + rco2.ID + "," + rco2.Type + "," + distanceVal + "," + facingValAB + "," + facingValBA + "\n";
+                outputString += rco1.ID + "," + rco2.ID + "," + rco1.Type  + "," + rco2.Type + "," + distanceVal + "," + facingValAB + "," + facingValBA + "," + alignmentVal + "\n";
             }
         }
 

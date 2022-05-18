@@ -242,7 +242,7 @@ namespace ModelCheckPackage
             List<string> ruleTypesList = rule.ExistentialClauses.Select(ec => ec.Value.Characteristic.Type).Distinct().ToList();
             foreach (string ruleType in ruleTypesList)
             {
-                if (RecusiveTypeCheck(ObjectTypeTree.GetType(ruleType), ObjectTypeTree.GetType(type)))
+                if (ObjectType.RecusiveTypeCheck(ObjectTypeTree.GetType(ruleType), ObjectTypeTree.GetType(type)))
                 {
                     return true;
                 }
@@ -502,7 +502,7 @@ namespace ModelCheckPackage
         public static bool CheckIfObjectHasCharacteristics(RuleCheckObject obj, Characteristic charic)
         {
             // check that the object matches the characteristic type:
-            if (!RecusiveTypeCheck(ObjectTypeTree.GetType(charic.Type), ObjectTypeTree.GetType(obj.Type)))
+            if (!ObjectType.RecusiveTypeCheck(ObjectTypeTree.GetType(charic.Type), ObjectTypeTree.GetType(obj.Type)))
             {
                 return false;
             }
@@ -523,20 +523,6 @@ namespace ModelCheckPackage
             }
 
             return allCharacterChecksPass;
-        }
-
-        public static bool RecusiveTypeCheck(ObjectType checkType, ObjectType objType)
-        {
-            // Checks if the objectType or any of its parents are equal to the checkType
-            if (objType == null)
-            {
-                return false;
-            }
-            if (objType.Name == checkType.Name)
-            {
-                return true;
-            }
-            return RecusiveTypeCheck(checkType, ObjectTypeTree.GetType(objType.ParentName));
         }
 
         public static double OnePropertyPassesPropertyCheck(Property property, PropertyCheck pCheck)

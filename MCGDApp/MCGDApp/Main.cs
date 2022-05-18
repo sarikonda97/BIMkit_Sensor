@@ -6,6 +6,7 @@ using MathPackage;
 using ModelCheckAPI;
 using ModelCheckPackage;
 using RuleAPI;
+using RuleAPI.Methods;
 using RuleAPI.Models;
 using RuleGeneratorPackage;
 using System;
@@ -373,37 +374,17 @@ namespace MCGDApp
         {
             ResetDsiplays();
 
-            // Get the model, object, and rules
-            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
-            List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
-            ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
-            if (modelMetaData == null || rules.Count == 0 || catalogObjectsMeta.Count == 0)
+            var results = await GetGDItemsAsync();
+            if (!results.Item1)
             {
-                MessageBox.Show("Select a model, rules, and objects");
                 return;
             }
+            Model model = results.Item3;
+            List<Rule> rules = results.Item2;
+            List<CatalogInitializer> catalogObjectsInits = results.Item4;
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-
-            APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
-            if (response.Code != System.Net.HttpStatusCode.OK)
-            {
-                MessageBox.Show(response.ReasonPhrase);
-                return;
-            }
-
-            Model model = response.Data;
-
-            // Find the center of the floor:
-            Vector3D ModelStartingLocation = new Vector3D();
-            ModelObject floorObject = model.ModelObjects.Where(o => o.TypeId == "Floor").First();
-            if (floorObject != null)
-            {
-                ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
-            }
-
-            List<CatalogInitializer> catalogObjectsInits = await GetCatalogInits(catalogObjectsMeta, ModelStartingLocation);
 
             GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits, GDSettings);
             Model newModel = generativeDesigner.ExecuteGenDesignSequential();
@@ -424,37 +405,17 @@ namespace MCGDApp
         {
             ResetDsiplays();
 
-            // Get the model, object, and rules
-            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
-            List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
-            ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
-            if (modelMetaData == null || rules.Count == 0 || catalogObjectsMeta.Count == 0)
+            var results = await GetGDItemsAsync();
+            if (!results.Item1)
             {
-                MessageBox.Show("Select a model, rules, and objects");
                 return;
             }
+            Model model = results.Item3;
+            List<Rule> rules = results.Item2;
+            List<CatalogInitializer> catalogObjectsInits = results.Item4;
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-
-            APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
-            if (response.Code != System.Net.HttpStatusCode.OK)
-            {
-                MessageBox.Show(response.ReasonPhrase);
-                return;
-            }
-
-            Model model = response.Data;
-
-            // Find the center of the floor:
-            Vector3D ModelStartingLocation = new Vector3D();
-            ModelObject floorObject = model.ModelObjects.Where(o => o.TypeId == "Floor").First();
-            if (floorObject != null)
-            {
-                ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
-            }
-
-            List<CatalogInitializer> catalogObjectsInits = await GetCatalogInits(catalogObjectsMeta, ModelStartingLocation);
 
             GenerativeDesigner generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits, GDSettings);
             Model newModel = generativeDesigner.ExecuteGenDesignRoundRobin();
@@ -483,6 +444,43 @@ namespace MCGDApp
                                              "\nErrors: " + cs.ErrorScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Error) +
                                              "\nWarning: " + cs.WarningScore + "/" + +rules.Count(r => r.ErrorLevel == ErrorLevel.Warning) +
                                              "\nRecommended: " + cs.RecommendScore + "/" + rules.Count(r => r.ErrorLevel == ErrorLevel.Recommended);
+        }
+
+        private async Task<Tuple<bool, List<Rule>, Model, List<CatalogInitializer>>> GetGDItemsAsync()
+        {
+            // Get the model, object, and rules
+            List<Rule> rules = GetCheckedRules(this.treeViewRules.Nodes);
+            List<CatalogObjectMetadata> catalogObjectsMeta = GetCheckedObjects();
+            ModelMetadata modelMetaData = this.listBoxModelList.SelectedItem as ModelMetadata;
+            if (modelMetaData == null || rules.Count == 0 || catalogObjectsMeta.Count == 0)
+            {
+                MessageBox.Show("Select a model, rules, and objects");
+                return new Tuple<bool, List<Rule>, Model, List<CatalogInitializer>>(false, null, null, null);
+            }
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return new Tuple<bool, List<Rule>, Model, List<CatalogInitializer>>(false, null, null, null);
+            }
+
+            Model model = response.Data;
+
+            // Find the center of the floor:
+            Vector3D ModelStartingLocation = new Vector3D();
+            ModelObject floorObject = model.ModelObjects.Where(o => o.TypeId == "Floor").First();
+            if (floorObject != null)
+            {
+                ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
+            }
+
+            List<CatalogInitializer> catalogObjectsInits = await GetCatalogInits(catalogObjectsMeta, ModelStartingLocation);
+
+            return new Tuple<bool, List<Rule>, Model, List<CatalogInitializer>>(true, rules, model, catalogObjectsInits);
         }
 
         private async Task<List<CatalogInitializer>> GetCatalogInits(List<CatalogObjectMetadata> catalogObjectsMeta, Vector3D ModelStartingLocation)
@@ -577,17 +575,7 @@ namespace MCGDApp
                 foreach (string line in File.ReadAllLines(file))
                 {
                     string[] lineSplit = line.Split(',');
-                    RelationInstance newRi = new RelationInstance()
-                    {
-                        id1 = lineSplit[0],
-                        type1 = lineSplit[1],
-                        id2 = lineSplit[2],
-                        type2 = lineSplit[3],
-                        distance = Convert.ToDouble(lineSplit[4]),
-                        facing12 = Convert.ToDouble(lineSplit[5]),
-                        facing21 = Convert.ToDouble(lineSplit[6]),
-                    };
-                    newRi.GetBooleansFromValues();
+                    RelationInstance newRi = new RelationInstance(lineSplit[0], lineSplit[1], lineSplit[2], lineSplit[3], Convert.ToDouble(lineSplit[4]), Convert.ToDouble(lineSplit[5]), Convert.ToDouble(lineSplit[6]), Convert.ToDouble(lineSplit[7]));
                     currentExample.relationInstances.Add(newRi);
                 }
                 exampleList.Add(currentExample);
@@ -614,6 +602,126 @@ namespace MCGDApp
                 MessageBox.Show(response.ReasonPhrase);
                 return;
             }
+        }
+
+        private async void buttonRuleGenEval_Click(object sender, EventArgs e)
+        {
+            ResetDsiplays();
+
+            var results = await GetGDItemsAsync();
+            if (!results.Item1)
+            {
+                return;
+            }
+            Model model = results.Item3;
+            List<Rule> rules = results.Item2;
+            List<CatalogInitializer> catalogObjectsInits = results.Item4;
+
+            // Generate some number of Examples using the rules and objects:
+            int numberOfExamples = 10;
+            List<Tuple<Model, CheckScore>> exampleModels = GenerateExamples(model, rules, catalogObjectsInits, numberOfExamples);
+
+            // Using the list of examples, Generate a bunch of rules (Types will only be furnishing related, no rules for building objects with other building objects)
+            List<string> listOfAllObjectTypes = model.ModelObjects.Select(c => c.TypeId).Distinct().ToList();
+            List<string> listOfFurnishingObjectTypes = catalogObjectsInits.Select(c => c.CatalogObject.TypeId).Distinct().ToList();
+            List<Example> exampleList = GetExamples(exampleModels);
+            List<Rule> generatedRules = new List<Rule>();
+            foreach (string type1 in listOfFurnishingObjectTypes)
+            {
+                foreach (string type2 in listOfAllObjectTypes)
+                {
+                    if (type1 == type2)
+                    {
+                        continue;
+                    }
+
+                    Rule newRule = RuleGenerator.LearnRuleBoolean(OccurrenceRule.ALL, type1, OccurrenceRule.ANY, type2, exampleList);
+                    if (newRule.LogicalExpression.RelationChecks.Count > 0)
+                    {
+                        // Only want rules that have at least one relation check
+                        generatedRules.Add(newRule);
+                    }
+                }
+            }
+
+            // Using the generated rules and the same objects as before, generate new layouts
+            List<Tuple<Model, CheckScore>> generatedRuleModels = GenerateExamples(model, generatedRules, catalogObjectsInits, numberOfExamples);
+        }
+
+        private List<Example> GetExamples(List<Tuple<Model, CheckScore>> exampleModels)
+        {
+            List<Example> exampleList = new List<Example>();
+            foreach (Model exampleModel in exampleModels.Select(em => em.Item1))
+            {
+                Example currentExample = new Example();
+                var listOfFurnishingObjectInModel = exampleModel.ModelObjects.Where(mo => ObjectType.RecusiveTypeCheck(ObjectTypeTree.GetType("FurnishingElement"), ObjectTypeTree.GetType(mo.TypeId)));
+                foreach (ModelObject newMos in listOfFurnishingObjectInModel) // UnsavedModelObjects)
+                {
+                    RuleCheckObject rco1 = new RuleCheckObject(newMos);
+                    Mesh rcoMesh1 = GetGlobalBBMesh(rco1);
+                    rco1.GlobalVerticies = rcoMesh1.VertexList;
+                    rco1.Triangles = rcoMesh1.TriangleList;
+
+                    foreach (ModelObject mos in exampleModel.ModelObjects)
+                    {
+                        if (newMos == mos || newMos.Id == mos.Id)
+                        {
+                            continue;
+                        }
+                        RuleCheckObject rco2 = new RuleCheckObject(mos);
+                        Mesh rcoMesh2 = GetGlobalBBMesh(rco2);
+                        rco2.GlobalVerticies = rcoMesh2.VertexList;
+                        rco2.Triangles = rcoMesh2.TriangleList;
+
+                        // ADD MORE HERE IF YOU WANT:
+                        double distanceVal = RelationMethods.Distance(new RuleCheckRelation(rco1, rco2));
+                        double facingValAB = RelationMethods.FacingAngleTo(new RuleCheckRelation(rco1, rco2));
+                        double facingValBA = RelationMethods.FacingAngleTo(new RuleCheckRelation(rco2, rco1));
+                        double alignmentVal = RelationMethods.AlignmentAngle(new RuleCheckRelation(rco2, rco1));
+
+                        RelationInstance newRi = new RelationInstance(rco1.ID, rco2.ID, rco1.Type, rco2.Type, distanceVal, facingValAB, facingValBA, alignmentVal);
+                        currentExample.relationInstances.Add(newRi);
+                    }
+                }
+                exampleList.Add(currentExample);
+            }
+
+            return exampleList;
+        }
+
+        private List<Tuple<Model, CheckScore>> GenerateExamples(Model model, List<Rule> rules, List<CatalogInitializer> catalogObjectsInits, int numberOfExamples)
+        {
+            List<Tuple<Rule, Type, MethodInfo>> compiledRules = null;
+            List<Tuple<Model, CheckScore>> exampleModels = new List<Tuple<Model, CheckScore>>();
+            for (int i = 0; i < numberOfExamples; i++)
+            {
+                GenerativeDesigner generativeDesigner;
+                if (compiledRules == null)
+                {
+                    generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits, GDSettings);
+                    compiledRules = generativeDesigner.GetCompiledRules();
+                }
+                else
+                {
+                    generativeDesigner = new GenerativeDesigner(model, compiledRules, catalogObjectsInits, GDSettings);
+                }
+
+                Model newModel = generativeDesigner.ExecuteGenDesignSequential();
+                ModelChecker = new ModelChecker(newModel, compiledRules);
+                List<RuleResult> ruleResults = ModelChecker.CheckModel(0, false);
+                CheckScore cs = ModelChecker.GetCheckScore();
+                exampleModels.Add(new Tuple<Model, CheckScore>(newModel, cs));
+            }
+            return exampleModels;
+        }
+
+        private Mesh GetGlobalBBMesh(RuleCheckObject rco)
+        {
+            Utils.GetXYZDimentions(rco.LocalVerticies, out Vector3D center, out Vector3D dims);
+            Mesh bbMesh = Utils.CreateBoundingBox(center, dims, FaceSide.FRONT);
+            Matrix4 transMat = Utils.GetTranslationMatrixFromLocationOrientation(rco.Location, rco.Orientation);
+            List<Vector3D> transVects = Utils.TranslateVerticies(transMat, bbMesh.VertexList);
+            return new Mesh(transVects, bbMesh.TriangleList);
         }
 
         #endregion

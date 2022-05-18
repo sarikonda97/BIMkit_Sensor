@@ -67,6 +67,7 @@ namespace MCGDApp
             this.buttonRuleLearner = new System.Windows.Forms.Button();
             this.buttonRuleTypeOrder = new System.Windows.Forms.Button();
             this.buttonVoxelCreator = new System.Windows.Forms.Button();
+            this.buttonRuleGenEval = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -501,6 +502,7 @@ namespace MCGDApp
             this.groupBox6.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox6.Controls.Add(this.buttonRuleGenEval);
             this.groupBox6.Controls.Add(this.buttonRuleLearner);
             this.groupBox6.Controls.Add(this.buttonRuleTypeOrder);
             this.groupBox6.Controls.Add(this.buttonVoxelCreator);
@@ -546,6 +548,18 @@ namespace MCGDApp
             this.buttonVoxelCreator.Text = "Create Voxels";
             this.buttonVoxelCreator.UseVisualStyleBackColor = true;
             this.buttonVoxelCreator.Click += new System.EventHandler(this.buttonVoxelCreator_Click);
+            // 
+            // buttonRuleGenEval
+            // 
+            this.buttonRuleGenEval.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonRuleGenEval.Location = new System.Drawing.Point(6, 193);
+            this.buttonRuleGenEval.Name = "buttonRuleGenEval";
+            this.buttonRuleGenEval.Size = new System.Drawing.Size(145, 52);
+            this.buttonRuleGenEval.TabIndex = 3;
+            this.buttonRuleGenEval.Text = "Rule Generator Evaluator";
+            this.buttonRuleGenEval.UseVisualStyleBackColor = true;
+            this.buttonRuleGenEval.Click += new System.EventHandler(this.buttonRuleGenEval_Click);
             // 
             // Main
             // 
@@ -613,6 +627,7 @@ namespace MCGDApp
         private System.Windows.Forms.Button buttonRecommended;
         private System.Windows.Forms.Button buttonRuleLearner;
         private System.Windows.Forms.Button buttonSelectAllRules;
+        private System.Windows.Forms.Button buttonRuleGenEval;
     }
 }
 

@@ -29,6 +29,20 @@ namespace DbmsApi.API
         {
             return Name;
         }
+
+        public static bool RecusiveTypeCheck(ObjectType checkType, ObjectType objType)
+        {
+            // Checks if the objectType or any of its parents are equal to the checkType
+            if (objType == null)
+            {
+                return false;
+            }
+            if (objType.Name == checkType.Name)
+            {
+                return true;
+            }
+            return RecusiveTypeCheck(checkType, ObjectTypeTree.GetType(objType.ParentName));
+        }
     }
 
     public static class ObjectTypeTree
