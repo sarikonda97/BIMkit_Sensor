@@ -64,6 +64,7 @@
     <Compile Include="Methods\RelationMethods.cs" />
     <Compile Include="Methods\VirtualObjects.cs" />
     <Compile Include="Models\Characteristic.cs" />
+    <Compile Include="Models\DefaultRuleCreator.cs" />
     <Compile Include="Models\ExistentialClause.cs" />
     <Compile Include="Models\LogicalExpression.cs" />
     <Compile Include="Models\ObjectCheck.cs" />

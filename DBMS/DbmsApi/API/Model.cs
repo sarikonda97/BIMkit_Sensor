@@ -43,5 +43,17 @@ namespace DbmsApi.API
                 TypeId = mco.TypeId
             };
         }
+
+        //public Model Copy()
+        //{
+        //    Model newModel = new Model()
+        //    {
+        //        Name = Name,
+        //        ModelObjects = ModelObjects.Select(m => m.Copy()).ToList(),
+        //        Relations = Relations.Select(r => r.Copy()).ToList(),
+        //        Properties = Properties.Copy(),
+        //        Tags = Tags.Select(t => new KeyValuePair<string, string>(t.Key, t.Value)).ToList()
+        //    };
+        //}
     }
 }

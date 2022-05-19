@@ -458,9 +458,6 @@ namespace MCGDApp
                 return new Tuple<bool, List<Rule>, Model, List<CatalogInitializer>>(false, null, null, null);
             }
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
             APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelMetaData.ModelId, LevelOfDetail.LOD100));
             if (response.Code != System.Net.HttpStatusCode.OK)
             {
@@ -475,7 +472,12 @@ namespace MCGDApp
             ModelObject floorObject = model.ModelObjects.Where(o => o.TypeId == "Floor").First();
             if (floorObject != null)
             {
-                ModelStartingLocation = new Vector3D(floorObject.Location.x, floorObject.Location.y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
+                // Might want it sligtly off the center:
+                Random r = new Random();
+                double x = -1.0 + r.NextDouble();
+                double y = -1.0 + r.NextDouble();
+
+                ModelStartingLocation = new Vector3D(floorObject.Location.x + x, floorObject.Location.y + y, floorObject.Components.Max(c => c.Vertices.Max(v => v.z)));
             }
 
             List<CatalogInitializer> catalogObjectsInits = await GetCatalogInits(catalogObjectsMeta, ModelStartingLocation);
@@ -594,16 +596,6 @@ namespace MCGDApp
             }
         }
 
-        public async void SaveRule(Rule rule)
-        {
-            APIResponse<string> response = await RuleAPIController.CreateRuleAsync(rule);
-            if (response.Code != System.Net.HttpStatusCode.OK)
-            {
-                MessageBox.Show(response.ReasonPhrase);
-                return;
-            }
-        }
-
         private async void buttonRuleGenEval_Click(object sender, EventArgs e)
         {
             ResetDsiplays();
@@ -618,14 +610,98 @@ namespace MCGDApp
             List<CatalogInitializer> catalogObjectsInits = results.Item4;
 
             // Generate some number of Examples using the rules and objects:
-            int numberOfExamples = 10;
-            List<Tuple<Model, CheckScore>> exampleModels = GenerateExamples(model, rules, catalogObjectsInits, numberOfExamples);
+            int numberOfExamples = 5;
+            List<Tuple<Model, CheckScore>> exampleModels = await GenerateExamples(model.Id, rules, catalogObjectsInits, numberOfExamples);
+            List<Example> exampleList = GetExamples(exampleModels);
 
             // Using the list of examples, Generate a bunch of rules (Types will only be furnishing related, no rules for building objects with other building objects)
+            List<Rule> generatedRules = GenerateRules(model, catalogObjectsInits, exampleList, "GeneratedRules");
+            // Need to add overlap to the rules
+            generatedRules.Add(DefaultRuleCreator.CreatOverlapRuleFurnishingAndReal());
+
+            // Using the generated rules and the same objects as before, generate new layouts
+            List <Tuple<Model, CheckScore>> generatedRuleModels = await GenerateExamples(model.Id, generatedRules, catalogObjectsInits, numberOfExamples);
+
+            // Evaluate the original examples with the generated rules, and the new layouts with the original rules
+            List<Tuple<Model, CheckScore>> examplesWithGenRules = EvaluateMultipleModels(exampleModels.Select(grm => grm.Item1).ToList(), generatedRules);
+            List<Tuple<Model, CheckScore>> generatedRuleOldRules = EvaluateMultipleModels(generatedRuleModels.Select(grm => grm.Item1).ToList(), rules);
+
+            // Save Models for visual check:
+            await SaveMultipleModels(exampleModels.Select(grm => grm.Item1).ToList(), "Example");
+            await SaveMultipleModels(generatedRuleModels.Select(grm => grm.Item1).ToList(), "Generated");
+
+            // Display all results
+            string displayString = generatedRules.Count.ToString() + " Generatated Rules\n\n";
+            for (int i = 0; i < numberOfExamples; i++)
+            {
+                displayString += exampleModels[i].Item1.Name + ": " + exampleModels[i].Item2.TotalScore().ToString("##.##") + " / " + examplesWithGenRules[i].Item2.TotalScore().ToString("##.##") + "\n";
+            }
+            displayString += "\n";
+            for (int i = 0; i < numberOfExamples; i++)
+            {
+                displayString += generatedRuleModels[i].Item1.Name + ": " + generatedRuleOldRules[i].Item2.TotalScore().ToString("##.##") + " / " + generatedRuleModels[i].Item2.TotalScore().ToString("##.##") + "\n";
+            }
+
+            this.richTextBoxGenDesign.Text = displayString;
+        }
+
+        public async void SaveRule(Rule rule)
+        {
+            APIResponse<string> response = await RuleAPIController.CreateRuleAsync(rule);
+            if (response.Code != System.Net.HttpStatusCode.OK)
+            {
+                MessageBox.Show(response.ReasonPhrase);
+                return;
+            }
+        }
+
+        private async Task<bool> SaveMultipleModels(List<Model> models, string name)
+        {
+            int counter = 0;
+            foreach (Model m in models)
+            {
+                m.Name = name + counter.ToString();
+                APIResponse<string> response3 = await DBMSController.CreateModel(m);
+                if (response3.Code != System.Net.HttpStatusCode.OK)
+                {
+                    MessageBox.Show(response3.ReasonPhrase);
+                    return false;
+                }
+                counter++;
+            }
+
+            return true;
+        }
+
+        private List<Tuple<Model, CheckScore>> EvaluateMultipleModels(List<Model> models, List<Rule> rules)
+        {
+            List<Tuple<Rule, Type, MethodInfo>> compiledRules = null;
+            List<Tuple<Model, CheckScore>> results = new List<Tuple<Model, CheckScore>>();
+            foreach (Model m in models)
+            {
+                if (compiledRules == null)
+                {
+                    ModelChecker = new ModelChecker(m, rules);
+                    List<RuleResult> ruleResults = ModelChecker.CheckModel(0, false);
+                    compiledRules = ModelChecker.CompiledRules;
+                }
+                else
+                {
+                    ModelChecker = new ModelChecker(m, compiledRules);
+                    List<RuleResult> ruleResults = ModelChecker.CheckModel(0, false);
+                }
+                CheckScore cs = ModelChecker.GetCheckScore();
+                results.Add(new Tuple<Model, CheckScore>(m, cs));
+            }
+
+            return results;
+        }
+
+        private static List<Rule> GenerateRules(Model model, List<CatalogInitializer> catalogObjectsInits, List<Example> exampleList, string ruleName)
+        {
+            List<Rule> generatedRules = new List<Rule>();
             List<string> listOfAllObjectTypes = model.ModelObjects.Select(c => c.TypeId).Distinct().ToList();
             List<string> listOfFurnishingObjectTypes = catalogObjectsInits.Select(c => c.CatalogObject.TypeId).Distinct().ToList();
-            List<Example> exampleList = GetExamples(exampleModels);
-            List<Rule> generatedRules = new List<Rule>();
             foreach (string type1 in listOfFurnishingObjectTypes)
             {
                 foreach (string type2 in listOfAllObjectTypes)
@@ -636,16 +712,17 @@ namespace MCGDApp
                     }
 
                     Rule newRule = RuleGenerator.LearnRuleBoolean(OccurrenceRule.ALL, type1, OccurrenceRule.ANY, type2, exampleList);
-                    if (newRule.LogicalExpression.RelationChecks.Count > 0)
+                    if (newRule != null && newRule.LogicalExpression.RelationChecks.Count > 0)
                     {
                         // Only want rules that have at least one relation check
+                        newRule.Id = Guid.NewGuid().ToString().Replace("-", "");
+                        newRule.Name = ruleName + generatedRules.Count.ToString();
                         generatedRules.Add(newRule);
                     }
                 }
             }
 
-            // Using the generated rules and the same objects as before, generate new layouts
-            List<Tuple<Model, CheckScore>> generatedRuleModels = GenerateExamples(model, generatedRules, catalogObjectsInits, numberOfExamples);
+            return generatedRules;
         }
 
         private List<Example> GetExamples(List<Tuple<Model, CheckScore>> exampleModels)
@@ -655,7 +732,7 @@ namespace MCGDApp
             {
                 Example currentExample = new Example();
                 var listOfFurnishingObjectInModel = exampleModel.ModelObjects.Where(mo => ObjectType.RecusiveTypeCheck(ObjectTypeTree.GetType("FurnishingElement"), ObjectTypeTree.GetType(mo.TypeId)));
-                foreach (ModelObject newMos in listOfFurnishingObjectInModel) // UnsavedModelObjects)
+                foreach (ModelObject newMos in listOfFurnishingObjectInModel)
                 {
                     RuleCheckObject rco1 = new RuleCheckObject(newMos);
                     Mesh rcoMesh1 = GetGlobalBBMesh(rco1);
@@ -689,24 +766,33 @@ namespace MCGDApp
             return exampleList;
         }
 
-        private List<Tuple<Model, CheckScore>> GenerateExamples(Model model, List<Rule> rules, List<CatalogInitializer> catalogObjectsInits, int numberOfExamples)
+        private async Task<List<Tuple<Model, CheckScore>>> GenerateExamples(string modelId, List<Rule> rules, List<CatalogInitializer> catalogObjectsInits, int numberOfExamples)
         {
             List<Tuple<Rule, Type, MethodInfo>> compiledRules = null;
             List<Tuple<Model, CheckScore>> exampleModels = new List<Tuple<Model, CheckScore>>();
             for (int i = 0; i < numberOfExamples; i++)
             {
+                APIResponse<Model> response = await DBMSController.GetModel(new ItemRequest(modelId, LevelOfDetail.LOD100));
+                if (response.Code != System.Net.HttpStatusCode.OK)
+                {
+                    MessageBox.Show(response.ReasonPhrase);
+                    return null;
+                }
+
+                Model newModel = response.Data;
+
                 GenerativeDesigner generativeDesigner;
                 if (compiledRules == null)
                 {
-                    generativeDesigner = new GenerativeDesigner(model, rules, catalogObjectsInits, GDSettings);
+                    generativeDesigner = new GenerativeDesigner(newModel, rules, catalogObjectsInits, GDSettings);
                     compiledRules = generativeDesigner.GetCompiledRules();
                 }
                 else
                 {
-                    generativeDesigner = new GenerativeDesigner(model, compiledRules, catalogObjectsInits, GDSettings);
+                    generativeDesigner = new GenerativeDesigner(newModel, compiledRules, catalogObjectsInits, GDSettings);
                 }
 
-                Model newModel = generativeDesigner.ExecuteGenDesignSequential();
+                newModel = generativeDesigner.ExecuteGenDesignSequential();
                 ModelChecker = new ModelChecker(newModel, compiledRules);
                 List<RuleResult> ruleResults = ModelChecker.CheckModel(0, false);
                 CheckScore cs = ModelChecker.GetCheckScore();

@@ -64,10 +64,10 @@ namespace MCGDApp
             this.buttonGDThread = new System.Windows.Forms.Button();
             this.buttonGDWeb = new System.Windows.Forms.Button();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.buttonRuleGenEval = new System.Windows.Forms.Button();
             this.buttonRuleLearner = new System.Windows.Forms.Button();
             this.buttonRuleTypeOrder = new System.Windows.Forms.Button();
             this.buttonVoxelCreator = new System.Windows.Forms.Button();
-            this.buttonRuleGenEval = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -513,6 +513,18 @@ namespace MCGDApp
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Other Methods";
             // 
+            // buttonRuleGenEval
+            // 
+            this.buttonRuleGenEval.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonRuleGenEval.Location = new System.Drawing.Point(6, 193);
+            this.buttonRuleGenEval.Name = "buttonRuleGenEval";
+            this.buttonRuleGenEval.Size = new System.Drawing.Size(145, 52);
+            this.buttonRuleGenEval.TabIndex = 3;
+            this.buttonRuleGenEval.Text = "Rule Generator Evaluator";
+            this.buttonRuleGenEval.UseVisualStyleBackColor = true;
+            this.buttonRuleGenEval.Click += new System.EventHandler(this.buttonRuleGenEval_Click);
+            // 
             // buttonRuleLearner
             // 
             this.buttonRuleLearner.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -548,18 +560,6 @@ namespace MCGDApp
             this.buttonVoxelCreator.Text = "Create Voxels";
             this.buttonVoxelCreator.UseVisualStyleBackColor = true;
             this.buttonVoxelCreator.Click += new System.EventHandler(this.buttonVoxelCreator_Click);
-            // 
-            // buttonRuleGenEval
-            // 
-            this.buttonRuleGenEval.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRuleGenEval.Location = new System.Drawing.Point(6, 193);
-            this.buttonRuleGenEval.Name = "buttonRuleGenEval";
-            this.buttonRuleGenEval.Size = new System.Drawing.Size(145, 52);
-            this.buttonRuleGenEval.TabIndex = 3;
-            this.buttonRuleGenEval.Text = "Rule Generator Evaluator";
-            this.buttonRuleGenEval.UseVisualStyleBackColor = true;
-            this.buttonRuleGenEval.Click += new System.EventHandler(this.buttonRuleGenEval_Click);
             // 
             // Main
             // 

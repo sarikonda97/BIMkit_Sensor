@@ -27,6 +27,11 @@ namespace RuleGeneratorPackage
                 filteredExamples.Add(newFilteredExample);
             }
 
+            if (filteredExamples.Count == 0)
+            {
+                return null;
+            }
+
             // For each example group values based on OccurrenceRule, resulting in all possibles options for that example
             foreach (FilteredExample fe in filteredExamples)
             {
@@ -90,6 +95,12 @@ namespace RuleGeneratorPackage
             // Search through example results and find the instance that holds true throughout
             List<bool?> bestResult = new List<bool?>();
             OptionSearch(new List<bool?>(), 0, filteredExamples, ref bestResult);
+
+            // Probably shouldnt happen but might...
+            if (bestResult.Count == 0)
+            {
+                return null;
+            }
 
             // Convert that back to a Rule for the output
             Dictionary<string, ExistentialClause> ecDict = new Dictionary<string, ExistentialClause>()
@@ -208,7 +219,7 @@ namespace RuleGeneratorPackage
             if (exampleIndex == examples.Count)
             {
                 // Check against best result:
-                if (TrueValCounter(bestResult) < TrueValCounter(combinedSoFar))
+                if (bestResult.Count == 0 || TrueValCounter(bestResult) < TrueValCounter(combinedSoFar))
                 {
                     bestResult = combinedSoFar;
                 }
@@ -272,7 +283,7 @@ namespace RuleGeneratorPackage
             BooleanResults = new List<bool?>()
             {
                 distance <= 1.0,
-                distance > 1.0 && distance >= 2.0,
+                distance > 1.0 && distance <= 2.0,
                 distance > 2.0,
 
                 facing12 <= 45.0*Math.PI/180.0,
