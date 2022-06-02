@@ -28,11 +28,15 @@ namespace DBMS.Controllers.DBControllers
         private IMongoCollection<Material> materialCollection;
         private IMongoCollection<MongoModel> modelCollection;
         private IMongoCollection<MongoCatalogObject> catalogObjectCollection;
+        private IMongoCollection<MongoDeviceObject> deviceCollection;
+        private IMongoCollection<MongoDeviceRelationships> relationshipsCollection;
         private IMongoCollection<ObjectType> typeCollection;
 
         private MongoDbController()
         {
-            mongoClient = new MongoClient(new MongoUrl(ConfigurationManager.ConnectionStrings["MongoDB"].ConnectionString));
+            //string mUrl = ConfigurationManager.ConnectionStrings["MongoDB"].ConnectionString;
+            string tempUrl = "mongodb://localhost:27017/";
+            mongoClient = new MongoClient(new MongoUrl(tempUrl));
             mongoDatabase = mongoClient.GetDatabase("BIMkit");
             RetrieveCollections();
             CreateDefaults();
@@ -45,6 +49,8 @@ namespace DBMS.Controllers.DBControllers
             materialCollection = mongoDatabase.GetCollection<Material>("materials");
             modelCollection = mongoDatabase.GetCollection<MongoModel>("models");
             catalogObjectCollection = mongoDatabase.GetCollection<MongoCatalogObject>("catalogObjects");
+            deviceCollection = mongoDatabase.GetCollection<MongoDeviceObject>("deviceObjects");
+            relationshipsCollection = mongoDatabase.GetCollection<MongoDeviceRelationships>("deviceRelationships");
             typeCollection = mongoDatabase.GetCollection<ObjectType>("objectTypes");
         }
 
@@ -393,6 +399,105 @@ namespace DBMS.Controllers.DBControllers
         public List<string> RetrieveAvailableCatalogObjectIDs()
         {
             return catalogObjectCollection.Find(co => true).ToList().Select(c => c.Id).ToList();
+        }
+
+        #endregion
+
+        #region devices
+
+        public string CreateDeviceObject(MongoDeviceObject co)
+        {
+            deviceCollection.InsertOne(co);
+            return co.Id;
+        }
+
+        public MongoDeviceObject GetDeviceObject(string id)
+        {
+            return deviceCollection.Find(co => co.Id == id).Limit(1).FirstOrDefault();
+        }
+
+        public void UpdateDeviceObject(MongoDeviceObject model)
+        {
+            deviceCollection.ReplaceOne(co => co.Id == model.Id, model);
+        }
+
+        public void DeleteDeviceObject(string id)
+        {
+            // Delete document
+            deviceCollection.DeleteOne(co => co.Id == id);
+        }
+
+        /*public void UpdateDeviceObjectMetaData(MongoDeviceObject catalogObject)
+        {
+            deviceCollection.FindOneAndUpdate(c => c.Id == catalogObject.DeviceId,
+                                                    Builders<MongoDeviceObject>.Update.Set(c => c.Name, catalogObject.Name)
+                                                                                       .Set(c => c.TypeId, catalogObject.Type)
+                                                                                       .Set(c => c.Properties, catalogObject.Properties));
+        }*/
+
+        public List<MongoDeviceObject> RetrieveAvailableDeviceObjects()
+        {
+            return deviceCollection.Find(co => true).ToList();
+        }
+
+        public List<string> RetrieveAvailableDeviceObjectIDs()
+        {
+            return deviceCollection.Find(co => true).ToList().Select(c => c.Id).ToList();
+        }
+
+        #endregion
+
+        #region device relationships
+
+        public string CreateDeviceRelationship(MongoDeviceRelationships co)
+        {
+            relationshipsCollection.InsertOne(co);
+            return co.Id;
+        }
+
+        // need to update this method for subject and object to get predicate
+        public List<String> GetDeviceRelationship(string subjectName, String objectName)
+        {
+            return relationshipsCollection.Find(r => r.Subject == subjectName && r.Object == objectName).ToList().Select(r => r.Predicate).ToList();
+        }
+
+        public List<String> GetUniqueSubjects()
+        {
+            return relationshipsCollection.Find(_ => true).ToList().Select(r => r.Subject).Distinct().ToList();
+        }
+
+        public List<String> GetUniqueObjects()
+        {
+            return relationshipsCollection.Find(_ => true).ToList().Select(r => r.Object).Distinct().ToList();
+        }
+
+        public void UpdateDeviceRelationship(MongoDeviceRelationships model)
+        {
+            relationshipsCollection.ReplaceOne(co => co.Id == model.Id, model);
+        }
+
+        public void DeleteDeviceRelationship(string id)
+        {
+            // Delete document
+            relationshipsCollection.DeleteOne(co => co.Id == id);
+        }
+
+        /*public void UpdateDeviceObjectMetaData(MongoDeviceObject catalogObject)
+        {
+            deviceCollection.FindOneAndUpdate(c => c.Id == catalogObject.DeviceId,
+                                                    Builders<MongoDeviceObject>.Update.Set(c => c.Name, catalogObject.Name)
+                                                                                       .Set(c => c.TypeId, catalogObject.Type)
+                                                                                       .Set(c => c.Properties, catalogObject.Properties));
+        }*/
+
+        public List<MongoDeviceRelationships> RetrieveAvailableDeviceRelationship()
+        {
+            return relationshipsCollection.Find(co => true).ToList();
+        }
+
+        public List<string> RetrieveAvailableDeviceRelationshipIDs()
+        {
+            return relationshipsCollection.Find(co => true).ToList().Select(c => c.Id).ToList();
         }
 
         #endregion

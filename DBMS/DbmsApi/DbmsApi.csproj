@@ -86,6 +86,8 @@
     <Compile Include="Exceptions\CatalogObjectDoesNotExistException.cs" />
     <Compile Include="Exceptions\RefreshTokenExpiredException.cs" />
     <Compile Include="HttpClientExtensions.cs" />
+    <Compile Include="Mongo\MongoDeviceRelationships.cs" />
+    <Compile Include="Mongo\MongoDeviceObject.cs" />
     <Compile Include="Mongo\MongoModel.cs" />
     <Compile Include="Mongo\MongoCatalogObject.cs" />
     <Compile Include="Mongo\MongoDocument.cs" />

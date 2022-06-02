@@ -37,7 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CjClutter.ObjLoader.Loader">
-      <HintPath>..\packages\CjClutter.ObjLoader.Loader\CjClutter.ObjLoader.Loader.dll</HintPath>
+      <HintPath>..\packages\CjClutter.ObjLoader.1.0.0\lib\netstandard1.4\CjClutter.ObjLoader.Loader.dll</HintPath>
     </Reference>
     <Reference Include="Esent.Interop, Version=1.9.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedEsent.1.9.4\lib\net40\Esent.Interop.dll</HintPath>
@@ -169,6 +169,10 @@
     <ProjectReference Include="..\..\DBMS\DbmsApi\DbmsApi.csproj">
       <Project>{79b59851-64ee-4388-a904-0921cf334e2f}</Project>
       <Name>DbmsApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MathPackage\MathPackage\MathPackage.csproj">
+      <Project>{0c409f93-c5db-4b60-86f3-473453bfe014}</Project>
+      <Name>MathPackage</Name>
     </ProjectReference>
     <ProjectReference Include="..\ModelConverter\ModelConverter.csproj">
       <Project>{79a520ba-1ef8-4cbe-b45a-205cc70c7aa2}</Project>
