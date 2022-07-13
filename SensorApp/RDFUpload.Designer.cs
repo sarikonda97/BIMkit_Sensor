@@ -32,7 +32,6 @@ namespace SensorApp
             this.browseButton = new System.Windows.Forms.Button();
             this.fileName = new System.Windows.Forms.TextBox();
             this.uploadButton = new System.Windows.Forms.Button();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.loadNodesButton = new System.Windows.Forms.Button();
             this.loadRelationshipsButton = new System.Windows.Forms.Button();
             this.subjectDropDown = new System.Windows.Forms.ComboBox();
@@ -40,6 +39,28 @@ namespace SensorApp
             this.predicateOutput = new System.Windows.Forms.RichTextBox();
             this.getValidButton = new System.Windows.Forms.Button();
             this.populateDropDownButton = new System.Windows.Forms.Button();
+            this.loadInstancesButton = new System.Windows.Forms.Button();
+            this.browseModelFile = new System.Windows.Forms.Button();
+            this.modelName = new System.Windows.Forms.TextBox();
+            this.loadModelButton = new System.Windows.Forms.Button();
+            this.mapTurtleToModelButton = new System.Windows.Forms.Button();
+            this.uniqueInstancesComboBox = new System.Windows.Forms.ComboBox();
+            this.relatedDevicesButton = new System.Windows.Forms.Button();
+            this.populateInstancesButton = new System.Windows.Forms.Button();
+            this.possibleRelationshipsTextbox = new System.Windows.Forms.RichTextBox();
+            this.getAvailableModelsBox = new System.Windows.Forms.Button();
+            this.selectModelCombobox = new System.Windows.Forms.ComboBox();
+            this.firstDeviceComboBox = new System.Windows.Forms.ComboBox();
+            this.secondDeviceComboBox = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.areDevicesRelatedButton = new System.Windows.Forms.Button();
+            this.deviceRelationStatusTextBox = new System.Windows.Forms.RichTextBox();
+            this.loadRoomsButton = new System.Windows.Forms.Button();
+            this.firstRoomComboBox = new System.Windows.Forms.ComboBox();
+            this.secondRoomComboBox = new System.Windows.Forms.ComboBox();
+            this.getRoomRelatedDevicesButton = new System.Windows.Forms.Button();
+            this.roomRelatedDevicesTextBox = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // browseButton
@@ -69,10 +90,6 @@ namespace SensorApp
             this.uploadButton.Text = "Upload";
             this.uploadButton.UseVisualStyleBackColor = true;
             this.uploadButton.Click += new System.EventHandler(this.uploadButton_Click);
-            // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.FileName = "openFileDialog1";
             // 
             // loadNodesButton
             // 
@@ -141,11 +158,237 @@ namespace SensorApp
             this.populateDropDownButton.UseVisualStyleBackColor = true;
             this.populateDropDownButton.Click += new System.EventHandler(this.populateDropDownButton_Click);
             // 
+            // loadInstancesButton
+            // 
+            this.loadInstancesButton.Location = new System.Drawing.Point(120, 291);
+            this.loadInstancesButton.Name = "loadInstancesButton";
+            this.loadInstancesButton.Size = new System.Drawing.Size(75, 43);
+            this.loadInstancesButton.TabIndex = 11;
+            this.loadInstancesButton.Text = "Load Instances";
+            this.loadInstancesButton.UseVisualStyleBackColor = true;
+            this.loadInstancesButton.Click += new System.EventHandler(this.loadInstancesButton_Click);
+            // 
+            // browseModelFile
+            // 
+            this.browseModelFile.Location = new System.Drawing.Point(695, 201);
+            this.browseModelFile.Name = "browseModelFile";
+            this.browseModelFile.Size = new System.Drawing.Size(75, 36);
+            this.browseModelFile.TabIndex = 12;
+            this.browseModelFile.Text = "Browse Model";
+            this.browseModelFile.UseVisualStyleBackColor = true;
+            this.browseModelFile.Click += new System.EventHandler(this.browseModelFile_Click);
+            // 
+            // modelName
+            // 
+            this.modelName.Location = new System.Drawing.Point(26, 210);
+            this.modelName.Name = "modelName";
+            this.modelName.Size = new System.Drawing.Size(639, 20);
+            this.modelName.TabIndex = 13;
+            // 
+            // loadModelButton
+            // 
+            this.loadModelButton.Location = new System.Drawing.Point(349, 236);
+            this.loadModelButton.Name = "loadModelButton";
+            this.loadModelButton.Size = new System.Drawing.Size(99, 23);
+            this.loadModelButton.TabIndex = 14;
+            this.loadModelButton.Text = "Load Model";
+            this.loadModelButton.UseVisualStyleBackColor = true;
+            this.loadModelButton.Click += new System.EventHandler(this.loadModelButton_Click);
+            // 
+            // mapTurtleToModelButton
+            // 
+            this.mapTurtleToModelButton.Location = new System.Drawing.Point(26, 291);
+            this.mapTurtleToModelButton.Name = "mapTurtleToModelButton";
+            this.mapTurtleToModelButton.Size = new System.Drawing.Size(75, 43);
+            this.mapTurtleToModelButton.TabIndex = 15;
+            this.mapTurtleToModelButton.Text = "Map .ttl to .bpm rooms";
+            this.mapTurtleToModelButton.UseVisualStyleBackColor = true;
+            this.mapTurtleToModelButton.Click += new System.EventHandler(this.mapTurtleToModelButton_Click);
+            // 
+            // uniqueInstancesComboBox
+            // 
+            this.uniqueInstancesComboBox.FormattingEnabled = true;
+            this.uniqueInstancesComboBox.Location = new System.Drawing.Point(502, 291);
+            this.uniqueInstancesComboBox.Name = "uniqueInstancesComboBox";
+            this.uniqueInstancesComboBox.Size = new System.Drawing.Size(162, 21);
+            this.uniqueInstancesComboBox.TabIndex = 16;
+            this.uniqueInstancesComboBox.SelectedIndexChanged += new System.EventHandler(this.uniqueInstancesComboBox_SelectedIndexChanged);
+            // 
+            // relatedDevicesButton
+            // 
+            this.relatedDevicesButton.Location = new System.Drawing.Point(518, 318);
+            this.relatedDevicesButton.Name = "relatedDevicesButton";
+            this.relatedDevicesButton.Size = new System.Drawing.Size(121, 23);
+            this.relatedDevicesButton.TabIndex = 17;
+            this.relatedDevicesButton.Text = "Get Related Devices";
+            this.relatedDevicesButton.UseVisualStyleBackColor = true;
+            this.relatedDevicesButton.Click += new System.EventHandler(this.relatedDevicesButton_Click);
+            // 
+            // populateInstancesButton
+            // 
+            this.populateInstancesButton.Location = new System.Drawing.Point(421, 291);
+            this.populateInstancesButton.Name = "populateInstancesButton";
+            this.populateInstancesButton.Size = new System.Drawing.Size(75, 43);
+            this.populateInstancesButton.TabIndex = 18;
+            this.populateInstancesButton.Text = "Populate Instances";
+            this.populateInstancesButton.UseVisualStyleBackColor = true;
+            this.populateInstancesButton.Click += new System.EventHandler(this.populateInstancesButton_Click);
+            // 
+            // possibleRelationshipsTextbox
+            // 
+            this.possibleRelationshipsTextbox.Location = new System.Drawing.Point(670, 271);
+            this.possibleRelationshipsTextbox.Name = "possibleRelationshipsTextbox";
+            this.possibleRelationshipsTextbox.Size = new System.Drawing.Size(100, 96);
+            this.possibleRelationshipsTextbox.TabIndex = 19;
+            this.possibleRelationshipsTextbox.Text = "";
+            // 
+            // getAvailableModelsBox
+            // 
+            this.getAvailableModelsBox.Location = new System.Drawing.Point(211, 287);
+            this.getAvailableModelsBox.Name = "getAvailableModelsBox";
+            this.getAvailableModelsBox.Size = new System.Drawing.Size(75, 50);
+            this.getAvailableModelsBox.TabIndex = 20;
+            this.getAvailableModelsBox.Text = "Get Available Models";
+            this.getAvailableModelsBox.UseVisualStyleBackColor = true;
+            this.getAvailableModelsBox.Click += new System.EventHandler(this.getAvailableModelsBox_Click);
+            // 
+            // selectModelCombobox
+            // 
+            this.selectModelCombobox.FormattingEnabled = true;
+            this.selectModelCombobox.Location = new System.Drawing.Point(292, 303);
+            this.selectModelCombobox.Name = "selectModelCombobox";
+            this.selectModelCombobox.Size = new System.Drawing.Size(121, 21);
+            this.selectModelCombobox.TabIndex = 21;
+            this.selectModelCombobox.SelectedIndexChanged += new System.EventHandler(this.selectModelCombobox_SelectedIndexChanged);
+            // 
+            // firstDeviceComboBox
+            // 
+            this.firstDeviceComboBox.FormattingEnabled = true;
+            this.firstDeviceComboBox.Location = new System.Drawing.Point(26, 389);
+            this.firstDeviceComboBox.Name = "firstDeviceComboBox";
+            this.firstDeviceComboBox.Size = new System.Drawing.Size(121, 21);
+            this.firstDeviceComboBox.TabIndex = 22;
+            this.firstDeviceComboBox.SelectedIndexChanged += new System.EventHandler(this.firstDeviceComboBox_SelectedIndexChanged);
+            // 
+            // secondDeviceComboBox
+            // 
+            this.secondDeviceComboBox.FormattingEnabled = true;
+            this.secondDeviceComboBox.Location = new System.Drawing.Point(26, 440);
+            this.secondDeviceComboBox.Name = "secondDeviceComboBox";
+            this.secondDeviceComboBox.Size = new System.Drawing.Size(121, 21);
+            this.secondDeviceComboBox.TabIndex = 23;
+            this.secondDeviceComboBox.SelectedIndexChanged += new System.EventHandler(this.secondDeviceComboBox_SelectedIndexChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(26, 370);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(63, 13);
+            this.label1.TabIndex = 24;
+            this.label1.Text = "First Device";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(26, 421);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(81, 13);
+            this.label2.TabIndex = 25;
+            this.label2.Text = "Second Device";
+            // 
+            // areDevicesRelatedButton
+            // 
+            this.areDevicesRelatedButton.Location = new System.Drawing.Point(175, 381);
+            this.areDevicesRelatedButton.Name = "areDevicesRelatedButton";
+            this.areDevicesRelatedButton.Size = new System.Drawing.Size(75, 35);
+            this.areDevicesRelatedButton.TabIndex = 26;
+            this.areDevicesRelatedButton.Text = "Are They Related ?";
+            this.areDevicesRelatedButton.UseVisualStyleBackColor = true;
+            this.areDevicesRelatedButton.Click += new System.EventHandler(this.areDevicesRelatedButton_Click);
+            // 
+            // deviceRelationStatusTextBox
+            // 
+            this.deviceRelationStatusTextBox.Location = new System.Drawing.Point(163, 426);
+            this.deviceRelationStatusTextBox.Name = "deviceRelationStatusTextBox";
+            this.deviceRelationStatusTextBox.Size = new System.Drawing.Size(100, 35);
+            this.deviceRelationStatusTextBox.TabIndex = 27;
+            this.deviceRelationStatusTextBox.Text = "";
+            // 
+            // loadRoomsButton
+            // 
+            this.loadRoomsButton.Location = new System.Drawing.Point(292, 365);
+            this.loadRoomsButton.Name = "loadRoomsButton";
+            this.loadRoomsButton.Size = new System.Drawing.Size(75, 23);
+            this.loadRoomsButton.TabIndex = 28;
+            this.loadRoomsButton.Text = "Load Rooms";
+            this.loadRoomsButton.UseVisualStyleBackColor = true;
+            this.loadRoomsButton.Click += new System.EventHandler(this.loadRoomsButton_Click);
+            // 
+            // firstRoomComboBox
+            // 
+            this.firstRoomComboBox.FormattingEnabled = true;
+            this.firstRoomComboBox.Location = new System.Drawing.Point(272, 399);
+            this.firstRoomComboBox.Name = "firstRoomComboBox";
+            this.firstRoomComboBox.Size = new System.Drawing.Size(121, 21);
+            this.firstRoomComboBox.TabIndex = 29;
+            this.firstRoomComboBox.SelectedIndexChanged += new System.EventHandler(this.firstRoomComboBox_SelectedIndexChanged);
+            // 
+            // secondRoomComboBox
+            // 
+            this.secondRoomComboBox.FormattingEnabled = true;
+            this.secondRoomComboBox.Location = new System.Drawing.Point(272, 439);
+            this.secondRoomComboBox.Name = "secondRoomComboBox";
+            this.secondRoomComboBox.Size = new System.Drawing.Size(121, 21);
+            this.secondRoomComboBox.TabIndex = 30;
+            this.secondRoomComboBox.SelectedIndexChanged += new System.EventHandler(this.secondRoomComboBox_SelectedIndexChanged);
+            // 
+            // getRoomRelatedDevicesButton
+            // 
+            this.getRoomRelatedDevicesButton.Location = new System.Drawing.Point(410, 389);
+            this.getRoomRelatedDevicesButton.Name = "getRoomRelatedDevicesButton";
+            this.getRoomRelatedDevicesButton.Size = new System.Drawing.Size(75, 71);
+            this.getRoomRelatedDevicesButton.TabIndex = 31;
+            this.getRoomRelatedDevicesButton.Text = "Identify Related Devices";
+            this.getRoomRelatedDevicesButton.UseVisualStyleBackColor = true;
+            this.getRoomRelatedDevicesButton.Click += new System.EventHandler(this.getRoomRelatedDevicesButton_Click);
+            // 
+            // roomRelatedDevicesTextBox
+            // 
+            this.roomRelatedDevicesTextBox.Location = new System.Drawing.Point(502, 379);
+            this.roomRelatedDevicesTextBox.Name = "roomRelatedDevicesTextBox";
+            this.roomRelatedDevicesTextBox.Size = new System.Drawing.Size(100, 96);
+            this.roomRelatedDevicesTextBox.TabIndex = 32;
+            this.roomRelatedDevicesTextBox.Text = "";
+            // 
             // RDFUpload
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 190);
+            this.ClientSize = new System.Drawing.Size(800, 487);
+            this.Controls.Add(this.roomRelatedDevicesTextBox);
+            this.Controls.Add(this.getRoomRelatedDevicesButton);
+            this.Controls.Add(this.secondRoomComboBox);
+            this.Controls.Add(this.firstRoomComboBox);
+            this.Controls.Add(this.loadRoomsButton);
+            this.Controls.Add(this.deviceRelationStatusTextBox);
+            this.Controls.Add(this.areDevicesRelatedButton);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.secondDeviceComboBox);
+            this.Controls.Add(this.firstDeviceComboBox);
+            this.Controls.Add(this.selectModelCombobox);
+            this.Controls.Add(this.getAvailableModelsBox);
+            this.Controls.Add(this.possibleRelationshipsTextbox);
+            this.Controls.Add(this.populateInstancesButton);
+            this.Controls.Add(this.relatedDevicesButton);
+            this.Controls.Add(this.uniqueInstancesComboBox);
+            this.Controls.Add(this.mapTurtleToModelButton);
+            this.Controls.Add(this.loadModelButton);
+            this.Controls.Add(this.modelName);
+            this.Controls.Add(this.browseModelFile);
+            this.Controls.Add(this.loadInstancesButton);
             this.Controls.Add(this.populateDropDownButton);
             this.Controls.Add(this.getValidButton);
             this.Controls.Add(this.predicateOutput);
@@ -157,7 +400,7 @@ namespace SensorApp
             this.Controls.Add(this.fileName);
             this.Controls.Add(this.browseButton);
             this.Name = "RDFUpload";
-            this.Text = "Form1";
+            this.Text = "Sensor App";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -168,7 +411,6 @@ namespace SensorApp
         private System.Windows.Forms.Button browseButton;
         private System.Windows.Forms.TextBox fileName;
         private System.Windows.Forms.Button uploadButton;
-        private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button loadNodesButton;
         private System.Windows.Forms.Button loadRelationshipsButton;
         private System.Windows.Forms.ComboBox subjectDropDown;
@@ -176,6 +418,28 @@ namespace SensorApp
         private System.Windows.Forms.RichTextBox predicateOutput;
         private System.Windows.Forms.Button getValidButton;
         private System.Windows.Forms.Button populateDropDownButton;
+        private System.Windows.Forms.Button loadInstancesButton;
+        private System.Windows.Forms.Button browseModelFile;
+        private System.Windows.Forms.TextBox modelName;
+        private System.Windows.Forms.Button loadModelButton;
+        private System.Windows.Forms.Button mapTurtleToModelButton;
+        private System.Windows.Forms.ComboBox uniqueInstancesComboBox;
+        private System.Windows.Forms.Button relatedDevicesButton;
+        private System.Windows.Forms.Button populateInstancesButton;
+        private System.Windows.Forms.RichTextBox possibleRelationshipsTextbox;
+        private System.Windows.Forms.Button getAvailableModelsBox;
+        private System.Windows.Forms.ComboBox selectModelCombobox;
+        private System.Windows.Forms.ComboBox firstDeviceComboBox;
+        private System.Windows.Forms.ComboBox secondDeviceComboBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button areDevicesRelatedButton;
+        private System.Windows.Forms.RichTextBox deviceRelationStatusTextBox;
+        private System.Windows.Forms.Button loadRoomsButton;
+        private System.Windows.Forms.ComboBox firstRoomComboBox;
+        private System.Windows.Forms.ComboBox secondRoomComboBox;
+        private System.Windows.Forms.Button getRoomRelatedDevicesButton;
+        private System.Windows.Forms.RichTextBox roomRelatedDevicesTextBox;
     }
 }
 

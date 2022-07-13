@@ -70,6 +70,7 @@
     <Compile Include="APIResponse.cs" />
     <Compile Include="API\AuthModel.cs" />
     <Compile Include="API\CatalogObject.cs" />
+    <Compile Include="API\deviceObject.cs" />
     <Compile Include="API\ModelMetadata.cs" />
     <Compile Include="API\CatalogObjectMetadata.cs" />
     <Compile Include="API\Component.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Exceptions\CatalogObjectDoesNotExistException.cs" />
     <Compile Include="Exceptions\RefreshTokenExpiredException.cs" />
     <Compile Include="HttpClientExtensions.cs" />
+    <Compile Include="Mongo\MongoRoomRelationships.cs" />
     <Compile Include="Mongo\MongoDeviceRelationships.cs" />
     <Compile Include="Mongo\MongoDeviceObject.cs" />
     <Compile Include="Mongo\MongoModel.cs" />

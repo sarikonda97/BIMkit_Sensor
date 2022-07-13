@@ -471,6 +471,11 @@ namespace DBMS.Controllers.DBControllers
             return relationshipsCollection.Find(_ => true).ToList().Select(r => r.Object).Distinct().ToList();
         }
 
+        public List<String> GetUniquePredicates()
+        {
+            return relationshipsCollection.Find(_ => true).ToList().Select(r => r.Predicate).Distinct().ToList();
+        }
+
         public void UpdateDeviceRelationship(MongoDeviceRelationships model)
         {
             relationshipsCollection.ReplaceOne(co => co.Id == model.Id, model);
