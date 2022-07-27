@@ -61,6 +61,8 @@ namespace SensorApp
             this.secondRoomComboBox = new System.Windows.Forms.ComboBox();
             this.getRoomRelatedDevicesButton = new System.Windows.Forms.Button();
             this.roomRelatedDevicesTextBox = new System.Windows.Forms.RichTextBox();
+            this.mapBpmToTtl = new System.Windows.Forms.Button();
+            this.changeTurtleRoomsButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // browseButton
@@ -160,7 +162,7 @@ namespace SensorApp
             // 
             // loadInstancesButton
             // 
-            this.loadInstancesButton.Location = new System.Drawing.Point(120, 291);
+            this.loadInstancesButton.Location = new System.Drawing.Point(119, 305);
             this.loadInstancesButton.Name = "loadInstancesButton";
             this.loadInstancesButton.Size = new System.Drawing.Size(75, 43);
             this.loadInstancesButton.TabIndex = 11;
@@ -197,7 +199,7 @@ namespace SensorApp
             // 
             // mapTurtleToModelButton
             // 
-            this.mapTurtleToModelButton.Location = new System.Drawing.Point(26, 291);
+            this.mapTurtleToModelButton.Location = new System.Drawing.Point(29, 250);
             this.mapTurtleToModelButton.Name = "mapTurtleToModelButton";
             this.mapTurtleToModelButton.Size = new System.Drawing.Size(75, 43);
             this.mapTurtleToModelButton.TabIndex = 15;
@@ -358,15 +360,37 @@ namespace SensorApp
             // 
             this.roomRelatedDevicesTextBox.Location = new System.Drawing.Point(502, 379);
             this.roomRelatedDevicesTextBox.Name = "roomRelatedDevicesTextBox";
-            this.roomRelatedDevicesTextBox.Size = new System.Drawing.Size(100, 96);
+            this.roomRelatedDevicesTextBox.Size = new System.Drawing.Size(268, 96);
             this.roomRelatedDevicesTextBox.TabIndex = 32;
             this.roomRelatedDevicesTextBox.Text = "";
+            // 
+            // mapBpmToTtl
+            // 
+            this.mapBpmToTtl.Location = new System.Drawing.Point(29, 303);
+            this.mapBpmToTtl.Name = "mapBpmToTtl";
+            this.mapBpmToTtl.Size = new System.Drawing.Size(75, 47);
+            this.mapBpmToTtl.TabIndex = 33;
+            this.mapBpmToTtl.Text = "Map .bpm to .ttl";
+            this.mapBpmToTtl.UseVisualStyleBackColor = true;
+            this.mapBpmToTtl.Click += new System.EventHandler(this.mapBpmToTtl_Click);
+            // 
+            // changeTurtleRoomsButton
+            // 
+            this.changeTurtleRoomsButton.Location = new System.Drawing.Point(119, 250);
+            this.changeTurtleRoomsButton.Name = "changeTurtleRoomsButton";
+            this.changeTurtleRoomsButton.Size = new System.Drawing.Size(75, 43);
+            this.changeTurtleRoomsButton.TabIndex = 34;
+            this.changeTurtleRoomsButton.Text = "change turtle rooms";
+            this.changeTurtleRoomsButton.UseVisualStyleBackColor = true;
+            this.changeTurtleRoomsButton.Click += new System.EventHandler(this.changeTurtleRoomsButton_Click);
             // 
             // RDFUpload
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 487);
+            this.ClientSize = new System.Drawing.Size(782, 497);
+            this.Controls.Add(this.changeTurtleRoomsButton);
+            this.Controls.Add(this.mapBpmToTtl);
             this.Controls.Add(this.roomRelatedDevicesTextBox);
             this.Controls.Add(this.getRoomRelatedDevicesButton);
             this.Controls.Add(this.secondRoomComboBox);
@@ -401,6 +425,7 @@ namespace SensorApp
             this.Controls.Add(this.browseButton);
             this.Name = "RDFUpload";
             this.Text = "Sensor App";
+            this.Load += new System.EventHandler(this.RDFUpload_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -440,6 +465,8 @@ namespace SensorApp
         private System.Windows.Forms.ComboBox secondRoomComboBox;
         private System.Windows.Forms.Button getRoomRelatedDevicesButton;
         private System.Windows.Forms.RichTextBox roomRelatedDevicesTextBox;
+        private System.Windows.Forms.Button mapBpmToTtl;
+        private System.Windows.Forms.Button changeTurtleRoomsButton;
     }
 }
 
