@@ -470,6 +470,85 @@ namespace SensorApp
             secondRoomRelatedDevices.UnionWith(bigRelatedDevices);
         }
 
+        public static List<string> getDirectRelationship(MongoModel currentModel, string devName)
+        {
+            HashSet<String> relatedDevices = getRelatedDevices(currentModel, devName);
+            List<string> output = new List<string>();
+
+            if (relatedDevices.Count == 0)
+            {
+                output.Add("No Related Devices");
+            }
+            else
+            {
+                output.AddRange(relatedDevices.ToList());
+            }
+
+            return output;
+        }
+
+        public static List<List<string>> getDirectRelationshipsWithPredicate(MongoModel currentModel, string devName)
+        {
+            Dictionary<string, string> relatedDevicesWithPredicate = getRelatedDevicesWithRelationship(currentModel, devName);
+            List<List<string>> output = new List<List<string>>();
+
+            if (relatedDevicesWithPredicate.Count == 0)
+            {
+                List<string> temp = new List<string>();
+                temp.Add("No Related Devices");
+            }
+            else
+            {
+                List<string> keys = relatedDevicesWithPredicate.Keys.ToList();
+                List<string> values = relatedDevicesWithPredicate.Values.ToList();
+
+
+                for (int i=0; i<keys.Count; i++)
+                {
+                    List<string> temp = new List<string>();
+                    temp.Add(keys[i]);
+                    temp.Add(values[i]);
+                    output.Add(temp);
+                }
+            }
+
+            return output;
+        }
+
+        public static List<string> getRelatedDevicesPath(MongoModel currentModel, string firstDevice, string secondDevice)
+        {
+            List<List<string>> deviceRelations = new List<List<string>>();
+            deviceRelations.Add(new List<string> { firstDevice });
+
+            while(true)
+            {
+                List<List<string>> temp = new List<List<string>>();
+                foreach (List<string> dev in deviceRelations)
+                {
+                    string currentDevice = dev[dev.Count() - 1];
+                    HashSet<string> relatedDevicesSet = getRelatedDevices(currentModel, currentDevice);
+                    List<string> relatedDevicesList = relatedDevicesSet.ToList();
+
+                    for (int i = 0; i < relatedDevicesList.Count; i++)
+                    {
+                        if (relatedDevicesList[i] == secondDevice)
+                        {
+                            dev.Add(secondDevice);
+                            return dev.GetRange(1, dev.Count-1);
+                        }
+                        else
+                        {
+                            List<string> tempDev = new List<string>(dev);
+                            tempDev.Add(relatedDevicesList[i]);
+                            temp.Add(tempDev);
+                        }
+
+                    }
+                }
+                deviceRelations = new List<List<string>>(temp);
+            }
+        }
+
         private static HashSet<String> getRelatedDevices(MongoModel currentModel, String deviceName)
         {
             HashSet<String> relatedDevices = new HashSet<String>();
@@ -483,6 +562,25 @@ namespace SensorApp
                 else if (rel.Object == deviceName)
                 {
                     relatedDevices.Add(rel.Subject);
+                }
+            }
+
+            return relatedDevices;
+        }
+
+        private static Dictionary<string, string> getRelatedDevicesWithRelationship(MongoModel currentModel, String deviceName)
+        {
+            Dictionary<string, string> relatedDevices = new Dictionary<string, string>();
+
+            foreach (MongoDeviceRelationships rel in currentModel.instanceRelationships)
+            {
+                if (rel.Subject == deviceName && !relatedDevices.ContainsKey(rel.Object))
+                {
+                    relatedDevices.Add(rel.Object, rel.Predicate);
+                }
+                else if (rel.Object == deviceName && !relatedDevices.ContainsKey(rel.Subject))
+                {
+                    relatedDevices.Add(rel.Subject, rel.Predicate);
                 }
             }
 

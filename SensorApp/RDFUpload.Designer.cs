@@ -63,6 +63,12 @@ namespace SensorApp
             this.roomRelatedDevicesTextBox = new System.Windows.Forms.RichTextBox();
             this.mapBpmToTtl = new System.Windows.Forms.Button();
             this.changeTurtleRoomsButton = new System.Windows.Forms.Button();
+            this.directRelationshipButton = new System.Windows.Forms.Button();
+            this.directRelationTextBox = new System.Windows.Forms.RichTextBox();
+            this.directRelatedDevicesAndRelationships = new System.Windows.Forms.Button();
+            this.directRelationshipWithPredicateTextBox = new System.Windows.Forms.RichTextBox();
+            this.getRelationshipPathButton = new System.Windows.Forms.Button();
+            this.relationshipPathTextBox = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // browseButton
@@ -363,6 +369,7 @@ namespace SensorApp
             this.roomRelatedDevicesTextBox.Size = new System.Drawing.Size(268, 96);
             this.roomRelatedDevicesTextBox.TabIndex = 32;
             this.roomRelatedDevicesTextBox.Text = "";
+            this.roomRelatedDevicesTextBox.TextChanged += new System.EventHandler(this.roomRelatedDevicesTextBox_TextChanged);
             // 
             // mapBpmToTtl
             // 
@@ -384,11 +391,72 @@ namespace SensorApp
             this.changeTurtleRoomsButton.UseVisualStyleBackColor = true;
             this.changeTurtleRoomsButton.Click += new System.EventHandler(this.changeTurtleRoomsButton_Click);
             // 
+            // directRelationshipButton
+            // 
+            this.directRelationshipButton.Location = new System.Drawing.Point(29, 491);
+            this.directRelationshipButton.Name = "directRelationshipButton";
+            this.directRelationshipButton.Size = new System.Drawing.Size(118, 47);
+            this.directRelationshipButton.TabIndex = 35;
+            this.directRelationshipButton.Text = "Get Direct Relationships of First Device";
+            this.directRelationshipButton.UseVisualStyleBackColor = true;
+            this.directRelationshipButton.Click += new System.EventHandler(this.relationTypeButton_Click);
+            // 
+            // directRelationTextBox
+            // 
+            this.directRelationTextBox.Location = new System.Drawing.Point(163, 491);
+            this.directRelationTextBox.Name = "directRelationTextBox";
+            this.directRelationTextBox.Size = new System.Drawing.Size(100, 47);
+            this.directRelationTextBox.TabIndex = 36;
+            this.directRelationTextBox.Text = "";
+            // 
+            // directRelatedDevicesAndRelationships
+            // 
+            this.directRelatedDevicesAndRelationships.Location = new System.Drawing.Point(273, 491);
+            this.directRelatedDevicesAndRelationships.Name = "directRelatedDevicesAndRelationships";
+            this.directRelatedDevicesAndRelationships.Size = new System.Drawing.Size(131, 47);
+            this.directRelatedDevicesAndRelationships.TabIndex = 37;
+            this.directRelatedDevicesAndRelationships.Text = "Get Direct Relationships of First Device with Relationship Type";
+            this.directRelatedDevicesAndRelationships.UseVisualStyleBackColor = true;
+            this.directRelatedDevicesAndRelationships.Click += new System.EventHandler(this.directRelatedDevicesAndRelationships_Click);
+            // 
+            // directRelationshipWithPredicateTextBox
+            // 
+            this.directRelationshipWithPredicateTextBox.Location = new System.Drawing.Point(410, 491);
+            this.directRelationshipWithPredicateTextBox.Name = "directRelationshipWithPredicateTextBox";
+            this.directRelationshipWithPredicateTextBox.Size = new System.Drawing.Size(86, 47);
+            this.directRelationshipWithPredicateTextBox.TabIndex = 38;
+            this.directRelationshipWithPredicateTextBox.Text = "";
+            this.directRelationshipWithPredicateTextBox.TextChanged += new System.EventHandler(this.directRelationshipWithPredicateTextBox_TextChanged);
+            // 
+            // getRelationshipPathButton
+            // 
+            this.getRelationshipPathButton.Location = new System.Drawing.Point(502, 491);
+            this.getRelationshipPathButton.Name = "getRelationshipPathButton";
+            this.getRelationshipPathButton.Size = new System.Drawing.Size(74, 47);
+            this.getRelationshipPathButton.TabIndex = 39;
+            this.getRelationshipPathButton.Text = "Get Realtionship Path";
+            this.getRelationshipPathButton.UseVisualStyleBackColor = true;
+            this.getRelationshipPathButton.Click += new System.EventHandler(this.getRelationshipPathButton_Click);
+            // 
+            // relationshipPathTextBox
+            // 
+            this.relationshipPathTextBox.Location = new System.Drawing.Point(583, 491);
+            this.relationshipPathTextBox.Name = "relationshipPathTextBox";
+            this.relationshipPathTextBox.Size = new System.Drawing.Size(185, 56);
+            this.relationshipPathTextBox.TabIndex = 40;
+            this.relationshipPathTextBox.Text = "";
+            // 
             // RDFUpload
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(782, 497);
+            this.ClientSize = new System.Drawing.Size(780, 559);
+            this.Controls.Add(this.relationshipPathTextBox);
+            this.Controls.Add(this.getRelationshipPathButton);
+            this.Controls.Add(this.directRelationshipWithPredicateTextBox);
+            this.Controls.Add(this.directRelatedDevicesAndRelationships);
+            this.Controls.Add(this.directRelationTextBox);
+            this.Controls.Add(this.directRelationshipButton);
             this.Controls.Add(this.changeTurtleRoomsButton);
             this.Controls.Add(this.mapBpmToTtl);
             this.Controls.Add(this.roomRelatedDevicesTextBox);
@@ -467,6 +535,12 @@ namespace SensorApp
         private System.Windows.Forms.RichTextBox roomRelatedDevicesTextBox;
         private System.Windows.Forms.Button mapBpmToTtl;
         private System.Windows.Forms.Button changeTurtleRoomsButton;
+        private System.Windows.Forms.Button directRelationshipButton;
+        private System.Windows.Forms.RichTextBox directRelationTextBox;
+        private System.Windows.Forms.Button directRelatedDevicesAndRelationships;
+        private System.Windows.Forms.RichTextBox directRelationshipWithPredicateTextBox;
+        private System.Windows.Forms.Button getRelationshipPathButton;
+        private System.Windows.Forms.RichTextBox relationshipPathTextBox;
     }
 }
 

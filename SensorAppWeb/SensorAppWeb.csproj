@@ -168,7 +168,10 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\DeviceRelationValidatorController.cs" />
     <Compile Include="Controllers\GetAvailableModelsController.cs" />
+    <Compile Include="Controllers\GetDirectRelationshipsController.cs" />
+    <Compile Include="Controllers\GetDirectRelationshipsWithRelationshipTypeController.cs" />
     <Compile Include="Controllers\GetRelatedDevicesController.cs" />
+    <Compile Include="Controllers\GetRelationshipPathController.cs" />
     <Compile Include="Controllers\GetRoomsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\GetInstancesController.cs" />
@@ -237,7 +240,10 @@
     <Folder Include="App_Data\" />
     <Folder Include="Views\DeviceRelationValidator\" />
     <Folder Include="Views\GetAvailableModels\" />
+    <Folder Include="Views\GetDirectRelationshipsWithDeviceType\" />
+    <Folder Include="Views\GetDirectRelationships\" />
     <Folder Include="Views\GetRelatedDevices\" />
+    <Folder Include="Views\GetRelationshipPath\" />
     <Folder Include="Views\GetRooms\" />
     <Folder Include="Views\PopulateInstances\" />
     <Folder Include="Views\RoomsCommonDevices\" />

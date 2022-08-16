@@ -261,5 +261,74 @@ namespace SensorAppWeb.Models
 
             return JsonConvert.SerializeObject(returnObject);
         }
+
+        public string getDirectRelationships(string currentModelName, string firstDevice)
+        {
+            List<string> output = new List<string>();
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+            List<string> directRelations = CoreSensorMethods.getDirectRelationship(currentModel, firstDevice);
+
+            foreach (string rel in directRelations)
+            {
+                output.Add(rel);
+            }
+
+            var returnObject = new
+            {
+                relatedDevices = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
+        public string getDirectRelationshipsWithRelationshipType(string currentModelName, string firstDevice)
+        {
+            List<string> output = new List<string>();
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+            List<List<string>> directRelationshipWithPredicate = CoreSensorMethods.getDirectRelationshipsWithPredicate(currentModel, firstDevice);
+
+            foreach (List<string> rel in directRelationshipWithPredicate)
+            {
+                output.Add(rel[0] + " - " + rel[1]);
+            }
+
+            var returnObject = new
+            {
+                relatedDevicesWithRelationship = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
+        public string getRelationshipPath(string currentModelName, string firstDevice, string secondDevice)
+        {
+            string outputString = "";
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+
+            bigRelatedDevices = new HashSet<String>();
+            CoreSensorMethods.recursiveRelationships(currentModel, bigRelatedDevices, firstDevice);
+
+            if (bigRelatedDevices.Contains(secondDevice))
+            {
+                List<string> relationshipPath = CoreSensorMethods.getRelatedDevicesPath(currentModel, firstDevice, secondDevice);
+
+                outputString = outputString + firstDevice;
+                foreach (string rel in relationshipPath)
+                {
+                    outputString = outputString + " -> " + rel;
+                }
+            }
+            else
+            {
+                outputString = outputString + "No Relationship exists";
+            }
+
+            var returnObject = new
+            {
+                relationship = outputString
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
     }
 }

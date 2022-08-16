@@ -455,10 +455,6 @@ namespace SensorApp
             }
         }
 
-        
-
-        
-
         private void loadRoomsButton_Click(object sender, EventArgs e)
         {
             try
@@ -532,6 +528,80 @@ namespace SensorApp
         private void RDFUpload_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void relationTypeButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                List<string> directRelations = CoreSensorMethods.getDirectRelationship(currentModel, firstDevice);
+
+                directRelationTextBox.Text = "";
+                foreach (string rel in directRelations)
+                {
+                    directRelationTextBox.AppendText(rel + Environment.NewLine);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void roomRelatedDevicesTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void directRelatedDevicesAndRelationships_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                List<List<string>> directRelationshipWithPredicate = CoreSensorMethods.getDirectRelationshipsWithPredicate(currentModel, firstDevice);
+
+                foreach(List<string> rel in directRelationshipWithPredicate)
+                {
+                    directRelationshipWithPredicateTextBox.AppendText(rel[0] + " - " + rel[1] + Environment.NewLine);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void directRelationshipWithPredicateTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void getRelationshipPathButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                bigRelatedDevices = new HashSet<String>();
+                CoreSensorMethods.recursiveRelationships(currentModel, bigRelatedDevices, firstDevice);
+
+                relationshipPathTextBox.Text = "";
+                if (bigRelatedDevices.Contains(secondDevice))
+                {
+                    List<string> relationshipPath = CoreSensorMethods.getRelatedDevicesPath(currentModel, firstDevice, secondDevice);
+
+                    relationshipPathTextBox.AppendText(firstDevice);
+                    foreach (string rel in relationshipPath)
+                    {
+                        relationshipPathTextBox.AppendText(" -> " + rel);
+                    }
+                }
+                else
+                {
+                    relationshipPathTextBox.AppendText("No Relationship exists");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
