@@ -330,5 +330,55 @@ namespace SensorAppWeb.Models
 
             return JsonConvert.SerializeObject(returnObject);
         }
+
+        public string getRelationshipPathWithPredicate(string currentModelName, string firstDevice, string secondDevice)
+        {
+            string outputString = "";
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+
+            bigRelatedDevices = new HashSet<String>();
+            CoreSensorMethods.recursiveRelationships(currentModel, bigRelatedDevices, firstDevice);
+
+            if (bigRelatedDevices.Contains(secondDevice))
+            {
+                List<string> relationshipPath = CoreSensorMethods.getRelatedDevicesPathWithRelationship(currentModel, firstDevice, secondDevice);
+
+                outputString = outputString + firstDevice;
+                foreach (string rel in relationshipPath)
+                {
+                    outputString = outputString + " -> " + rel;
+                }
+            }
+            else
+            {
+                outputString = outputString + "No Relationship exists";
+            }
+
+            var returnObject = new
+            {
+                relationship = outputString
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
+        public string getRoomDevices(string currentModelName, string roomName)
+        {
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+            List<string> roomRelatedDevices = CoreSensorMethods.getRoomDirectRelatedDevices(roomName, currentModel);
+            List<string> output = new List<string>();
+
+            foreach (string dev in roomRelatedDevices)
+            {
+                output.Add(dev);
+            }
+
+            var returnObject = new
+            {
+                relatedDevices = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
     }
 }

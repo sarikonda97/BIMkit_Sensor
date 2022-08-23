@@ -172,6 +172,8 @@
     <Compile Include="Controllers\GetDirectRelationshipsWithRelationshipTypeController.cs" />
     <Compile Include="Controllers\GetRelatedDevicesController.cs" />
     <Compile Include="Controllers\GetRelationshipPathController.cs" />
+    <Compile Include="Controllers\GetRelationshipPathWithPredicateController.cs" />
+    <Compile Include="Controllers\GetRoomDevicesController.cs" />
     <Compile Include="Controllers\GetRoomsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\GetInstancesController.cs" />
@@ -243,7 +245,9 @@
     <Folder Include="Views\GetDirectRelationshipsWithDeviceType\" />
     <Folder Include="Views\GetDirectRelationships\" />
     <Folder Include="Views\GetRelatedDevices\" />
+    <Folder Include="Views\GetRelationshipPathWithPredicate\" />
     <Folder Include="Views\GetRelationshipPath\" />
+    <Folder Include="Views\GetRoomDevices\" />
     <Folder Include="Views\GetRooms\" />
     <Folder Include="Views\PopulateInstances\" />
     <Folder Include="Views\RoomsCommonDevices\" />

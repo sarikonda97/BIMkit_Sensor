@@ -16,6 +16,7 @@ namespace DbmsApi.API
         /*public List<MongoDeviceObject> deviceObjects = new List<MongoDeviceObject>();*/
         public List<MongoDeviceRelationships> instanceRelationships = new List<MongoDeviceRelationships>();
          public List<MongoRoomRelationships> roomRelationships = new List<MongoRoomRelationships>();
+        public List<MongoRoomDeviceRelationships> roomDeviceRelationships = new List<MongoRoomDeviceRelationships>();
         public List<Relation> Relations = new List<Relation>();
         public Properties Properties;
         public List<KeyValuePair<string, string>> Tags = new List<KeyValuePair<string, string>>();

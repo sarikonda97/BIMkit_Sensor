@@ -101,6 +101,22 @@ namespace SensorApp
                 IUriNode predicateNode = g.CreateUriNode(predicatePrefix + ":" + predicateType);
                 IEnumerable<Triple> predicateResult = g.GetTriplesWithPredicate(predicateNode);
 
+                HashSet<string> standardPrefixes = new HashSet<string>()
+                {
+                    "brick",
+                    "brick_v_1_0_2",
+                    "brickframe",
+                    "btag",
+                    "rdf",
+                    "rdfs",
+                    "tag",
+                    "xml",
+                    "xsd",
+                    "owl",
+                };
+
+                List<string> turtlePrefix = g.NamespaceMap.Prefixes.Where(item => !standardPrefixes.Contains(item)).ToList();
+
                 // starts here
 
                 foreach (Triple triple in predicateResult)
@@ -111,8 +127,8 @@ namespace SensorApp
                     String objectName = objectString.Substring(objectString.LastIndexOf('#') + 1);
 
                     // hard coded value to soda_hall. Will break if used with other namespace files.
-                    IUriNode subjectNode = g.CreateUriNode("soda_hall:" + subjectName);
-                    IUriNode objectNode = g.CreateUriNode("soda_hall:" + objectName);
+                    IUriNode subjectNode = g.CreateUriNode(turtlePrefix[0] + ":" + subjectName);
+                    IUriNode objectNode = g.CreateUriNode(turtlePrefix[0] + ":" + objectName);
 
                     IEnumerable<Triple> subjectParent = g.GetTriplesWithSubject(subjectNode);
                     IEnumerable<Triple> objectParent = g.GetTriplesWithSubject(objectNode);
@@ -293,6 +309,7 @@ namespace SensorApp
 
             // Build the room list
             List<MongoRoomRelationships> roomRelationshipList = new List<MongoRoomRelationships>();
+            List<MongoRoomDeviceRelationships> roomDeviceRelationshipList = new List<MongoRoomDeviceRelationships>();
 
             List<String> invalidDevicePredicates = new List<string>
                 {
@@ -300,7 +317,7 @@ namespace SensorApp
                     "isPartOf",
                     // "hasPart",
                     //"isLocationOf",
-                    "hasLocation"
+                    /*"hasLocation"*/
                 };
 
             List<String> currentPredicates = db.GetUniquePredicates();
@@ -342,6 +359,13 @@ namespace SensorApp
                         mongoRoomRelationship.Room = objectName;
 
                         roomRelationshipList.Add(mongoRoomRelationship);
+                    } else if (currentPredicate == "hasLocation")
+                    {
+                        MongoRoomDeviceRelationships mongoRoomDeviceRelationship = new MongoRoomDeviceRelationships();
+                        mongoRoomDeviceRelationship.Room = objectName;
+                        mongoRoomDeviceRelationship.Device = subjectName;
+
+                        roomDeviceRelationshipList.Add(mongoRoomDeviceRelationship);
                     }
                     else
                     {
@@ -392,6 +416,7 @@ namespace SensorApp
             loadedModel.deviceObjects = deviceObjectList.GroupBy(dev => dev.Name).Select(gh => gh.First()).ToList(); // gh was initially g
             loadedModel.instanceRelationships = allInstanceRelationships;
             loadedModel.roomRelationships = roomRelationshipList;
+            loadedModel.roomDeviceRelationships = roomDeviceRelationshipList;
 
             MongoModel finalModel = preprocessAndCreateModel(loadedModel, db);
 
@@ -549,6 +574,58 @@ namespace SensorApp
             }
         }
 
+        public static List<string> getRelatedDevicesPathWithRelationship(MongoModel currentModel, string firstDevice, string secondDevice)
+        {
+            List<List<string>> deviceRelations = new List<List<string>>();
+            deviceRelations.Add(new List<string> { firstDevice });
+
+            while (true)
+            {
+                List<List<string>> temp = new List<List<string>>();
+                foreach (List<string> dev in deviceRelations)
+                {
+                    string currentDevice = dev[dev.Count() - 1];
+                    string[] currentDeviceItems = currentDevice.Split('-');
+                    currentDevice = currentDeviceItems[0];
+                    Dictionary<string, string> relatedDevicesMap = getRelatedDevicesWithRelationship(currentModel, currentDevice);
+                    List<string> relatedDevicesList = relatedDevicesMap.Keys.ToList();
+                    List<string> relatedDevicesRelationshipList = relatedDevicesMap.Values.ToList();
+
+                    for (int i = 0; i < relatedDevicesList.Count; i++)
+                    {
+                        if (relatedDevicesList[i].Contains(secondDevice))
+                        {
+                            dev.Add(secondDevice + "-" + relatedDevicesRelationshipList[i]);
+                            return dev.GetRange(1, dev.Count - 1);
+                        }
+                        else
+                        {
+                            List<string> tempDev = new List<string>(dev);
+                            tempDev.Add(relatedDevicesList[i] + "-" + relatedDevicesRelationshipList[i]);
+                            temp.Add(tempDev);
+                        }
+
+                    }
+                }
+                deviceRelations = new List<List<string>>(temp);
+            }
+        }
+
+        public static List<string> getRoomDirectRelatedDevices(string room, Model currentModel)
+        {
+            List<string> directRoomRelatedDevices = new List<string>();
+
+            foreach (MongoRoomDeviceRelationships rel in currentModel.roomDeviceRelationships)
+            {
+                if (rel.Room.Contains(room))
+                {
+                    directRoomRelatedDevices.Add(rel.Device);
+                }
+            }
+
+            return directRoomRelatedDevices;
+        }
+
         private static HashSet<String> getRelatedDevices(MongoModel currentModel, String deviceName)
         {
             HashSet<String> relatedDevices = new HashSet<String>();
@@ -606,6 +683,7 @@ namespace SensorApp
             fullModel.deviceObjects = model.deviceObjects;
             fullModel.instanceRelationships = model.instanceRelationships;
             fullModel.roomRelationships = model.roomRelationships;
+            fullModel.roomDeviceRelationships = model.roomDeviceRelationships;
 
             // Need to do a quick check that the catalog Ids are valid. If not then they are deleted:
             List<CatalogObjectMetadata> coMetas = db.RetrieveAvailableCatalogObjects();

@@ -69,6 +69,10 @@ namespace SensorApp
             this.directRelationshipWithPredicateTextBox = new System.Windows.Forms.RichTextBox();
             this.getRelationshipPathButton = new System.Windows.Forms.Button();
             this.relationshipPathTextBox = new System.Windows.Forms.RichTextBox();
+            this.roomRelatedDevicesButton = new System.Windows.Forms.Button();
+            this.roomRelatedDevTextBox = new System.Windows.Forms.RichTextBox();
+            this.getRelPathWithRelButton = new System.Windows.Forms.Button();
+            this.relPathWithRelTextBox = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // browseButton
@@ -354,7 +358,7 @@ namespace SensorApp
             // 
             // getRoomRelatedDevicesButton
             // 
-            this.getRoomRelatedDevicesButton.Location = new System.Drawing.Point(410, 389);
+            this.getRoomRelatedDevicesButton.Location = new System.Drawing.Point(583, 392);
             this.getRoomRelatedDevicesButton.Name = "getRoomRelatedDevicesButton";
             this.getRoomRelatedDevicesButton.Size = new System.Drawing.Size(75, 71);
             this.getRoomRelatedDevicesButton.TabIndex = 31;
@@ -364,9 +368,9 @@ namespace SensorApp
             // 
             // roomRelatedDevicesTextBox
             // 
-            this.roomRelatedDevicesTextBox.Location = new System.Drawing.Point(502, 379);
+            this.roomRelatedDevicesTextBox.Location = new System.Drawing.Point(670, 379);
             this.roomRelatedDevicesTextBox.Name = "roomRelatedDevicesTextBox";
-            this.roomRelatedDevicesTextBox.Size = new System.Drawing.Size(268, 96);
+            this.roomRelatedDevicesTextBox.Size = new System.Drawing.Size(100, 96);
             this.roomRelatedDevicesTextBox.TabIndex = 32;
             this.roomRelatedDevicesTextBox.Text = "";
             this.roomRelatedDevicesTextBox.TextChanged += new System.EventHandler(this.roomRelatedDevicesTextBox_TextChanged);
@@ -446,11 +450,51 @@ namespace SensorApp
             this.relationshipPathTextBox.TabIndex = 40;
             this.relationshipPathTextBox.Text = "";
             // 
+            // roomRelatedDevicesButton
+            // 
+            this.roomRelatedDevicesButton.Location = new System.Drawing.Point(399, 384);
+            this.roomRelatedDevicesButton.Name = "roomRelatedDevicesButton";
+            this.roomRelatedDevicesButton.Size = new System.Drawing.Size(65, 79);
+            this.roomRelatedDevicesButton.TabIndex = 41;
+            this.roomRelatedDevicesButton.Text = "Identify Related Devices for a Room";
+            this.roomRelatedDevicesButton.UseVisualStyleBackColor = true;
+            this.roomRelatedDevicesButton.Click += new System.EventHandler(this.roomRelatedDevicesButton_Click);
+            // 
+            // roomRelatedDevTextBox
+            // 
+            this.roomRelatedDevTextBox.Location = new System.Drawing.Point(476, 379);
+            this.roomRelatedDevTextBox.Name = "roomRelatedDevTextBox";
+            this.roomRelatedDevTextBox.Size = new System.Drawing.Size(100, 96);
+            this.roomRelatedDevTextBox.TabIndex = 42;
+            this.roomRelatedDevTextBox.Text = "";
+            // 
+            // getRelPathWithRelButton
+            // 
+            this.getRelPathWithRelButton.Location = new System.Drawing.Point(29, 553);
+            this.getRelPathWithRelButton.Name = "getRelPathWithRelButton";
+            this.getRelPathWithRelButton.Size = new System.Drawing.Size(118, 60);
+            this.getRelPathWithRelButton.TabIndex = 43;
+            this.getRelPathWithRelButton.Text = "Get Relationship Path Button";
+            this.getRelPathWithRelButton.UseVisualStyleBackColor = true;
+            this.getRelPathWithRelButton.Click += new System.EventHandler(this.getRelPathWithRelButton_Click);
+            // 
+            // relPathWithRelTextBox
+            // 
+            this.relPathWithRelTextBox.Location = new System.Drawing.Point(163, 553);
+            this.relPathWithRelTextBox.Name = "relPathWithRelTextBox";
+            this.relPathWithRelTextBox.Size = new System.Drawing.Size(250, 66);
+            this.relPathWithRelTextBox.TabIndex = 44;
+            this.relPathWithRelTextBox.Text = "";
+            // 
             // RDFUpload
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(780, 559);
+            this.ClientSize = new System.Drawing.Size(780, 636);
+            this.Controls.Add(this.relPathWithRelTextBox);
+            this.Controls.Add(this.getRelPathWithRelButton);
+            this.Controls.Add(this.roomRelatedDevTextBox);
+            this.Controls.Add(this.roomRelatedDevicesButton);
             this.Controls.Add(this.relationshipPathTextBox);
             this.Controls.Add(this.getRelationshipPathButton);
             this.Controls.Add(this.directRelationshipWithPredicateTextBox);
@@ -541,6 +585,10 @@ namespace SensorApp
         private System.Windows.Forms.RichTextBox directRelationshipWithPredicateTextBox;
         private System.Windows.Forms.Button getRelationshipPathButton;
         private System.Windows.Forms.RichTextBox relationshipPathTextBox;
+        private System.Windows.Forms.Button roomRelatedDevicesButton;
+        private System.Windows.Forms.RichTextBox roomRelatedDevTextBox;
+        private System.Windows.Forms.Button getRelPathWithRelButton;
+        private System.Windows.Forms.RichTextBox relPathWithRelTextBox;
     }
 }
 

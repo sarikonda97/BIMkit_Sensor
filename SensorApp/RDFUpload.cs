@@ -603,5 +603,52 @@ namespace SensorApp
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private void roomRelatedDevicesButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                List<string> roomRelatedDevices = CoreSensorMethods.getRoomDirectRelatedDevices(firstSelectedRoom, currentModel);
+
+                roomRelatedDevicesTextBox.Text = "";
+                foreach (string dev in roomRelatedDevices)
+                {
+                    roomRelatedDevTextBox.AppendText(dev + Environment.NewLine);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void getRelPathWithRelButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                bigRelatedDevices = new HashSet<String>();
+                CoreSensorMethods.recursiveRelationships(currentModel, bigRelatedDevices, firstDevice);
+
+                relPathWithRelTextBox.Text = "";
+                if (bigRelatedDevices.Contains(secondDevice))
+                {
+                    List<string> relationshipPath = CoreSensorMethods.getRelatedDevicesPathWithRelationship(currentModel, firstDevice, secondDevice);
+
+                    relPathWithRelTextBox.AppendText(firstDevice);
+                    foreach (string rel in relationshipPath)
+                    {
+                        relPathWithRelTextBox.AppendText(" -> " + rel);
+                    }
+                }
+                else
+                {
+                    relPathWithRelTextBox.AppendText("No Relationship exists");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
 }
