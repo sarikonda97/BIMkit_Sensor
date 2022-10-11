@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using SensorAppWeb.Models;
+﻿using SensorAppWeb.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +8,12 @@ using System.Web.Mvc;
 
 namespace SensorAppWeb.Controllers
 {
-    public class ValidRelationshipsController : Controller
+    public class GetRelatedObjectsController : Controller
     {
-        // GET: ValidRelationships
+        // GET: GetRelatedObjects
 
         SensorApiMethods sensorApiMethods;
-        public ValidRelationshipsController()
+        public GetRelatedObjectsController()
         {
             sensorApiMethods = new SensorApiMethods();
         }
@@ -24,10 +23,9 @@ namespace SensorAppWeb.Controllers
             return View();
         }
 
-        public string Get([FromBody] String subjectName, String objectName)
+        public string Get([FromBody] string currentModel, string subjectName)
         {
-            return sensorApiMethods.getValidRelationships(subjectName, objectName);
-
+            return sensorApiMethods.getRelatedObjects(currentModel, subjectName);
         }
     }
 }

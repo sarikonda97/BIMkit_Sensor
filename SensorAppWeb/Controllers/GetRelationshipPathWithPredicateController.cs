@@ -23,9 +23,9 @@ namespace SensorAppWeb.Controllers
             return View();
         }
 
-        public string Get([FromBody] string currentModel, String firstDevice, string secondDevice)
+        public string Get([FromBody] string currentModel, String sourceSubject, string targetObject)
         {
-            return sensorApiMethods.getRelationshipPathWithPredicate(currentModel, firstDevice, secondDevice);
+            return sensorApiMethods.getRelationshipPathWithPredicate(currentModel, sourceSubject, targetObject);
         }
     }
 }

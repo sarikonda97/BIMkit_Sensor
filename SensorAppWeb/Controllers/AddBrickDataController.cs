@@ -9,16 +9,16 @@ using System.Web.Mvc;
 
 namespace SensorAppWeb.Controllers
 {
-    public class SensorController : Controller
+    public class AddBrickDataController : Controller
     {
         SensorApiMethods sensorApiMethods;
 
-        public SensorController()
+        public AddBrickDataController()
         {
             sensorApiMethods = new SensorApiMethods();
         }
 
-        // GET: Sensor
+        // GET: AddBrickData
         public ActionResult Index()
         {
             return View();

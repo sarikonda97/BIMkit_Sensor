@@ -8,23 +8,24 @@ using System.Web.Mvc;
 
 namespace SensorAppWeb.Controllers
 {
-    public class GetRelationshipPathController : Controller
+    public class GetDevicesByTypeController : Controller
     {
-        // GET: GetRelationshipPath
+        // GET: GetDevicesByType
 
         SensorApiMethods sensorApiMethods;
-        public GetRelationshipPathController()
+        public GetDevicesByTypeController()
         {
             sensorApiMethods = new SensorApiMethods();
         }
+
         public ActionResult Index()
         {
             return View();
         }
 
-        public string Get([FromBody] string currentModel, string sourceSubject, string targetObject)
+        public string Get([FromBody] String currentModel, string deviceType)
         {
-            return sensorApiMethods.getRelationshipPath(currentModel, sourceSubject, targetObject);
+            return sensorApiMethods.GetDevicesByType(currentModel, deviceType);
         }
     }
 }

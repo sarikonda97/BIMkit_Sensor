@@ -3,16 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 
 namespace SensorAppWeb.Controllers
 {
-    public class SubjectsAndObjectsController : Controller
+    public class GetRelatedSubjectsController : Controller
     {
-        // GET: SubjectsAndObjects
+        // GET: GetRelatedSubjects
 
         SensorApiMethods sensorApiMethods;
-        public SubjectsAndObjectsController()
+        public GetRelatedSubjectsController()
         {
             sensorApiMethods = new SensorApiMethods();
         }
@@ -21,10 +22,9 @@ namespace SensorAppWeb.Controllers
         {
             return View();
         }
-
-        public string Get()
+        public string Get([FromBody] string currentModel, string objectName)
         {
-            return sensorApiMethods.getSubjectsAndObjects();
+            return sensorApiMethods.getRelatedSubjects(currentModel, objectName);
         }
     }
 }

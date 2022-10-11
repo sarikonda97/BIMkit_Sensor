@@ -12,7 +12,7 @@ using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 
-namespace SensorApp
+namespace SensorAppApi
 {
     public static class CoreSensorMethods
     {
@@ -26,8 +26,6 @@ namespace SensorApp
             prefixMap.Add("https://brickschema.org/schema/Brick", "brick");
             prefixMap.Add("http://www.w3.org/1999/02/22-rdf-syntax-ns", "rdf");
             prefixMap.Add("http://www.w3.org/2000/01/rdf-schema", "rdfs");
-            prefixMap.Add("http://www.w3.org/2002/07/owl", "owl");
-            prefixMap.Add("https://brickschema.org/schema/1.0.2/BrickFrame", "brickframe");
 
             // Query and process possible predicate types
             Object predicateTypes = g.ExecuteQuery("SELECT DISTINCT ?type WHERE { ?s ?type ?a}");
@@ -89,7 +87,7 @@ namespace SensorApp
             }
 
         }
-        
+
         public static void loadRelationships(List<List<String>> predicates, IGraph g, MongoDbController db)
         {
             // Identify the unique parent relationships in the entire RDF graph
@@ -189,63 +187,53 @@ namespace SensorApp
             }
         }
 
-        public static Model loadModel(Model loadedModel, string modelPath)
+        public static void loadModel(Model loadedModel, string modelPath)
         {
             loadedModel = DBMSReadWrite.ReadModel(modelPath);
             string[] pathSplit = modelPath.Split('\\');
             string[] nameSplit = pathSplit[pathSplit.Count() - 1].Split('.');
             loadedModel.Name = nameSplit[0];
-
-            return loadedModel;
         }
 
         public static void mapTtlToBpm(MongoDbController db, List<List<String>> predicates, List<String> roomList, List<String> zoneList, Dictionary<String, String> roomToZoneMap, Dictionary<String, String> zoneToRoomMap, IGraph g)
         {
             List<String> possiblePredicates = db.GetDeviceRelationship("HVAC_Zone", "Room");
-            //testing out isPartOf;
-            possiblePredicates.Add("isPartOf");
-            possiblePredicates = possiblePredicates.Distinct().ToList();
-            
-            
 
-            foreach (string possiblePredicate in possiblePredicates)
+            String predicatePrefix = "brick";
+            String predicateType = possiblePredicates[0];
+
+            foreach (List<String> predicate in predicates)
             {
-                String predicatePrefix = "brick";
-                String predicateType = possiblePredicate;
-
-                foreach (List<String> predicate in predicates)
+                if (predicate[1] == possiblePredicates[0])
                 {
-                    if (predicate[1] == possiblePredicate)
-                    {
-                        predicatePrefix = predicate[0];
-                    }
+                    predicatePrefix = predicate[0];
                 }
+            }
 
-                IUriNode predicateNode = g.CreateUriNode(predicatePrefix + ":" + predicateType);
-                IEnumerable<Triple> predicateResult = g.GetTriplesWithPredicate(predicateNode);
+            IUriNode predicateNode = g.CreateUriNode(predicatePrefix + ":" + predicateType);
+            IEnumerable<Triple> predicateResult = g.GetTriplesWithPredicate(predicateNode);
 
-                foreach (Triple triple in predicateResult)
+            foreach (Triple triple in predicateResult)
+            {
+                String subjectString = triple.Subject.ToString();
+                String objectString = triple.Object.ToString();
+                String subjectName = subjectString.Substring(subjectString.LastIndexOf('#') + 1);
+                String objectName = objectString.Substring(objectString.LastIndexOf('#') + 1);
+
+                /*if (!zoneToRoomMap.ContainsKey(subjectName))
                 {
-                    String subjectString = triple.Subject.ToString();
-                    String objectString = triple.Object.ToString();
-                    String subjectName = subjectString.Substring(subjectString.LastIndexOf('#') + 1);
-                    String objectName = objectString.Substring(objectString.LastIndexOf('#') + 1);
+                    zoneToRoomMap.Add(subjectName, objectName);
+                }*/
+                zoneToRoomMap[subjectName] = objectName;
+                /*
+                if(!roomToZoneMap.ContainsKey(objectName))
+                {
+                    roomToZoneMap.Add(objectName, subjectName);
+                }*/
+                roomToZoneMap[objectName] = subjectName;
 
-                    /*if (!zoneToRoomMap.ContainsKey(subjectName))
-                    {
-                        zoneToRoomMap.Add(subjectName, objectName);
-                    }*/
-                    zoneToRoomMap[subjectName] = objectName;
-                    /*
-                    if(!roomToZoneMap.ContainsKey(objectName))
-                    {
-                        roomToZoneMap.Add(objectName, subjectName);
-                    }*/
-                    roomToZoneMap[objectName] = subjectName;
-
-                    roomList.Add(objectName);
-                    zoneList.Add(subjectName);
-                }
+                roomList.Add(objectName);
+                zoneList.Add(subjectName);
             }
         }
 
@@ -263,20 +251,10 @@ namespace SensorApp
         public static void changeTurtleRooms(string turtlePath, List<String> atbRoomList, List<String> roomList, Dictionary<String, String> roomToZoneMap)
         {
             //    String ttlFile = File.ReadAllText("C:\\Users\\csydora\\Desktop\\soda_hall.ttl");
-            String ttlFile = File.ReadAllText(turtlePath);
+            String ttlFile = turtlePath;
             int ttlRoomCount = 0;
-
-            int maxRooms = Math.Min(atbRoomList.Count, roomList.Count);
-            int counter = 0;
-
             foreach (String atbRoom in atbRoomList)
             {
-                if (counter == maxRooms)
-                {
-                    break;
-                }
-                ++counter;
-
                 String zoneName = "hvac_zone_" + atbRoom;
 
                 ttlFile = ttlFile.Replace(roomList[ttlRoomCount], atbRoom);
@@ -305,7 +283,7 @@ namespace SensorApp
                 {
                     zoneToZoneObjectIdMap.Add(zone, modelObject.Id);
                 }
-                
+
                 loadedModel.ModelObjects.Add(modelObject);
             }
 
@@ -339,7 +317,7 @@ namespace SensorApp
             List<String> invalidDevicePredicates = new List<string>
                 {
                     "isLocation",
-                    /*"isPartOf",*/
+                    "isPartOf",
                     // "hasPart",
                     //"isLocationOf",
                     /*"hasLocation"*/
@@ -385,38 +363,11 @@ namespace SensorApp
 
                         roomRelationshipList.Add(mongoRoomRelationship);
                     }
-                    else if (currentPredicate == "isPartOf")
-                    {
-                        if ((subjectName.ToLower().Contains("room") || subjectName.ToLower().Contains("rm")) && objectName.ToLower().Contains("hvac"))
-                        {
-                            MongoRoomRelationships mongoRoomRelationship = new MongoRoomRelationships();
-                            mongoRoomRelationship.HVAC_Zone = objectName;
-                            mongoRoomRelationship.Room = subjectName;
-
-                            roomRelationshipList.Add(mongoRoomRelationship);
-                        }
-                        else if ((subjectName.ToLower().Contains("room") || subjectName.ToLower().Contains("rm")) && !objectName.ToLower().Contains("hvac"))
-                        {
-                            MongoRoomDeviceRelationships mongoRoomDeviceRelationship = new MongoRoomDeviceRelationships();
-                            mongoRoomDeviceRelationship.Room = objectName;
-                            mongoRoomDeviceRelationship.Device = subjectName;
-
-                            roomDeviceRelationshipList.Add(mongoRoomDeviceRelationship);
-                        }
-                    }
                     else if (currentPredicate == "hasLocation")
                     {
                         MongoRoomDeviceRelationships mongoRoomDeviceRelationship = new MongoRoomDeviceRelationships();
                         mongoRoomDeviceRelationship.Room = objectName;
                         mongoRoomDeviceRelationship.Device = subjectName;
-
-                        roomDeviceRelationshipList.Add(mongoRoomDeviceRelationship);
-                    }
-                    else if (currentPredicate == "hasPoint" && subjectName.ToLower().Contains("room"))
-                    {
-                        MongoRoomDeviceRelationships mongoRoomDeviceRelationship = new MongoRoomDeviceRelationships();
-                        mongoRoomDeviceRelationship.Room = subjectName;
-                        mongoRoomDeviceRelationship.Device = objectName;
 
                         roomDeviceRelationshipList.Add(mongoRoomDeviceRelationship);
                     }
@@ -597,7 +548,7 @@ namespace SensorApp
                 List<string> values = relatedDevicesWithPredicate.Values.ToList();
 
 
-                for (int i=0; i<keys.Count; i++)
+                for (int i = 0; i < keys.Count; i++)
                 {
                     List<string> temp = new List<string>();
                     temp.Add(keys[i]);
@@ -614,7 +565,7 @@ namespace SensorApp
             List<List<string>> deviceRelations = new List<List<string>>();
             deviceRelations.Add(new List<string> { firstDevice });
 
-            while(true)
+            while (true)
             {
                 List<List<string>> temp = new List<List<string>>();
                 foreach (List<string> dev in deviceRelations)
@@ -628,7 +579,7 @@ namespace SensorApp
                         if (relatedDevicesList[i] == secondDevice)
                         {
                             dev.Add(secondDevice);
-                            return dev.GetRange(1, dev.Count-1);
+                            return dev.GetRange(1, dev.Count - 1);
                         }
                         else
                         {
@@ -700,7 +651,7 @@ namespace SensorApp
         {
             List<string> devicesByType = new List<string>();
 
-            foreach(deviceObject dev in currentModel.deviceObjects)
+            foreach (deviceObject dev in currentModel.deviceObjects)
             {
                 if (dev.Type == deviceType)
                 {

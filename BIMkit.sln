@@ -102,6 +102,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensorAppWeb", "SensorAppWe
 		{E89236A7-8AC4-4BBB-AB92-4F5B022A8619} = {E89236A7-8AC4-4BBB-AB92-4F5B022A8619}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensorAppApi", "SensorAppApi\SensorAppApi.csproj", "{838EFFC7-E6FF-4487-B40B-648EB0A3D9DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -192,6 +194,10 @@ Global
 		{CE0E262D-C6AB-44C0-9402-653230D89271}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE0E262D-C6AB-44C0-9402-653230D89271}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE0E262D-C6AB-44C0-9402-653230D89271}.Release|Any CPU.Build.0 = Release|Any CPU
+		{838EFFC7-E6FF-4487-B40B-648EB0A3D9DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{838EFFC7-E6FF-4487-B40B-648EB0A3D9DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{838EFFC7-E6FF-4487-B40B-648EB0A3D9DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{838EFFC7-E6FF-4487-B40B-648EB0A3D9DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

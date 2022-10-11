@@ -8,12 +8,12 @@ using System.Web.Mvc;
 
 namespace SensorAppWeb.Controllers
 {
-    public class GetRelationshipPathController : Controller
+    public class GetAllKnownRelationshipTypesController : Controller
     {
-        // GET: GetRelationshipPath
+        // GET: GetAllKnownRelationshipTypes
 
         SensorApiMethods sensorApiMethods;
-        public GetRelationshipPathController()
+        public GetAllKnownRelationshipTypesController()
         {
             sensorApiMethods = new SensorApiMethods();
         }
@@ -21,10 +21,9 @@ namespace SensorAppWeb.Controllers
         {
             return View();
         }
-
-        public string Get([FromBody] string currentModel, string sourceSubject, string targetObject)
+        public string Get([FromBody] String currentModel)
         {
-            return sensorApiMethods.getRelationshipPath(currentModel, sourceSubject, targetObject);
+            return sensorApiMethods.GetRelationshipTypes(currentModel);
         }
     }
 }

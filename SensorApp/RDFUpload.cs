@@ -1,6 +1,7 @@
 ﻿using DBMS.Controllers.DBControllers;
 using DbmsApi;
 using DbmsApi.API;
+using SensorAppApi;
 using DbmsApi.Mongo;
 using System;
 using System.Collections.Generic;
@@ -89,7 +90,10 @@ namespace SensorApp
         {
             try
             {
+                // This points to the packages core sensor methods
                 CoreSensorMethods.loadNodes(db, g);
+                // This was an attempt to make an API in a thirdparty package
+                /*SensorAPIController.loadNodesApi(db, g);*/
                 MessageBox.Show("Successfully populated Nodes");
             }
             catch (Exception ex)
@@ -102,7 +106,10 @@ namespace SensorApp
         {
             try
             {
+                // This points to the packages core sensor methods
                 CoreSensorMethods.loadRelationships(predicates, g, db);
+                // This was an attempt to make an API in a thirdparty package
+                /*SensorAPIController.loadRelationshipsApi(predicates, g, db);*/
                 MessageBox.Show("Relationships populated successfully!");
             }
             catch (Exception ex)
@@ -116,7 +123,10 @@ namespace SensorApp
             List<String> subjects = new List<string>();
             List<String> objects = new List<string>();
 
+            // This points to the packages core sensor methods
             CoreSensorMethods.getSubjectsAndObjects(db, subjects, objects);
+            // This was an attempt to make an API in a thirdparty package
+            /*SensorAPIController.getSubjectsAndObjectsApi(db, subjects, objects);*/
 
             if (subjectDropDown.Items.Count == 0 && objectDropDown.Items.Count == 0)
             {
@@ -188,7 +198,12 @@ namespace SensorApp
                 {
                     g = new Graph();
                     predicates = new List<List<String>>();
+                    // This points to the packages core sensor methods
                     CoreSensorMethods.uploadTtl(g, path, predicates);
+
+                    // This was an attempt to make an API in a thirdparty package
+                    /*SensorAPIController.uploadTtlApi(g, path, predicates);*/
+
                     MessageBox.Show("Upload successful!");
                 }
             }
@@ -244,7 +259,10 @@ namespace SensorApp
                 roomToZoneMap = new Dictionary<String, String>();
                 roomList = new List<String>();
                 zoneList = new List<String>();
+                // This points to the packages core sensor methods
                 CoreSensorMethods.mapTtlToBpm(db, predicates, roomList, zoneList, roomToZoneMap, zoneToRoomMap, g);
+                // This was an attempt to make an API in a thirdparty package
+                /*SensorAPIController.mapTtlToBpmApi(db, predicates, roomList, zoneList, roomToZoneMap, zoneToRoomMap, g);*/
                 MessageBox.Show("Turtle File rooms mapped to the BIM model successfully!");
             }
             catch (Exception ex)
@@ -258,7 +276,11 @@ namespace SensorApp
             try
             {
                 atbRoomList = new List<string>();
+
+                // This points to the packages core sensor methods
                 CoreSensorMethods.mapBpmToTtl(atbRoomList, loadedModel);
+                // This was an attempt to make an API in a thirdparty package
+                /*SensorAPIController.mapBpmToTtlApi(atbRoomList, loadedModel);*/
                 MessageBox.Show("BPM Rooms mapped to the TTL File successfully!");
             }
             catch (Exception ex)
@@ -271,7 +293,10 @@ namespace SensorApp
         {
             try
             {
+                // This points to the packages core sensor methods
                 CoreSensorMethods.changeTurtleRooms(path, atbRoomList, roomList, roomToZoneMap);
+                // This was an attempt to make an API in a thirdparty package
+                /*SensorAPIController.changeTurtleRoomsApi(path, atbRoomList, roomList, roomToZoneMap);*/
                 MessageBox.Show("TTL Rooms have been changed to BPM Room convention and new TTL file has been generated!");
             }
             catch (Exception ex)
@@ -284,8 +309,11 @@ namespace SensorApp
         {
             try
             {
-                loadedModel = new Model();
-                CoreSensorMethods.loadModel(loadedModel, modelPath);
+                /*loadedModel = new Model();*/
+                // This points to the packages core sensor methods
+                loadedModel = CoreSensorMethods.loadModel(loadedModel, modelPath);
+                // This was an attempt to make an API in a thirdparty package
+                /*SensorAPIController.loadModelApi(loadedModel, modelPath);*/
                 MessageBox.Show("Model loaded successfully!");
             }
             catch (Exception ex)
@@ -298,7 +326,10 @@ namespace SensorApp
         {
             try
             {
+                // This points to the packages core sensor methods
                 CoreSensorMethods.loadInstances(loadedModel, validRoomList, zoneList, roomList, roomToZoneMap, deviceObjectList, predicates, g, db);
+                // This was an attempt to make an API in a thirdparty package
+                /*SensorAPIController.loadInstancesApi(loadedModel, validRoomList, zoneList, roomList, roomToZoneMap, deviceObjectList, predicates, g, db);*/
                 MessageBox.Show("Instances loaded successfully!");
             }
             catch (Exception ex)

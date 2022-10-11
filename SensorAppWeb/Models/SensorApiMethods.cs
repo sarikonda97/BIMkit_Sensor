@@ -46,7 +46,7 @@ namespace SensorAppWeb.Models
             {
                 g = new Graph();
                 predicates = new List<List<String>>();
-                loadedModel = new Model();
+                /*loadedModel = new Model();*/
                 atbRoomList = new List<string>();
                 zoneToRoomMap = new Dictionary<String, String>();
                 roomToZoneMap = new Dictionary<String, String>();
@@ -55,7 +55,7 @@ namespace SensorAppWeb.Models
                 CoreSensorMethods.uploadTtl(g, ttlPath, predicates);
                 CoreSensorMethods.loadNodes(db, g);
                 CoreSensorMethods.loadRelationships(predicates, g, db);
-                CoreSensorMethods.loadModel(loadedModel, modelPath);
+                loadedModel = CoreSensorMethods.loadModel(loadedModel, modelPath);
                 CoreSensorMethods.mapTtlToBpm(db, predicates, roomList, zoneList, roomToZoneMap, zoneToRoomMap, g);
                 CoreSensorMethods.mapBpmToTtl(atbRoomList, loadedModel);
                 //    CoreSensorMethods.changeTurtleRooms(ttlPath, atbRoomList, roomList, roomToZoneMap); // not including change turtle rooms as it is a one time operation 
@@ -210,6 +210,146 @@ namespace SensorAppWeb.Models
             return JsonConvert.SerializeObject(returnObject);
         }
 
+        public string getRelatedObjects(string currentModelName, string deviceName)
+        {
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+
+            HashSet<String> relatedDevices = new HashSet<String>();
+            List<string> output = new List<string>();
+
+            foreach (MongoDeviceRelationships rel in currentModel.instanceRelationships)
+            {
+                if (rel.Subject == deviceName)
+                {
+                    relatedDevices.Add(rel.Object);
+                }
+            }
+
+            if (relatedDevices.Count == 0)
+            {
+                output.Add("No Related Devices");
+            }
+            else
+            {
+                foreach (String dev in relatedDevices)
+                {
+                    output.Add(dev);
+                }
+            }
+
+            var returnObject = new
+            {
+                relatedObjects = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
+        public string getRelatedObjectsWithPredicate(string currentModelName, string deviceName)
+        {
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+
+            HashSet<String> relatedDevices = new HashSet<String>();
+            List<string> output = new List<string>();
+
+            foreach (MongoDeviceRelationships rel in currentModel.instanceRelationships)
+            {
+                if (rel.Subject == deviceName)
+                {
+                    relatedDevices.Add(rel.Object + "-" + rel.Predicate);
+                }
+            }
+
+            if (relatedDevices.Count == 0)
+            {
+                output.Add("No Related Devices");
+            }
+            else
+            {
+                foreach (String dev in relatedDevices)
+                {
+                    output.Add(dev);
+                }
+            }
+
+            var returnObject = new
+            {
+                relatedObjects = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
+        public string getRelatedSubjects(string currentModelName, string deviceName)
+        {
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+
+            HashSet<String> relatedDevices = new HashSet<String>();
+            List<string> output = new List<string>();
+
+            foreach (MongoDeviceRelationships rel in currentModel.instanceRelationships)
+            {
+                if (rel.Object == deviceName)
+                {
+                    relatedDevices.Add(rel.Subject);
+                }
+            }
+
+            if (relatedDevices.Count == 0)
+            {
+                output.Add("No Related Devices");
+            }
+            else
+            {
+                foreach (String dev in relatedDevices)
+                {
+                    output.Add(dev);
+                }
+            }
+
+            var returnObject = new
+            {
+                relatedSubjects = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
+        public string getRelatedSubjectsWithPredicate(string currentModelName, string deviceName)
+        {
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+
+            HashSet<String> relatedDevices = new HashSet<String>();
+            List<string> output = new List<string>();
+
+            foreach (MongoDeviceRelationships rel in currentModel.instanceRelationships)
+            {
+                if (rel.Object == deviceName)
+                {
+                    relatedDevices.Add(rel.Subject + "-" + rel.Predicate);
+                }
+            }
+
+            if (relatedDevices.Count == 0)
+            {
+                output.Add("No Related Devices");
+            }
+            else
+            {
+                foreach (String dev in relatedDevices)
+                {
+                    output.Add(dev);
+                }
+            }
+
+            var returnObject = new
+            {
+                relatedSubjects = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
         public string getRooms(string currentModelName)
         {
             MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
@@ -256,7 +396,7 @@ namespace SensorAppWeb.Models
 
             var returnObject = new
             {
-                rooms = output
+                roomCommonDevices = output
             };
 
             return JsonConvert.SerializeObject(returnObject);
@@ -315,7 +455,7 @@ namespace SensorAppWeb.Models
                 outputString = outputString + firstDevice;
                 foreach (string rel in relationshipPath)
                 {
-                    outputString = outputString + " -> " + rel;
+                    outputString = outputString + "->" + rel;
                 }
             }
             else
@@ -376,6 +516,47 @@ namespace SensorAppWeb.Models
             var returnObject = new
             {
                 relatedDevices = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
+        public string GetDevicesByType(string currentModelName, string deviceType)
+        {
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+            List<string> output = CoreSensorMethods.getDevicesByType(deviceType, currentModel);
+
+            var returnObject = new
+            {
+                devicesByType = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
+        public string GetDeviceTypes(string currentModelName)
+        {
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+            HashSet<string> deviceTypes = CoreSensorMethods.getDeviceTypes(currentModel);
+            List<string> output = deviceTypes.ToList();
+
+            var returnObject = new
+            {
+                deviceTypes = output
+            };
+
+            return JsonConvert.SerializeObject(returnObject);
+        }
+
+        public string GetRelationshipTypes(string currentModelName)
+        {
+            MongoModel currentModel = CoreSensorMethods.getCurrentModel(db, currentModelName);
+            HashSet<string> relationshipTypes = CoreSensorMethods.getRelationshipTypes(currentModel);
+            List<string> output = relationshipTypes.ToList();
+
+            var returnObject = new
+            {
+                relationshipTypes = output
             };
 
             return JsonConvert.SerializeObject(returnObject);

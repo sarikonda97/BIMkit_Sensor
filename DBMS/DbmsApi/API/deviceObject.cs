@@ -10,6 +10,7 @@ namespace DbmsApi.API
     {
         public string id;
         public string Name;
+        public string Type;
         public string TypeId;
         public string generalLocation;
         public string deviceId;
