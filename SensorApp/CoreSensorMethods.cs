@@ -284,7 +284,8 @@ namespace SensorApp
                 ++ttlRoomCount;
             }
 
-            File.WriteAllText("C:\\Users\\csydora\\Desktop\\BIMkit\\SensorApp\\test.ttl", ttlFile);
+            string outputPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            File.WriteAllText(outputPath + "\\modelRelatedBrick.ttl", ttlFile);
         }
 
         public static void loadInstances(Model loadedModel, List<String> validRoomList, List<String> zoneList, List<String> roomList, Dictionary<String, String> roomToZoneMap, List<deviceObject> deviceObjectList, List<List<String>> predicates, IGraph g, MongoDbController db)
