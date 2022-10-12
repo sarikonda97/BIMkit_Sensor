@@ -77,11 +77,11 @@ namespace SensorApp
             // 
             // browseButton
             // 
-            this.browseButton.Location = new System.Drawing.Point(695, 24);
+            this.browseButton.Location = new System.Drawing.Point(695, 12);
             this.browseButton.Name = "browseButton";
-            this.browseButton.Size = new System.Drawing.Size(75, 23);
+            this.browseButton.Size = new System.Drawing.Size(75, 41);
             this.browseButton.TabIndex = 0;
-            this.browseButton.Text = "Browse";
+            this.browseButton.Text = "Browse Turtle File";
             this.browseButton.UseVisualStyleBackColor = true;
             this.browseButton.Click += new System.EventHandler(this.browseButton_Click);
             // 
@@ -97,9 +97,9 @@ namespace SensorApp
             this.uploadButton.Location = new System.Drawing.Point(349, 53);
             this.uploadButton.Name = "uploadButton";
             this.uploadButton.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.uploadButton.Size = new System.Drawing.Size(75, 23);
+            this.uploadButton.Size = new System.Drawing.Size(87, 23);
             this.uploadButton.TabIndex = 3;
-            this.uploadButton.Text = "Upload";
+            this.uploadButton.Text = "Load Brick File";
             this.uploadButton.UseVisualStyleBackColor = true;
             this.uploadButton.Click += new System.EventHandler(this.uploadButton_Click);
             // 
@@ -174,7 +174,7 @@ namespace SensorApp
             // 
             this.loadInstancesButton.Location = new System.Drawing.Point(119, 305);
             this.loadInstancesButton.Name = "loadInstancesButton";
-            this.loadInstancesButton.Size = new System.Drawing.Size(75, 43);
+            this.loadInstancesButton.Size = new System.Drawing.Size(86, 43);
             this.loadInstancesButton.TabIndex = 11;
             this.loadInstancesButton.Text = "Load Instances";
             this.loadInstancesButton.UseVisualStyleBackColor = true;
@@ -211,9 +211,9 @@ namespace SensorApp
             // 
             this.mapTurtleToModelButton.Location = new System.Drawing.Point(29, 250);
             this.mapTurtleToModelButton.Name = "mapTurtleToModelButton";
-            this.mapTurtleToModelButton.Size = new System.Drawing.Size(75, 43);
+            this.mapTurtleToModelButton.Size = new System.Drawing.Size(84, 47);
             this.mapTurtleToModelButton.TabIndex = 15;
-            this.mapTurtleToModelButton.Text = "Map .ttl to .bpm rooms";
+            this.mapTurtleToModelButton.Text = "Populate Room Relationships";
             this.mapTurtleToModelButton.UseVisualStyleBackColor = true;
             this.mapTurtleToModelButton.Click += new System.EventHandler(this.mapTurtleToModelButton_Click);
             // 
@@ -379,9 +379,9 @@ namespace SensorApp
             // 
             this.mapBpmToTtl.Location = new System.Drawing.Point(29, 303);
             this.mapBpmToTtl.Name = "mapBpmToTtl";
-            this.mapBpmToTtl.Size = new System.Drawing.Size(75, 47);
+            this.mapBpmToTtl.Size = new System.Drawing.Size(84, 47);
             this.mapBpmToTtl.TabIndex = 33;
-            this.mapBpmToTtl.Text = "Map .bpm to .ttl";
+            this.mapBpmToTtl.Text = "Populate Room Device Relations";
             this.mapBpmToTtl.UseVisualStyleBackColor = true;
             this.mapBpmToTtl.Click += new System.EventHandler(this.mapBpmToTtl_Click);
             // 
@@ -389,9 +389,9 @@ namespace SensorApp
             // 
             this.changeTurtleRoomsButton.Location = new System.Drawing.Point(119, 250);
             this.changeTurtleRoomsButton.Name = "changeTurtleRoomsButton";
-            this.changeTurtleRoomsButton.Size = new System.Drawing.Size(75, 43);
+            this.changeTurtleRoomsButton.Size = new System.Drawing.Size(86, 43);
             this.changeTurtleRoomsButton.TabIndex = 34;
-            this.changeTurtleRoomsButton.Text = "change turtle rooms";
+            this.changeTurtleRoomsButton.Text = "Generate New Turtle File";
             this.changeTurtleRoomsButton.UseVisualStyleBackColor = true;
             this.changeTurtleRoomsButton.Click += new System.EventHandler(this.changeTurtleRoomsButton_Click);
             // 
@@ -474,7 +474,7 @@ namespace SensorApp
             this.getRelPathWithRelButton.Name = "getRelPathWithRelButton";
             this.getRelPathWithRelButton.Size = new System.Drawing.Size(118, 60);
             this.getRelPathWithRelButton.TabIndex = 43;
-            this.getRelPathWithRelButton.Text = "Get Relationship Path Button";
+            this.getRelPathWithRelButton.Text = "Get Relationship Path with Predicate";
             this.getRelPathWithRelButton.UseVisualStyleBackColor = true;
             this.getRelPathWithRelButton.Click += new System.EventHandler(this.getRelPathWithRelButton_Click);
             // 
