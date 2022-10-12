@@ -139,6 +139,8 @@ namespace SensorApp
                     objectDropDown.Items.Add(obj);
                 }
             }
+
+            MessageBox.Show("Subjects and Objects have been populated.");
         }
 
         private void subjectDropDown_SelectedIndexChanged(object sender, EventArgs e)
@@ -167,6 +169,7 @@ namespace SensorApp
         {
             if (selectedSubject != null && selectedObject != null) {
                 List<String> possiblePredicates = CoreSensorMethods.getDeviceRelationship(db, selectedSubject, selectedObject);
+                possiblePredicates = possiblePredicates.Distinct().ToList();
 
                 predicateOutput.Text = "";
                 if (possiblePredicates.Count == 0)
@@ -590,7 +593,8 @@ namespace SensorApp
             {
                 List<List<string>> directRelationshipWithPredicate = CoreSensorMethods.getDirectRelationshipsWithPredicate(currentModel, firstDevice);
 
-                foreach(List<string> rel in directRelationshipWithPredicate)
+                directRelationshipWithPredicateTextBox.Text = "";
+                foreach (List<string> rel in directRelationshipWithPredicate)
                 {
                     directRelationshipWithPredicateTextBox.AppendText(rel[0] + " - " + rel[1] + Environment.NewLine);
                 }
@@ -641,7 +645,7 @@ namespace SensorApp
             {
                 List<string> roomRelatedDevices = CoreSensorMethods.getRoomDirectRelatedDevices(firstSelectedRoom, currentModel);
 
-                roomRelatedDevicesTextBox.Text = "";
+                roomRelatedDevTextBox.Text = "";
                 foreach (string dev in roomRelatedDevices)
                 {
                     roomRelatedDevTextBox.AppendText(dev + Environment.NewLine);
